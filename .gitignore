@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+
+# Android/IDE
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild
+.cxx/
+
+# Kotlin
+.kotlin/
+
+# Secrets / keystores（V1 发版前如引入签名密钥，禁止入库）
+*.jks
+*.keystore
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
