@@ -19,6 +19,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.shinefs.app.ui.theme.ShineColors
 
@@ -43,6 +45,7 @@ fun HomeScreen(
             color = ShineColors.GoldPrimary,
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
+            fontFamily = FontFamily.Serif,
             modifier = Modifier.semantics { contentDescription = "shinefs_home_tagline" },
         )
         Text(

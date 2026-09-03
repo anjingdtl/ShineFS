@@ -272,7 +272,7 @@ private fun DrawScope.drawElementRing(c: Offset, r: Float) {
 /** 天池：玄黑水色圆 + 太极 + 磁针（印于盘面，针尖指盘面北）。swayDeg 为微摆角。 */
 private fun DrawScope.drawTianchi(c: Offset, r: Float, swayDeg: Float) {
     val poolR = r * 0.40f
-    drawCircle(Color(0xFF11151C), radius = poolR, center = c)
+    drawCircle(ShineColors.TianchiWater, radius = poolR, center = c)
     drawCircle(ShineColors.GoldMuted, radius = poolR, center = c, style = Stroke(1.2f))
 
     // 太极（小幅居上，磁针叠于其上）
@@ -304,8 +304,8 @@ private fun DrawScope.drawTianchi(c: Offset, r: Float, swayDeg: Float) {
 }
 
 private fun DrawScope.drawTaiji(center: Offset, radius: Float) {
-    val ivory = Color(0xFFE8E2D4)
-    val black = Color(0xFF15161A)
+    val ivory = ShineColors.Ivory
+    val black = ShineColors.InkBlack
     drawCircle(ivory, radius = radius, center = center)
     // 右半黑
     drawArc(

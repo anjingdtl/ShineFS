@@ -26,4 +26,9 @@ object ShineColors {
     val ElementFire = Color(0xFFB03A2E)      // 火·朱砂
     val ElementEarth = Color(0xFFA8823C)     // 土·黄土
     val ElementMetal = Color(0xFFC9B98A)     // 金·素金
+
+    // 罗盘专属色（天池水色/太极象牙/太极玄墨）
+    val TianchiWater = Color(0xFF11151C)
+    val Ivory = Color(0xFFE8E2D4)
+    val InkBlack = Color(0xFF15161A)
 }

@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 外环：古铜金 -->
+    <path
+        android:pathData="M54,26 a28,28 0 1,0 0.001,0 z M54,30 a24,24 0 1,1 -0.001,0 z"
+        android:strokeColor="#B8955A"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000" />
+    <!-- 四正向刻度 -->
+    <path android:pathData="M54,26 L54,33 M54,75 L54,82 M26,54 L33,54 M75,54 L82,54"
+        android:strokeColor="#B8955A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+    <!-- 四隅刻度（短） -->
+    <path android:pathData="M34.2,34.2 L39.1,39.1 M73.8,34.2 L68.9,39.1 M34.2,73.8 L39.1,68.9 M73.8,73.8 L68.9,68.9"
+        android:strokeColor="#7E6A44"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round" />
+    <!-- 天池磁针：北朱砂 / 南素金 -->
+    <path android:pathData="M54,36 L58.5,54 L49.5,54 z" android:fillColor="#D24A3A" />
+    <path android:pathData="M54,72 L58.5,54 L49.5,54 z" android:fillColor="#D9BC7A" />
+    <path android:pathData="M54,50 a4,4 0 1,0 0.001,0 z" android:fillColor="#0C0C0F"
+        android:strokeColor="#B8955A" android:strokeWidth="1" />
+</vector>

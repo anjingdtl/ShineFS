@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -258,6 +259,7 @@ private fun SealOverlay(reducedMotion: Boolean) {
             Text(
                 "定",
                 color = ShineColors.CinnabarBright,
+                fontFamily = FontFamily.Serif,
                 fontSize = 56.sp,
                 fontWeight = FontWeight.Bold,
             )

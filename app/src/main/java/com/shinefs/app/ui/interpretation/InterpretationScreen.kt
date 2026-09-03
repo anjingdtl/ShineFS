@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -258,6 +259,7 @@ private fun SectionTitle(title: String) {
         color = ShineColors.GoldPrimary,
         fontSize = 15.sp,
         fontWeight = FontWeight.Medium,
+        fontFamily = FontFamily.Serif,
         modifier = Modifier.padding(top = 18.dp, bottom = 6.dp),
     )
 }

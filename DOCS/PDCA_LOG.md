@@ -372,3 +372,33 @@
 - **Next cycle**: Cycle 08 — 视觉统一与动效打磨（应用图标/字体层级/间距/对比度/大字体/减少动画复核）。
 
 **验收判定：Cycle 07 达标（持久化 ✓ 收藏/备注/删除 ✓ 筛选 ✓ 版本追踪展示 ✓ 无主线程 DB ✓），Cycle 07 关闭。**
+
+---
+
+## Cycle 08 — 视觉统一与动效打磨（2026-09-03）
+
+### Plan
+
+- **Goal**: 方案 §Cycle 08 检查单：色彩/字体/图标/间距/卡片/弹窗/动效节奏/朱砂克制/深色对比/大字体兼容。
+- **Scope**: 应用图标（adaptive 前景 vector + monochrome 层 + 传统圆形 PNG×5 密度）；标题/卦名/定印衬线（FontFamily.Serif 碑刻感，正文保持无衬线）；罗盘硬编码色收口为 Token（TianchiWater/Ivory/InkBlack）；大字体（1.3×）与系统"减少动画"实测；Lint 余量压降。
+- **Out of scope**: 自定义字体文件（无授权字库资产，列为 TD）；横屏（D-08 锁竖屏）。
+
+### Do
+
+- **Added**: `drawable/ic_launcher_foreground.xml`（金环+四隅刻度+朱砂/素金磁针）、`ic_launcher_monochrome.xml`、adaptive xml×2、圆形 PNG×10；ShineColors 三罗盘 Token。
+- **Changed**: Manifest 接入 icon/roundIcon；首页标语/卦名/段落标题/定印衬线化。
+
+### Check
+
+- **Build/Tests/Lint**: 全绿；**Lint 警告 27→16**（IconLauncherShape×10、MonochromeLauncherIcon×2 清零；MissingApplicationIcon 于接入图标时清零；余 16 条为依赖更新提示×6、IconDuplicates×5[圆/方同图，设计如此]、LockedOrientationActivity×1[D-08 有意]、OldTargetApi/Autoboxing/DefaultLocale/DiscouragedApi×4[非阻断]）。
+- **大字体 1.3×**: 罗盘页读数/按钮/状态全部渲染无截断（`cycle08_fontscale.png`）。
+- **减少动画**: animator_duration_scale=0 下罗盘读数与导航正常（装饰动画按设计关闭，`cycle08_compass.png`）。
+- **朱砂使用审查**: 朱砂仅用于向首指针/磁针北/警告/定印/动爻/未核定徽标——克制符合方案。
+- **Regression**: 全量 76 测试 + 全流程 E2E 无异常。
+
+### Act
+
+- **Remaining known issues**: IconDuplicates（圆/方一致，接受）；自定义碑刻字体缺资产（TD-09 记录）；LockedOrientationActivity 为 D-08 决策产物（接受）。
+- **Next cycle**: Cycle 09 — 质量门禁与 V1.0 总验收。
+
+**验收判定：Cycle 08 达标（图标 ✓ Token 收口 ✓ 衬线层级 ✓ 大字体 ✓ 减少动画 ✓ Lint 压降 ✓），Cycle 08 关闭。**
