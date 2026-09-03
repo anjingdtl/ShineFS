@@ -4,6 +4,25 @@
 
 ## [Unreleased]
 
+### Cycle 01 — 术数数据与演算核心（2026-09-03）
+
+#### 新增
+- `:core:yijing` 纯 Kotlin JVM 模块（无 Android/UI/AI 依赖，可独立 JVM 测试）：
+  - 八卦模型（先天卦数、爻列、后天方位/角度、五行、象义、亲属）
+  - 二十四山（方案 §3.2 原序 + 索引/边界公式）、后天八卦 45° 扇区映射、坐向换算
+  - 六十四卦结构表（King Wen 序，8×8 上下卦编码；卦名/卦序待人工复核）
+  - 动爻翻转与变卦推导（384 组合测试全覆盖 + 往返一致）
+  - 起卦模式 A/B/C 接口（公式待决策 D-01～D-05，未实现）
+- 33 个 JVM 单元测试（7 套），全绿
+- `DOCS/YIJING_RULES.md`（规则 rules-v0.1：唯一事实源 + 数据核定状态）
+
+#### 修复
+- 六十四卦数据：45 萃误录为下兑上坤 → 更正为下坤上兑（被 8×8 覆盖测试逮出）
+- Lint 基线建立：lintDebug 0 error（PropertyEscape 对 local.properties 的 Windows 误报已按文件级理由禁用；余 6 条非阻断警告记录为技术债）
+
+#### 验证
+- assembleDebug + :app 单测 + :core:yijing 33 测试 + lintDebug 全绿；emulator-5554 重装重启回归通过
+
 ### Cycle 00 — 项目基线审计（2026-09-03）
 
 #### 新增

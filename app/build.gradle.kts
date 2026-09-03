@@ -20,6 +20,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    lint {
+        // PropertyEscape 对已按规范转义的 local.properties 在 Windows 上仍误报；
+        // 该文件不入库（.gitignore）、不随 APK 发布，故仅对此检查关闭。
+        disable += "PropertyEscape"
+    }
 }
 
 kotlin {

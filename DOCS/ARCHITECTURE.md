@@ -1,7 +1,7 @@
 # ShineFS 架构说明（ARCHITECTURE）
 
 > 维护规则：每个 PDCA Cycle 结束时同步更新本文件。
-> 当前状态：**Cycle 00 基线**（2026-09-03）
+> 当前状态：**Cycle 01 完成**（2026-09-03，:core:yijing 术数核心已建）
 
 ## 1. 项目定位
 
@@ -28,16 +28,27 @@
 
 ## 3. 模块结构
 
+> 状态：Cycle 01 起引入 `:core:yijing` 纯 Kotlin 模块。
+
 ```text
 ShineFS/
-├─ app/                    # Android Application（Compose 壳，包名 com.shinefs.app）
+├─ app/                              # Android Application（Compose 壳，包名 com.shinefs.app）
 │  └─ src/
 │     ├─ main/java/com/shinefs/app/
 │     │  ├─ MainActivity.kt          # 基线首页（占位，无业务交互）
 │     │  └─ ui/theme/ShineColors.kt  # 设计 Token 初稿（方案 §7.2，HEX 为占位值）
 │     └─ test/.../BaselineSmokeTest.kt
+├─ core/yijing/                      # ★ Cycle 01：术数核心（纯 Kotlin JVM，无 Android/UI/AI 依赖）
+│  └─ src/
+│     ├─ main/kotlin/com/shinefs/core/yijing/
+│     │  ├─ model/    Trigram(八卦) / Hexagram(六十四卦)
+│     │  ├─ rules/    Azimuths / Mountains24(二十四山) / LaterHeavenBagua(后天八卦)
+│     │  │            / Orientation(坐向) / HexagramOps(动爻变卦)
+│     │  ├─ data/     Hexagrams(六十四卦结构表，待人工复核)
+│     │  └─ divination/ 起卦结果模型 + 模式A/B/C接口（公式待决策 D-01~D-05，无实现）
+│     └─ test/        33 用例（含 384 变卦全覆盖）
 ├─ gradle/libs.versions.toml
-├─ DOCS/                   # 方案与过程文档（本仓库文档根，对应方案中的 docs/）
+├─ DOCS/                             # 方案与过程文档
 └─ CHANGELOG.md
 ```
 
@@ -45,10 +56,16 @@ ShineFS/
 
 ```text
 ├─ app/                    # Compose 壳 + 导航
-├─ core/yijing/            # 纯 Kotlin 术数核心（Cycle 01）——无 Android/UI/AI 依赖
+├─ core/yijing/            # ✅ 纯 Kotlin 术数核心（Cycle 01 已建）
 ├─ core/compass/           # 传感器罗盘引擎（Cycle 02）
 └─ feature/*               # 页面模块（Cycle 03+）
 ```
+
+### 关键解耦约束（Cycle 01 起生效）
+
+- `:core:yijing` 仅依赖 kotlin-stdlib（编译期结构性保证无 Android/UI/AI 依赖），可独立 JVM 测试。
+- `:app` 暂不依赖 `:core:yijing`；接线发生在出现真实消费方的 Cycle（03/04）。
+- 术数规则唯一事实源：`DOCS/YIJING_RULES.md`（rules-v0.1）。
 
 ## 4. 架构原则（摘自方案，具有约束力）
 
@@ -88,6 +105,8 @@ ShineFS/
 | TD-01 | Gradle 提示存在 deprecated 用法（与 Gradle 10 不兼容） | 非阻断，来源待查（AGP/插件） |
 | TD-02 | 设计 Token HEX 为占位值 | Cycle 08 前核定 |
 | TD-03 | jvmTarget 17 + minSdk 24：app 内使用 java.time 等 API 需 desugaring | 暂避开；core 模块为纯 JVM 不受影响 |
-| TD-04 | Lint 未运行（无 lint 基线） | Cycle 01 Check 补齐 |
-| TD-05 | 无 Git 仓库 | Cycle 00 Act 中 init |
+| TD-04 | ~~无 Lint 基线~~ | ✅ Cycle 01 关闭：lintDebug 0 error 入 Check 流程 |
+| TD-05 | ~~无 Git 仓库~~ | ✅ Cycle 00 Act 关闭 |
 | TD-06 | 仪器化测试/UI 测试能力未建立 | Cycle 03+ 按需引入 |
+| TD-07 | Lint 6 条非阻断警告（无应用图标 ×1、依赖可更新 ×4、OldTargetApi ×1）；应用图标随视觉周期补 | Cycle 03/08 |
+| TD-08 | 六十四卦卦名/卦序为 Agent 录入（结构测试全绿，含既济→屯方案示例验算），仍需人工复核一遍 | Cycle 05 前完成 |

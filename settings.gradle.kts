@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ShineFS"
 include(":app")
+include(":core:yijing")

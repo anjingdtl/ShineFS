@@ -89,7 +89,7 @@
 
 ## Cycle 01 — 术数数据与演算核心（YijingCore）
 
-> 状态：**Plan 已立，Do 进行中**（本轮接续执行）
+> 状态：**已完成并关闭**（2026-09-03）
 
 ### Plan
 
@@ -116,4 +116,51 @@
   4. 二十四山边界（0/7.49/7.5/352.5/359.99 等）有测试且通过；
   5. 未定义的术数公式只留接口与待决策记录，无猜测实现。
 
-（Do / Check / Act 于本轮实施后回填）
+### Do
+
+- **Changed**:
+  - `settings.gradle.kts`：include `:core:yijing`；`build.gradle.kts`（root）：注册 kotlin-jvm 插件；`gradle/libs.versions.toml`：新增 kotlin-jvm 插件项；
+  - `app/build.gradle.kts`：新增 `lint { disable += "PropertyEscape" }`（见 Check/Act）；
+  - `local.properties`：SDK 路径改为属性文件规范转义写法（本地文件，不入库）。
+- **Added**:
+  - `:core:yijing` 纯 Kotlin JVM 模块（仅依赖 kotlin-stdlib + junit，**无 Android/UI/AI 依赖**，结构性保证）：
+    - `model/Trigram.kt`：八卦枚举（先天卦数=声明序，爻列自下而上，后天方位/角度/五行/象义/亲属/关键词）；
+    - `model/Hexagram.kt`：六十四卦模型（King Wen 序 + 卦名 + 上下经卦；六爻与 Unicode 卦符派生；**原典文本字段有意缺席**，待 D-09/Cycle 05）；
+    - `rules/Azimuths.kt`：方位角合法域校验（[0,360)、拒 NaN，fail-fast）；
+    - `rules/Mountains24.kt`：二十四山（方案 §3.2 原序 + 索引公式 + 边界派生）；
+    - `rules/LaterHeavenBagua.kt`：后天八卦 45° 扇区映射（与二十四山双实现交叉验证）；
+    - `rules/Orientation.kt`：坐向换算（向/坐/向卦/坐卦/五行）；
+    - `rules/HexagramOps.kt`：本卦查询、动爻翻转、变卦推导；
+    - `divination/DivinationRules.kt`：起卦结果模型 + 模式 A/B/C 接口（**公式未拍板，无实现**）；
+    - `data/Hexagrams.kt`：六十四卦结构表（Agent 录入 + 自动化结构测试，待人工复核）。
+  - 测试 7 套 33 用例：八卦属性/互逆、二十四山（24 中心 + 上下边界 + 跨 0° + 方案临界角 + 非法输入）、后天八卦（方案 §12.1 边界 + 山卦领属交叉）、坐向（方案用例 + §10.1 示例 182.4°→向午坐子离火 + 对向互验）、六十四卦（64 序唯一/卦名唯一/8×8 全覆盖/六爻拆分/卦符码位/15 个锚点卦）、**变卦 384 组合全覆盖 + 往返一致 + 既济三爻动变屯（方案 §10.1 示例）**、起卦结果确定性。
+  - `DOCS/YIJING_RULES.md`：规则 rules-v0.1 固化（含数据核定状态与待决策清单）。
+- **Removed**: 无。
+- **Migration**: 无（新增模块，无既有数据）。
+
+### Check
+
+- **Build**: `./gradlew assembleDebug`（:app + :core:yijing）→ **BUILD SUCCESSFUL**。
+- **Unit tests**: `:core:yijing:test` 33/33 **PASS**（含 384 变卦）；`:app:testDebugUnitTest` 1/1 PASS。
+- **Lint**: `:app:lintDebug` 首跑报 1 error（`local.properties` PropertyEscape）——按建议转义后**仍报**，判定为 AGP Lint 在 Windows 上对已正确转义文件的已知误报（cat -A 核实内容与建议完全一致）；因该文件不入库、不随 APK 发布，仅对该单条检查 disable（注释注明理由）。复跑 → **0 error**，余 6 条非阻断警告（MissingApplicationIcon×1、NewerVersionAvailable×3、GradleDependency×1、OldTargetApi×1）记录为 TD-07。
+- **关键算法测试**: 384 变卦 + 边界临界角 + 8×8 全覆盖全部通过；方案 §10.1 示例（既济三爻动→屯、182.4° 向午坐子）双验算通过。
+- **UI**: 本轮未改 UI（核心模块未接线至 app），无 UI 回归面。
+- **Runtime**: APK 重装 emulator-5554 Success → 重启 → 进程存活（pid 6181）→ 无 crash。
+- **Regression**: `:app` 构建/测试/运行不因新模块受影响（全量任务同跑通过）。
+- **Problems found**（本轮 Check 抓到并已 Act）:
+  1. **六十四卦数据错误**：45 萃误录为"下兑上坤"（与 19 临重复，8×8 覆盖缺"下坤上兑"）→ 修正为下坤上兑，测试转绿——证明"结构性测试兜底录入错误"的必要性，**人工复核要求维持不撤**（TD-08）；
+  2. 测试自身笔误一处（15° 期望值误写为丑，实为癸中心角）→ 已修正；
+  3. `String.code` 不存在（应为 `symbol[0].code`）→ 编译期修复；
+  4. Lint PropertyEscape 误报（见上）。
+
+### Act
+
+- **Fixes**: 上述 4 项全部修复并复检通过（构建+33 测试+Lint 0 error+模拟器回归）。
+- **Remaining known issues**: TD-01（Gradle deprecation）、TD-02（设计 Token 占位）、TD-03（desugaring 约束）、TD-06（无 UI/仪器化测试）、TD-07（Lint 6 条非阻断警告，含无应用图标）、TD-08（六十四卦卦名/卦序待人工复核，见 YIJING_RULES §7）。TD-04（Lint 基线）本轮关闭：lintDebug 0 error 已入 Check 流程。
+- **Decision**:
+  - 起卦公式（D-01～D-05）维持"接口-only"，未猜测任何口径；
+  - 原典文本不进 Cycle 01 模型（避免占位文本冒充经典）；
+  - `:core:yijing` 不被 `:app` 依赖（接线发生在有真实消费方的 Cycle 03/04，避免无意义依赖）。
+- **Next cycle**: Cycle 02 — 电子罗盘引擎（SensorManager、Rotation Vector 优先 + 磁力计/加速度计回退、方位角、环形平滑、稳定检测、精度与磁干扰提示、生命周期管理；验收：0/360° 无跳变、退出注销 listener、无泄漏）。
+
+**验收判定：Cycle 01 达标（规则可脱离 Android 单独测试 ✓ 无 AI 依赖 ✓ 无 UI 依赖 ✓ 384 变卦测试 ✓），Cycle 01 关闭。**
