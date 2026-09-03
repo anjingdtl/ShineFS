@@ -237,3 +237,37 @@
 - **Next cycle**: Cycle 04 — 定盘与起卦。
 
 **验收判定：Cycle 03 达标（传统风格多层盘面 ✓ 无文字重叠 ✓ 平滑旋盘 ✓ 稳定度联动 ✓ 异常提示 ✓ 生命周期 ✓），Cycle 03 关闭。**
+
+---
+
+## Cycle 04 — 定盘与起卦（2026-09-03）
+
+### Plan
+
+- **Goal**: 定盘锁定（稳定条件/朱砂定印/触觉）→ 场景选择 → 确定性起卦 → 六爻自下而上生成动画 → 动爻朱砂高亮与阴阳翻转 → 本卦→变卦过渡 → 算法依据可查。
+- **Scope**: 可替换规则引擎架构（接口已立于 Cycle 01 + 本轮 FixtureDirectionRule 明确标记临时口径）；CaseRepository 接口 + 内存实现（Cycle 07 换 Room）；DivinationService 编排；CompassScreen 定盘交互；SceneSelectScreen（方案 §9.5 八场景+单项）；HexagramRevealScreen（爻动画）；CastModesScreen（三模式可用性：B/C 待决策占位）；首页入口启用。
+- **Out of scope**: 解读页八段结构（Cycle 05）、持久化（Cycle 07）、宅居测局流程（Cycle 06，复用本周期 SceneSelect+houseAuditId 预留）。
+- **Risks**: 临时规则被误当正式（UI/说明/代码三重显著标记 fixture/临时）；动画参与计算的嫌疑（结果先算后演）。
+- **Acceptance criteria**: 同输入同输出（测试）；六爻自下而上生成+动爻朱砂+翻转过渡；定盘需稳定良好且无磁扰/倾斜；E2E 全流程模拟器跑通无 crash。
+
+### Do
+
+- **Added**（core:yijing）：`FixtureDirectionRule`（上卦=向卦[正式]；下卦/动爻=公历取数[临时口径，三重标记]）。
+- **Added**（app）：`data/`（DivinationCase、Scenes、CaseRepository+内存实现、DivinationService+ruleExplain）、AppGraph 服务定位；`ui/divination/`（CastModesScreen/SceneSelectScreen/HexagramRevealScreen+LineBar 爻动画）；CompassScreen 定盘状态机（canLock 门控/定印叠加层/重新测量/起卦入口）；Router 新增 3 目的地 + Interpretation 占位。
+- **Tests**: FixtureDirectionRuleTest 5 例（确定性/八向卦/公式抽查/余零约定/标识）；DivinationServiceTest 5 例（完整卦例/可重复性/变卦映射一致/规则说明/宅局分组）。
+
+### Check
+
+- **Build/Tests/Lint**: 全绿（测试累计 61：yijing 38 + compass 14 + app 9；lint 0 error）。
+- **模拟器 E2E**: 首页→罗盘（稳定良好）→**定盘**（"已定盘 · 15:44:53"+重新测量/起卦按钮）→**场景选择**（八场景+单项测量全列出）→选"大门"→**卦象已成**：本卦井（48，上坎下巽✓）·第3爻动·变卦坎（29，井三爻翻转推导✓）·"临时联调口径（非正式）（rules-v0.1）"显著标识→算法依据卡完整展开（正式/临时分列+待决策编号）→logcat 0 crash/ANR。
+- **动画验证**: 六爻逐爻生成与翻转动画在真机录屏复核列入 Cycle 09（模拟器已确认状态推进与终态渲染）。
+- **Problems found**: ① CompassScreen 整文件重写丢失共享组件（ScreenHeader/StatusRow/HintCard 等）→ 补回；② 两处无效语法/坏 import → 修复；③ 测试文件残留占位函数 → 清理。
+- **Regression**: Cycle 03 罗盘渲染与读数不受影响。
+
+### Act
+
+- **Fixes**: 上述 3 项开发期问题已修复并复检（构建+61 测试+E2E）。
+- **Decision**: 起卦结果于场景选择瞬间计算并入库（页面刷新/返回不改变卦象）；查看解读入口已接路由（Cycle 05 实装八段）。
+- **Next cycle**: Cycle 05 — 解卦与原典（结构化八段、原典仓储接口+核定标记、AI 接口抽象与不可用降级）。
+
+**验收判定：Cycle 04 达标（同样输入同样结果 ✓ 六爻下→上生成+朱砂动爻+翻转过渡 ✓ 定盘条件门控 ✓ 流程闭环 ✓），Cycle 04 关闭。**

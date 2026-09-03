@@ -4,12 +4,17 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.shinefs.app.data.LockedReading
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /** 轻量路由（避免引入导航库依赖）：显式返回栈 + 系统返回键接管。 */
 sealed interface Dest {
     data object Home : Dest
     data object Compass : Dest
+    data object CastModes : Dest
+    data class SceneSelect(val reading: LockedReading, val houseAuditId: String? = null) : Dest
+    data class Reveal(val caseId: String) : Dest
+    data class Interpretation(val caseId: String) : Dest
 }
 
 class Router(initial: List<Dest> = listOf(Dest.Home)) {
