@@ -16,4 +16,13 @@ object AppGraph {
     val classicTexts: ClassicTextRepository = FixtureClassicTexts()
     val ruleInterpreter = RuleBasedInterpreter()
     val aiInterpreter: AiInterpreter = OfflineAiInterpreter()
+
+    /** 当前宅居测局会话（跨导航存活；Cycle 07 随持久化落地）。 */
+    private var currentHouseAuditId: String? = null
+
+    fun obtainHouseAuditId(): String =
+        currentHouseAuditId ?: java.util.UUID.randomUUID().toString().also { currentHouseAuditId = it }
+
+    fun newHouseAuditId(): String =
+        java.util.UUID.randomUUID().toString().also { currentHouseAuditId = it }
 }

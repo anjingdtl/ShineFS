@@ -302,3 +302,36 @@
 - **Next cycle**: Cycle 06 — 宅居测局（八场景独立测量 + 整宅摘要）。
 
 **验收判定：Cycle 05 达标（八段结构 ✓ 原典可溯源降级 ✓ AI 不可用不出空白页 ✓ 规则版本可查 ✓），Cycle 05 关闭。**
+
+---
+
+## Cycle 06 — 宅居测局（2026-09-03）
+
+### Plan
+
+- **Goal**: 方案 §9.5 八场景（大门/客厅/主卧/书房/灶位/阳台/办公位/商铺入口）逐项独立测量 + 整宅摘要；V1 不进飞星。
+- **Scope**: HouseAuditScreen（场景清单/状态/新开测局/摘要）；HouseSummarizer（纯函数：按场景去重保留最新、五行分布、摘要文本+边界声明）；路由改造（Compass 携带 house 上下文、SceneSelect 场景预选直达自动起卦、Router.replace 语义）；首页入口启用。
+- **Out of scope**: 测局历史浏览（随 Cycle 07 卦例筛选）、测局持久化（内存会话，Cycle 07 一并落地）。
+- **Risks**: 预选自动起卦与返回栈交互（重复触发副作用）；测局会话跨导航丢失。
+- **Acceptance cycles**: 八场景可逐项测量并挂 houseAuditId；同场景重复测量保留最新；摘要含坐向/卦象/五行分布且明示"不做飞星"；返回栈无副作用循环。
+
+### Do
+
+- **Added**: HouseAuditScreen、HouseSummarizer、Router.replace；Compass/SceneSelect 目的地扩展 house 上下文与 preselectedSceneId。
+- **Changed**: MainActivity 布线（预选分支自动起卦后 **replace** 揭示页）；auditId 会话提升至 AppGraph（跨导航存活）。
+- **Tests**: HouseSummarizerTest 4 例（空测局/按局过滤+去重/摘要文本/满测）。
+
+### Check
+
+- **Build/Tests/Lint**: 全绿（测试累计 76；lint 0 error）。
+- **模拟器 E2E**: 宅居测局（0/8、八场景待测）→ 大门 →罗盘→定盘→起卦（**场景预选自动直达**，无二次选择）→卦象已成（井）→ 返回键逐级回退（罗盘→测局，**无重复起卦**）→ 测局页 **1/8、大门行"向子坐午 · 《井》›"** ✓；logcat 0 crash/ANR；截图 `DOCS/assets/cycle06_reveal.png`。
+- **Problems found**: ① 返回键在自动起卦页形成"SceneSelect 重复 cast"死循环 → Router.replace 修复并复测；② 测局 auditId 每次进页面重生成导致摘要丢失 → 会话提升 AppGraph 修复并复测。
+- **Regression**: 普通定盘起卦流程（非宅居路径）不受影响。
+
+### Act
+
+- **Fixes**: 上述 2 个真实缺陷修复（含返回栈语义与状态提升），全流程复测通过。
+- **Remaining known issues**: 测局会话与卦例均在内存（重启即失）→ Cycle 07 Room 持久化一并解决。
+- **Next cycle**: Cycle 07 — Room 卦例库（历史/筛选/收藏/备注/删除/版本追踪）+ 测局持久化。
+
+**验收判定：Cycle 06 达标（八场景测量 ✓ 摘要含边界声明 ✓ 无流派越界 ✓ 返回栈正确 ✓），Cycle 06 关闭。**
