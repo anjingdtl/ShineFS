@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 sealed interface Dest {
     data object Home : Dest
     data object HouseAudit : Dest
+    data object History : Dest
 
     /** houseAuditId/sceneId 非空时表示从宅居测局进入（场景已预选，定盘后直达起卦）。 */
     data class Compass(val houseAuditId: String? = null, val sceneId: String? = null) : Dest

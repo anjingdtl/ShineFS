@@ -28,6 +28,7 @@ fun HomeScreen(
     onOpenCompass: () -> Unit,
     onOpenCastModes: () -> Unit,
     onOpenHouseAudit: () -> Unit,
+    onOpenHistory: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -60,7 +61,7 @@ fun HomeScreen(
             HomeEntry("风水罗盘", "动态罗盘 · 定盘 · 坐向", enabled = true, tag = "", onClick = onOpenCompass)
             HomeEntry("起卦解易", "方位起卦 · 时间起卦 · 数字起卦", enabled = true, tag = "", onClick = onOpenCastModes)
             HomeEntry("宅居测局", "大门 · 客厅 · 主卧 · 灶位 等场景", enabled = true, tag = "", onClick = onOpenHouseAudit)
-            HomeEntry("卦例记录", "历史 · 收藏 · 规则版本", enabled = false, tag = "建设中 Cycle 07", onClick = {})
+            HomeEntry("卦例记录", "历史 · 收藏 · 规则版本", enabled = true, tag = "", onClick = onOpenHistory)
         }
 
         Column(

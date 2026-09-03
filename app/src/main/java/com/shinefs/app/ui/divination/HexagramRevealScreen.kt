@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,6 +44,7 @@ import com.shinefs.app.ui.theme.ShineColors
 import com.shinefs.core.yijing.data.Hexagrams
 import com.shinefs.core.yijing.model.Hexagram
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 /**
  * 起卦揭示页：六爻自下而上逐爻生成 → 动爻朱砂高亮 + 阴阳翻转 → 本卦→变卦过渡。
@@ -51,20 +53,22 @@ import kotlinx.coroutines.delay
 @Composable
 fun HexagramRevealScreen(
     caseId: String,
-    caseLoader: (String) -> com.shinefs.app.data.DivinationCase?,
+    caseLoader: suspend (String) -> com.shinefs.app.data.DivinationCase?,
     ruleExplain: String,
     onBackToHome: () -> Unit,
     onOpenInterpretation: (String) -> Unit,
 ) {
-    val case = remember(caseId) { caseLoader(caseId) }
+    val caseState by produceState<com.shinefs.app.data.DivinationCase?>(initialValue = null, caseId) {
+        value = withContext(kotlinx.coroutines.Dispatchers.IO) { caseLoader(caseId) }
+    }
     var revealed by remember { mutableIntStateOf(0) }        // 已生成爻数 0..6
     var flipDone by remember { mutableStateOf(false) }       // 动爻翻转完成
     var changedShown by remember { mutableStateOf(false) }   // 变卦呈现
     var showRule by remember { mutableStateOf(false) }
     val reducedMotion = rememberReducedMotion()
 
-    LaunchedEffect(caseId) {
-        if (case == null) return@LaunchedEffect
+    LaunchedEffect(caseState?.id) {
+        val c = caseState ?: return@LaunchedEffect
         if (reducedMotion) {
             revealed = 6
             flipDone = true
@@ -91,7 +95,7 @@ fun HexagramRevealScreen(
     ) {
         ScreenHeader(title = "卦象已成", onBack = onBackToHome)
 
-        if (case == null) {
+        val case = caseState ?: run {
             Text("未找到卦例", color = ShineColors.CinnabarBright, modifier = Modifier.padding(24.dp))
             return@Column
         }

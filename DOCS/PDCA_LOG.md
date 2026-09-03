@@ -335,3 +335,40 @@
 - **Next cycle**: Cycle 07 — Room 卦例库（历史/筛选/收藏/备注/删除/版本追踪）+ 测局持久化。
 
 **验收判定：Cycle 06 达标（八场景测量 ✓ 摘要含边界声明 ✓ 无流派越界 ✓ 返回栈正确 ✓），Cycle 06 关闭。**
+
+---
+
+## Cycle 07 — 卦例与本地数据（Room）（2026-09-03）
+
+### Plan
+
+- **Goal**: Room 持久化卦例（历史/收藏/备注/删除/筛选/规则版本追踪，方案 §9.6），重启不丢。
+- **Scope**: Room 2.6.1 + KSP 2.1.20-1.0.32；DivinationCaseEntity/Dao/Database（schema 导出）；RoomCaseRepository 实现 CaseRepository（接口不变）；HistoryScreen（日期/场景/收藏筛选）；InterpretationScreen 增卦例管理区（收藏/备注/删除含确认）；全链路 IO 线程改造（produceState/rememberCoroutineScope）。
+- **Out of scope**: DAO 的 JVM 单测（Robolectric 未引入——以模拟器持久化 E2E 覆盖 + 迁移测试列入后续）；DataStore（暂无用户设置项）。
+- **Risks**: 阻塞 DAO 上主线程（全链路 IO 线程化改造）；Room+KSP 兼容性。
+- **Acceptance**: 保存→强杀→重启历史仍在；收藏/备注/删除生效且持久；筛选可用；无主线程 DB 访问 crash；既有测试回归。
+
+### Do
+
+- **Added**: `data/db/ShineDatabase.kt`（Entity/Dao/Database）、`data/db/CaseMappers.kt`、`RoomCaseRepository`、`ui/history/HistoryScreen`；schemas 导出（version 1）。
+- **Changed**: AppGraph.init(context) 建库；MainActivity 全部仓储调用 withContext(IO)；Reveal/Interpretation/House 页改为异步加载（produceState）+ 可变工作副本；首页入口全量启用。
+- **Tests**: 既有 76 例回归（本周期以 E2E 为主验证新层）。
+
+### Check
+
+- **Build/Tests/Lint**: 全绿（76 测试 + lint 0 error；KSP 首次拉取依赖成功）。
+- **持久化 E2E（模拟器）**: pm clear → 起卦（大门，井卦 3 爻动）→ 查看解读 → **am force-stop + 重启 → 历史列表仍在**（坎 6 爻动→涣，变卦结构验算正确 ✓）→ 收藏切换（★）→ **再次强杀重启 → ★ 持久** → 删除（确认）→ 历史空态文案 ✓；logcat 全程 0 crash/ANR；截图 `cycle07_history.png`/`cycle07_interpretation.png`。
+- **Problems found（本周期 Check 抓到并修复）**:
+  1. **Room+KSP1 MissingType**：@Database 文件内混入引用领域类型的顶层映射函数导致 KSP 解析失败 → 拆分 CaseMappers.kt（教训入档：Room 注解文件保持纯净）；
+  2. Room 2.7.2（KMP 线）同环境同样报错 → 回退 2.6.1 稳定线（决策记录）；
+  3. 阻塞 DAO 误用主线程/事件回调内 LaunchedEffect 等 4 处协程误用 → produceState + rememberCoroutineScope 重构；
+  4. 智能转换/缺 import 编译错若干 → 修复。
+- **Regression**: 罗盘/定盘/起卦/测局全流程复跑无异常。
+
+### Act
+
+- **Fixes**: 上述 4 类问题全部修复并经持久化 E2E 复测。
+- **Remaining known issues**: DAO 无 JVM 单测（Robolectric 引入与 migration 测试列为后续增强，schema 已导出为迁移基线）；测局会话 id 仍内存态（卦例已持久，会话重启后新开一轮——符合预期）。
+- **Next cycle**: Cycle 08 — 视觉统一与动效打磨（应用图标/字体层级/间距/对比度/大字体/减少动画复核）。
+
+**验收判定：Cycle 07 达标（持久化 ✓ 收藏/备注/删除 ✓ 筛选 ✓ 版本追踪展示 ✓ 无主线程 DB ✓），Cycle 07 关闭。**

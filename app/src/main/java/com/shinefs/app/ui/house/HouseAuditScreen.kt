@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,7 +40,7 @@ import java.util.UUID
  */
 @Composable
 fun HouseAuditScreen(
-    casesProvider: () -> List<com.shinefs.app.data.DivinationCase>,
+    casesProvider: suspend () -> List<com.shinefs.app.data.DivinationCase>,
     onBack: () -> Unit,
     onMeasureScene: (auditId: String, sceneId: String) -> Unit,
     onOpenCase: (caseId: String) -> Unit,
@@ -47,8 +48,10 @@ fun HouseAuditScreen(
     // 当前测局会话（跨导航存活于 AppGraph；卦例入仓储，可回溯）
     var auditId by remember { mutableStateOf(com.shinefs.app.AppGraph.obtainHouseAuditId()) }
     var refresh by remember { mutableStateOf(0) }
-    val cases = remember(auditId, refresh) { casesProvider() }
-    val summary = remember(cases, auditId, refresh) { HouseSummarizer.summarize(auditId, cases) }
+    val cases by produceState(initialValue = listOf<com.shinefs.app.data.DivinationCase>(), auditId, refresh) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { casesProvider() }
+    }
+    val summary = remember(cases, auditId) { HouseSummarizer.summarize(auditId, cases) }
 
     Column(
         modifier = Modifier

@@ -1,0 +1,172 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "4015f2e19aee2f7cba9380b6770770b1",
+    "entities": [
+      {
+        "tableName": "divination_cases",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `sceneId` TEXT NOT NULL, `sceneName` TEXT NOT NULL, `azimuth` REAL, `facingMountain` TEXT, `sittingMountain` TEXT, `facingTrigram` TEXT, `facingElement` TEXT, `stability` TEXT, `ruleId` TEXT NOT NULL, `ruleDisplayName` TEXT NOT NULL, `rulesVersion` TEXT NOT NULL, `interpretationVersion` TEXT NOT NULL, `upperTrigram` TEXT NOT NULL, `lowerTrigram` TEXT NOT NULL, `originalHexagramOrder` INTEGER NOT NULL, `originalHexagramName` TEXT NOT NULL, `changingLine` INTEGER NOT NULL, `changedHexagramOrder` INTEGER NOT NULL, `changedHexagramName` TEXT NOT NULL, `houseAuditId` TEXT, `favorite` INTEGER NOT NULL, `note` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sceneId",
+            "columnName": "sceneId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sceneName",
+            "columnName": "sceneName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "azimuth",
+            "columnName": "azimuth",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facingMountain",
+            "columnName": "facingMountain",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sittingMountain",
+            "columnName": "sittingMountain",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facingTrigram",
+            "columnName": "facingTrigram",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facingElement",
+            "columnName": "facingElement",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stability",
+            "columnName": "stability",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ruleId",
+            "columnName": "ruleId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ruleDisplayName",
+            "columnName": "ruleDisplayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rulesVersion",
+            "columnName": "rulesVersion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "interpretationVersion",
+            "columnName": "interpretationVersion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "upperTrigram",
+            "columnName": "upperTrigram",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lowerTrigram",
+            "columnName": "lowerTrigram",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originalHexagramOrder",
+            "columnName": "originalHexagramOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originalHexagramName",
+            "columnName": "originalHexagramName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changingLine",
+            "columnName": "changingLine",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changedHexagramOrder",
+            "columnName": "changedHexagramOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changedHexagramName",
+            "columnName": "changedHexagramName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "houseAuditId",
+            "columnName": "houseAuditId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "favorite",
+            "columnName": "favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4015f2e19aee2f7cba9380b6770770b1')"
+    ]
+  }
+}

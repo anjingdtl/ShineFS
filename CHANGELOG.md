@@ -1,5 +1,19 @@
 ## [Unreleased]
 
+### Cycle 07 — 卦例与本地数据（2026-09-03）
+
+#### 新增
+- Room 持久化（room 2.6.1 + KSP）：卦例表/DAO/schema 导出；仓储接口不变换 Room 实现
+- 卦例记录页：日期（今天/近7天）+八场景+收藏筛选；强杀重启数据不丢
+- 解卦页卦例管理区：收藏/备注/删除（含确认）
+- 全链路 IO 线程化（produceState/rememberCoroutineScope，无主线程 DB 访问）
+#### 重要修复
+- Room+KSP MissingType：@Database 文件不得混入引用领域类型的顶层函数（拆分 CaseMappers）
+- 协程误用 4 处重构（阻塞 DAO/事件回调 LaunchedEffect）
+#### 验证
+- 持久化 E2E：保存→强杀→重启→历史在；收藏跨重启持久；删除后空态正确；logcat 0 crash
+## [Unreleased]
+
 ### Cycle 06 — 宅居测局（2026-09-03）
 
 #### 新增

@@ -10,13 +10,18 @@ import com.shinefs.app.ui.compass.CompassScreen
 import com.shinefs.app.ui.divination.CastModesScreen
 import com.shinefs.app.ui.divination.HexagramRevealScreen
 import com.shinefs.app.ui.divination.SceneSelectScreen
+import com.shinefs.app.ui.history.HistoryScreen
 import com.shinefs.app.ui.home.HomeScreen
 import com.shinefs.app.ui.nav.Dest
 import com.shinefs.app.ui.nav.Router
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppGraph.init(this)
         setContent {
             ShineApp()
         }
@@ -26,19 +31,30 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ShineApp() {
     val router = remember { Router() }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     router.HandleBack()
     when (val dest = router.currentAsState()) {
         Dest.Home -> HomeScreen(
             onOpenCompass = { router.push(Dest.Compass()) },
             onOpenCastModes = { router.push(Dest.CastModes) },
             onOpenHouseAudit = { router.push(Dest.HouseAudit) },
+            onOpenHistory = { router.push(Dest.History) },
         )
         Dest.HouseAudit -> com.shinefs.app.ui.house.HouseAuditScreen(
-            casesProvider = { AppGraph.caseRepository.all() },
+            casesProvider = {
+                withContext(Dispatchers.IO) { AppGraph.caseRepository.all() }
+            },
             onBack = { router.pop() },
             onMeasureScene = { auditId, sceneId ->
                 router.push(Dest.Compass(houseAuditId = auditId, sceneId = sceneId))
             },
+            onOpenCase = { router.push(Dest.Interpretation(it)) },
+        )
+        Dest.History -> HistoryScreen(
+            casesProvider = {
+                withContext(Dispatchers.IO) { AppGraph.caseRepository.all() }
+            },
+            onBack = { router.pop() },
             onOpenCase = { router.push(Dest.Interpretation(it)) },
         )
         is Dest.Compass -> CompassScreen(
@@ -64,11 +80,13 @@ fun ShineApp() {
             val preselected = dest.preselectedSceneId
             if (preselected != null) {
                 LaunchedEffect(dest) {
-                    val case = AppGraph.divinationService.castWithDirection(
-                        reading = dest.reading,
-                        scene = com.shinefs.app.data.Scenes.byId(preselected),
-                        houseAuditId = dest.houseAuditId,
-                    )
+                    val case = withContext(Dispatchers.IO) {
+                        AppGraph.divinationService.castWithDirection(
+                            reading = dest.reading,
+                            scene = com.shinefs.app.data.Scenes.byId(preselected),
+                            houseAuditId = dest.houseAuditId,
+                        )
+                    }
                     router.replace(Dest.Reveal(case.id))
                 }
             } else {
@@ -76,12 +94,14 @@ fun ShineApp() {
                     reading = dest.reading,
                     onBack = { router.pop() },
                     onSelect = { sceneId ->
-                        val case = AppGraph.divinationService.castWithDirection(
-                            reading = dest.reading,
-                            scene = com.shinefs.app.data.Scenes.byId(sceneId),
-                            houseAuditId = dest.houseAuditId,
-                        )
-                        router.push(Dest.Reveal(case.id))
+                        scope.launch(Dispatchers.IO) {
+                            val case = AppGraph.divinationService.castWithDirection(
+                                reading = dest.reading,
+                                scene = com.shinefs.app.data.Scenes.byId(sceneId),
+                                houseAuditId = dest.houseAuditId,
+                            )
+                            router.push(Dest.Reveal(case.id))
+                        }
                     },
                 )
             }
@@ -100,6 +120,12 @@ fun ShineApp() {
             interpreter = AppGraph.aiInterpreter,
             interpreter2 = AppGraph.ruleInterpreter,
             onBack = { router.pop() },
+            onUpdateCase = { updated ->
+                scope.launch(Dispatchers.IO) { AppGraph.caseRepository.update(updated) }
+            },
+            onDeleteCase = { id ->
+                withContext(Dispatchers.IO) { AppGraph.caseRepository.delete(id) }
+            },
         )
     }
 }
