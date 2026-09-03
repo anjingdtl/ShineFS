@@ -271,3 +271,34 @@
 - **Next cycle**: Cycle 05 — 解卦与原典（结构化八段、原典仓储接口+核定标记、AI 接口抽象与不可用降级）。
 
 **验收判定：Cycle 04 达标（同样输入同样结果 ✓ 六爻下→上生成+朱砂动爻+翻转过渡 ✓ 定盘条件门控 ✓ 流程闭环 ✓），Cycle 04 关闭。**
+
+---
+
+## Cycle 05 — 解卦与原典（2026-09-03）
+
+### Plan
+
+- **Goal**: 固定八段解卦页（测量/卦象/原典/象义/空间/宜忌/AI/规则版本）；原典仓储接口化 + 明确未核定的 fixture 数据；AI 接口抽象与不可用降级（不出空白页）。
+- **Scope**: core:yijing `text/`（ClassicHexagramText + Repository + FixtureClassicTexts[6 卦，verified=false，爻辞一律不录]）；app `ai/`（AiInterpreter 接口 + OfflineAiInterpreter[NOT_CONFIGURED] + buildStructuredRequest[§10.1 字段]）；`interpret/RuleBasedInterpreter`（象义=卦象结构事实、空间=方位五行特质+八场景建议、宜忌=通则+免责；**不做五行生克吉凶推断**→新增待决策 D-10）；InterpretationScreen 八段。
+- **Out of scope**: 正式 64 卦原典录入（D-09）、远端 AI 接入（接口已备）、宅居摘要（Cycle 06）。
+- **Risks**: fixture 卦辞被当核定本（verified 标记 + UI 双重显著标注）；解读文案越界成流派断言（模板仅陈述结构事实 + 明示"不做飞星"）。
+- **Acceptance criteria**: 八段齐全；原典未收录/未核定时显式提示而非空白或伪造；AI 不可用时第七段降级为确定性摘要；单测覆盖。
+
+### Do
+
+- **Added**: 上述 core:text 3 文件、app:ai 1、app:interpret 1、InterpretationScreen 1；测试 3 套 11 例（FixtureClassicTexts 4 / RuleBasedInterpreter 5 / AiInterpreter 2）。
+- **Changed**: AppGraph 注入 classicTexts/ruleInterpreter/aiInterpreter；MainActivity Interpretation 路由实装（占位移除）。
+
+### Check
+
+- **Build/Tests/Lint**: 全绿（测试累计 72：yijing 42 + compass 14 + app 16；lint 0 error）。
+- **模拟器 E2E**: 定盘→场景→起卦→查看解读：**八段全部渲染**（一~五首屏可见，滚动后六/七/八齐全）；"AI 仅负责白话解释，不参与卦象计算；AI 不可用时完整结果不受影响"降级提示显示 ✓；本卦井不在 fixture 6 卦内 → "原典数据待核定入库（D-09）"正确降级（若起得乾/坤/屯/蒙/既济/未济则展示卦辞象辞+未核定徽标）；logcat 0 crash/ANR；截图 `DOCS/assets/cycle05_interpretation.png`。
+- **Regression**: Cycle 03/04 流程复跑无异常（本周期 E2E 即复用全流程）。
+
+### Act
+
+- **New pending decision**: **D-10** 空间解读是否纳入五行生克（相生/相冲）推断：属"五行基础对应关系"边界问题，不同流派用法不一，V1.0 未实现，拍板前解读文案仅做特质描述。
+- **Remaining known issues**: 正式原典（64 卦卦辞+象辞+爻辞）待 D-09 定底本后人工核定入库；远端 AI 实现未接（接口+降级就绪）。
+- **Next cycle**: Cycle 06 — 宅居测局（八场景独立测量 + 整宅摘要）。
+
+**验收判定：Cycle 05 达标（八段结构 ✓ 原典可溯源降级 ✓ AI 不可用不出空白页 ✓ 规则版本可查 ✓），Cycle 05 关闭。**

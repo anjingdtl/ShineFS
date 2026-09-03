@@ -61,12 +61,13 @@ fun ShineApp() {
             onBackToHome = { router.popToRoot() },
             onOpenInterpretation = { router.push(Dest.Interpretation(it)) },
         )
-        is Dest.Interpretation -> InterpretationPlaceholder(caseId = dest.caseId, onBack = { router.pop() })
+        is Dest.Interpretation -> com.shinefs.app.ui.interpretation.InterpretationScreen(
+            caseId = dest.caseId,
+            caseLoader = { AppGraph.caseRepository.byId(it) },
+            classicTexts = AppGraph.classicTexts,
+            interpreter = AppGraph.aiInterpreter,
+            interpreter2 = AppGraph.ruleInterpreter,
+            onBack = { router.pop() },
+        )
     }
-}
-
-/** Cycle 05 前的解读页占位（结构性八段在下一周期落地）。 */
-@Composable
-private fun InterpretationPlaceholder(caseId: String, onBack: () -> Unit) {
-    com.shinefs.app.ui.compass.ScreenHeader(title = "解卦 · 建设中", onBack = onBack)
 }
