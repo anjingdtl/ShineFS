@@ -1,7 +1,7 @@
 # ShineFS 架构说明（ARCHITECTURE）
 
 > 维护规则：每个 PDCA Cycle 结束时同步更新本文件。
-> 当前状态：**Cycle 01 完成**（2026-09-03，:core:yijing 术数核心已建）
+> 当前状态：**V1.0 建设收口**（2026-09-04，Cycle 00–09 全部关闭；真机罗盘验收清单见 DOCS/REAL_DEVICE_TEST.md）
 
 ## 1. 项目定位
 

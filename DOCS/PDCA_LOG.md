@@ -402,3 +402,48 @@
 - **Next cycle**: Cycle 09 — 质量门禁与 V1.0 总验收。
 
 **验收判定：Cycle 08 达标（图标 ✓ Token 收口 ✓ 衬线层级 ✓ 大字体 ✓ 减少动画 ✓ Lint 压降 ✓），Cycle 08 关闭。**
+
+---
+
+## Cycle 09 — 质量门禁与 V1.0 总验收（2026-09-03/04）
+
+### Plan
+
+- **Goal**: 方案 §Cycle 09 全部门禁 + §19 V1.0 用户闭环总验收 + `DOCS/REAL_DEVICE_TEST.md` 真机清单。
+- **Scope**: 全量单测/Lint/Debug/Release 构建；模拟器完整流程 E2E（冷启动计时/后台恢复/旋转锁定/性能采样/AI 降级/Crash 巡检）；文档一致性收口。
+- **Out of scope**: 真机磁场实测（环境无真机——转 REAL_DEVICE_TEST 清单，不伪造结论）。
+
+### Do
+
+- Release 构建通过（app-release-unsigned.apk 7.5MB，签名 keystore 未配置属发版事项非本轮门禁）。
+- 完整闭环 E2E（清数据冷启动 → 罗盘 → 定盘 → 场景 → 起卦 → 八段解读 → 宅居测局 → 卦例记录），每步截图存档 `DOCS/assets/v10_*.png`。
+
+### Check（总验收矩阵）
+
+| 门禁 | 结果 |
+|---|---|
+| 全量 Unit Test | **76/76 PASS**（yijing 42[含 384 变卦] + compass 14[含 0/360 跨界] + app 20） |
+| 64×6 变卦测试 | ✅ 全覆盖 + 往返一致 |
+| 二十四山边界测试 | ✅ 24 山中心+上下界+跨 0°+方案临界角 |
+| 0°/360° 罗盘测试 | ✅ 单测 + 引擎跨界平滑 + 盘面旋转最短路径 |
+| Lint | ✅ 0 error；16 条非阻断警告（明细见 Cycle 08） |
+| Debug Build | ✅ |
+| Release Build | ✅（unsigned） |
+| 模拟器完整流程 | ✅ 全闭环（含中途 HOME 打断恢复、强杀重启数据不丢） |
+| UI 回归 | ✅ 全页面渲染（首页/罗盘/模式/场景/揭示/解读/测局/历史） |
+| 数据持久化 | ✅ Room 保存/重启/收藏/备注/删除 E2E（Cycle 07+09 复验） |
+| 生命周期 | ✅ 冷启动 1.6s；HOME 恢复；返回栈正确；旋转锁定存活不重建 |
+| AI 不可用降级 | ✅ 默认离线解释器：第七段显式降级文案，无空白页 |
+| 无磁力计降级 | ✅ 逻辑单测（FULL/LIMITED）+ 不伪造方向；**UI 实机表现 → 真机清单 4.x** |
+| Crash/ANR | ✅ App 进程 0 FATAL/0 ANR，crash buffer 空（全 E2E 后） |
+| 性能 | ✅ 罗盘页 305 帧/5s、Janky 0.33%、p95 28ms（模拟器） |
+| 文档一致性 | ✅ 本轮收口：ARCHITECTURE/TEST_MATRIX/YIJING_RULES/CHANGELOG/REAL_DEVICE_TEST 同步 |
+| 真实磁场能力 | ⬜ 转入 `DOCS/REAL_DEVICE_TEST.md`（7 大类 18 项，未验证不宣称） |
+
+### Act
+
+- **Fixes**: E2E 中发现的两处脚本/坐标误操作（非产品缺陷）当场纠正后复验通过。
+- **Remaining known issues（V1.0 收口口径）**: ① 待决策项 D-01~D-05、D-09、D-10 未拍板（临时口径三重标记、原典 fixture 6 卦未核定、爻辞未录）；② Room DAO 无 JVM 单测（schema 已导出，迁移测试后续）；③ 自定义碑刻字体无资产；④ Lint 16 条非阻断；⑤ Gradle deprecation（TD-01）；⑥ 真机磁场项全部待验证。
+- **Decision**: V1.0 可交付状态判定为"**可安装体验的 V1.0（模拟器验收全绿，真机罗盘验收待执行）**"——符合方案 §12.3"传感器罗盘最终验收不能只依赖模拟器"的边界声明。
+
+**验收判定：Cycle 09 模拟器可测门禁全部通过；真机门禁清单化交付。Cycle 09 关闭，V1.0 建设收口。**
