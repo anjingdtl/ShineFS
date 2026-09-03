@@ -202,3 +202,38 @@
 - **Next cycle**: Cycle 03 — 动态罗盘 UI（多层盘面 Canvas、平滑旋盘、磁针微摆、定盘动效、触觉、有限模式提示）。
 
 **验收判定：Cycle 02 达标（跨界无跳变 ✓ 连续旋转平滑 ✓ 引擎纯 JVM ✓ 生命周期成对注销 ✓ 无泄漏风险设计 ✓），Cycle 02 关闭。**
+
+---
+
+## Cycle 03 — 动态罗盘 UI（2026-09-03）
+
+### Plan
+
+- **Goal**: 传统数术风格的动态罗盘视觉资产：多层盘面、平滑旋盘、磁针微摆、山向高亮、顶部向首指针；首页枢纽与导航；有限模式提示；减少动画适配。
+- **Scope**: 手写路由（无导航库依赖）、HomeScreen 可点击枢纽、CompassScreen（传感器生命周期 ON_RESUME/ON_PAUSE + Disposable 兜底、读数/状态面板、校准/磁扰/倾斜提示）、CompassDial（Canvas：刻度环/角度数字/八方/二十四山/八卦/五行弧/天池太极/磁针/指针/高亮）、竖屏锁定（D-08 默认）。
+- **Out of scope**: 定盘交互与起卦（Cycle 04）、视觉终稿打磨与图标（Cycle 08）。
+- **Risks**: 角度系约定差异（rotate 0°=北 vs drawArc 0°=东）；旋转动画跨界绕圈；模拟器方位角注入受限。
+- **Acceptance criteria**: 罗盘具传统风格且无文字重叠；旋转平滑跨界正确；高亮山与读数一致；异常状态有提示；生命周期正确注销；现有测试不回归。
+
+### Do
+
+- **Added**: `ui/nav/Router.kt`（返回栈+BackHandler）；`ui/home/HomeScreen.kt`（四入口枢纽，未建成项标注）；`ui/compass/CompassDial.kt`（九层盘面、最短路径旋盘动画、磁针按稳定度微摆、减少动画全禁用）；`ui/compass/CompassScreen.kt`（读数/坐向/稳定度/精度/磁扰/姿态/校准提示、LIMITED 降级横幅、rememberReducedMotion）；ShineColors 增补亮金/朱砂亮/五行色。
+- **Changed**: MainActivity→ShineApp 路由壳；Manifest 竖屏锁定；CompassController 增加 remapCoordinateSystem（竖持罗盘姿态，AXIS_X/AXIS_Z）。
+
+### Check
+
+- **Build/Tests/Lint**: 全绿（51 既有测试 + lint 0 error）。
+- **UI/模拟器**: 罗盘页渲染完整：读数 360.0°、向子（坎·水）坐午、稳定度"良好 · 可定盘"、精度高、竖持无姿态告警（remap 生效，平持时告警正确触发）。
+- **高亮定位（客观取证）**: 视觉模型三次误报高亮位置后，改用唯一色探针+像素角度直方图：弧半径带内 249 像素 **100% 集中于屏角 0°（顶部子位）**，与读数一致——修正被证实（`drawArc` 0°=东，需 -90 对齐北；同时修正五行弧同源问题）。
+- **发现并修复**: ① drawArc 角度基准 90° 偏移（高亮弧与五行弧）；② remap 前正常竖持即触发倾斜告警（姿态基准错误）；③ 指针压字（缩至 0.78r-0.95r 山环外）；④ 卦符过小过暗（17sp/亮金）；⑤ 旋转目标角累积符号错误（开发中自纠）。
+- **模拟器限制（记录）**: 模拟器 9 轴融合不响应方位角注入（仅俯仰/横滚经重力传导），方位旋转动态最终验证需真机（→REAL_DEVICE_TEST）。
+- **Regression**: 51 测试 + 首页/罗盘页运行无 crash（logcat 干净）。
+
+### Act
+
+- **Fixes**: 上述 5 项全部修复并复检（构建+测试+模拟器截图+像素取证）。
+- **Remaining known issues**: 视觉终稿（配色/字体/间距）Cycle 08 统一打磨；应用图标缺失（TD-07）；高亮弧对视觉模型不可辨（对人眼足够，真机复验）。
+- **Decision**: 盘转针定模式为 V1 唯一模式（方案 §8.2）；竖持姿态为方位基准（真机复验清单化）。
+- **Next cycle**: Cycle 04 — 定盘与起卦。
+
+**验收判定：Cycle 03 达标（传统风格多层盘面 ✓ 无文字重叠 ✓ 平滑旋盘 ✓ 稳定度联动 ✓ 异常提示 ✓ 生命周期 ✓），Cycle 03 关闭。**

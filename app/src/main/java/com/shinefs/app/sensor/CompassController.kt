@@ -49,6 +49,7 @@ class CompassController(context: Context) {
     private val accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
     private val rotationMatrix = FloatArray(9)
+    private val remappedMatrix = FloatArray(9)
     private val orientation = FloatArray(3)
     private var gravity = FloatArray(3)
     private var geomagnetic = FloatArray(3)
@@ -62,7 +63,6 @@ class CompassController(context: Context) {
             when (event.sensor.type) {
                 Sensor.TYPE_ROTATION_VECTOR -> {
                     SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-                    SensorManager.getOrientation(rotationMatrix, orientation)
                     pushOrientation()
                 }
                 Sensor.TYPE_MAGNETIC_FIELD -> {
@@ -121,12 +121,22 @@ class CompassController(context: Context) {
         if (rotationVectorSensor != null) return
         if (!haveGravity || !haveGeomagnetic) return
         if (SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic)) {
-            SensorManager.getOrientation(rotationMatrix, orientation)
             pushOrientation()
         }
     }
 
+    /**
+     * 以"竖持罗盘"姿态计算方位：remap 到屏幕坐标系（AXIS_X/AXIS_Z），
+     * 手机正对前方自然手持时方位角有效；pitch/roll 为该姿态下的倾角。
+     */
     private fun pushOrientation() {
+        SensorManager.remapCoordinateSystem(
+            rotationMatrix,
+            SensorManager.AXIS_X,
+            SensorManager.AXIS_Z,
+            remappedMatrix,
+        )
+        SensorManager.getOrientation(remappedMatrix, orientation)
         val azimuthDeg = Math.toDegrees(orientation[0].toDouble()).toFloat()
         val pitchDeg = Math.toDegrees(orientation[1].toDouble()).toFloat()
         val rollDeg = Math.toDegrees(orientation[2].toDouble()).toFloat()
