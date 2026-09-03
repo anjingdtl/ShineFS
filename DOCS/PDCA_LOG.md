@@ -164,3 +164,41 @@
 - **Next cycle**: Cycle 02 — 电子罗盘引擎（SensorManager、Rotation Vector 优先 + 磁力计/加速度计回退、方位角、环形平滑、稳定检测、精度与磁干扰提示、生命周期管理；验收：0/360° 无跳变、退出注销 listener、无泄漏）。
 
 **验收判定：Cycle 01 达标（规则可脱离 Android 单独测试 ✓ 无 AI 依赖 ✓ 无 UI 依赖 ✓ 384 变卦测试 ✓），Cycle 01 关闭。**
+
+---
+
+## Cycle 02 — 电子罗盘引擎（2026-09-03）
+
+### Plan
+
+- **Goal**: 真实可用的方向检测引擎：Rotation Vector 优先 + 磁力计/加速度计回退、环形平滑、稳定检测、精度/磁干扰/倾斜检测、生命周期管理、无磁力计降级判定。
+- **Current state**: Cycle 01 完成；`:app` 与 `:core:yijing` 存在，无任何传感器代码。
+- **Scope**: 新增 `:core:compass` 纯 Kotlin 模块（数学层：归一化/最短路径/环形均值与标准差/EMA 平滑/毛刺抑制/稳定分档/磁扰监测/倾斜标记）+ `:app` 薄接线层（CompassController：SensorManager 注册注销、旋转矩阵→方位角、StateFlow 输出）+ 能力判定（FULL/LIMITED）+ 全量单测。
+- **Out of scope**: 罗盘 UI（Cycle 03）、定盘交互（Cycle 04）、真实设备磁场标定（REAL_DEVICE_TEST）。
+- **Risks**: 平滑跨界绕圈（测试固化）；毛刺误杀快速旋转（仅稳定期抑制 + 阈值 175°）；磁扰阈值无真机标定（默认 [10,100]µT，文档标注待标定）。
+- **Acceptance criteria**: 0/360° 无跳变（单测）；连续旋转平滑（单测）；引擎无 Android 依赖；:app 回归不受影响；传感器层与术数层零耦合。
+
+### Do
+
+- **Added**:
+  - `:core:compass`（kotlin-jvm）：`CircularMath`（normalize/shortestDiff/circularMean/circularStdDeg）、`CompassEngine`（EMA α=0.2 + 环形 std 分档 GOOD≤0.6°/FAIR≤2.5° + 稳定期毛刺抑制 + tilt>45° 标记）、`MagneticMonitor`（[10,100]µT 异常，待真机标定）、`CompassState`、`StabilityLevel`/`SensorAccuracy`（Android 精度常量映射）；
+  - `:app` `sensor/CompassController`（RV 优先、accel+mag 回退、磁力计常开供磁扰检测、start/stop 成对注销并重置、UiState StateFlow）与 `CompassCapability`（FULL/LIMITED 纯逻辑）；
+  - 测试 17 用例：CircularMath 4、CompassEngine 10、CompassCapability 3。
+
+### Check
+
+- **Build**: assembleDebug（3 模块）BUILD SUCCESSFUL。
+- **Unit tests**: :core:yijing 33 + :core:compass 14 + :app 4 = **51 全部 PASS**（本周期抓到并修复：normalize 负零漂落 360、对径集 std 浮点预期错误、两处测试编译错误）。
+- **Lint**: lintDebug 0 error（6 条既有非阻断警告不变）。
+- **Runtime**: emulator-5554 重装启动存活（pid 7041）；dumpsys 确认模拟器有 Rotation Vector/Accelerometer/Magnetic 传感器；`adb emu sensor set orientation` 注入可用（后续 E2E 可程序化驱动方位角）。
+- **Regression**: 既有 33+1 测试与首页运行不受影响。
+- **Problems found**: ① `:app` 未依赖新模块（补依赖）；② 测试 `until` 用于 Float 区间不合法；③ 上述两个浮点边界问题。全部已修复复检。
+
+### Act
+
+- **Fixes**: 见 Check（4 项，全部复检通过）。
+- **Remaining known issues**: 磁扰阈值与稳定度阈值需真机标定（→REAL_DEVICE_TEST）；真机罗盘最终验收不得以模拟器替代（已列入）。
+- **Decision**: "已定盘"实现为引擎外层锁定状态（Cycle 04 交互），稳定度仅三档输出。
+- **Next cycle**: Cycle 03 — 动态罗盘 UI（多层盘面 Canvas、平滑旋盘、磁针微摆、定盘动效、触觉、有限模式提示）。
+
+**验收判定：Cycle 02 达标（跨界无跳变 ✓ 连续旋转平滑 ✓ 引擎纯 JVM ✓ 生命周期成对注销 ✓ 无泄漏风险设计 ✓），Cycle 02 关闭。**

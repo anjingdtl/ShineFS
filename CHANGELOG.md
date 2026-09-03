@@ -1,3 +1,11 @@
+## [Unreleased]
+
+### Cycle 02 — 电子罗盘引擎（2026-09-03）
+
+#### 新增
+- `:core:compass` 纯 Kotlin 模块：环形数学（归一化/最短路径/环形均值标准差）、EMA 平滑（跨界不绕圈）、稳定度三档、稳定期毛刺抑制、磁场干扰监测、倾斜标记
+- `:app` CompassController：Rotation Vector 优先 + 磁力计/加速度计回退、磁力计常开供磁扰检测、start/stop 成对注销、StateFlow 输出；能力判定 FULL/LIMITED（无磁力计不伪造方向）
+- 17 个新单测（累计 51 全绿）
 # Changelog
 
 本文件记录每个 PDCA Cycle 的对外可见变化。格式参考 Keep a Changelog，版本号随发版周期演进。
