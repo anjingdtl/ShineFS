@@ -3,6 +3,22 @@ package com.shinefs.core.classics
 import com.shinefs.core.classics.data.CanonicalTextsData
 import java.security.MessageDigest
 
+/** 原典核验等级；只有双来源逐条校勘完成后才允许进入 DUAL_SOURCE_FULL。 */
+enum class CorpusVerificationStatus(val label: String, val evidence: String) {
+    ELECTRONIC_STRUCTURE_VERIFIED(
+        label = "电子底本已校验",
+        evidence = "结构完整性、checksum、电子底本核对与代码锚点抽查已完成；独立第二来源全量校勘未完成",
+    ),
+    DUAL_SOURCE_PARTIAL(
+        label = "双来源部分校勘",
+        evidence = "第二独立来源已完成部分逐卦/逐爻比对，异文已登记",
+    ),
+    DUAL_SOURCE_FULL(
+        label = "双来源全量校勘",
+        evidence = "第二独立来源已完成逐卦/逐爻比对，异文已登记",
+    ),
+}
+
 /**
  * 周易原典单爻文本（V2.0 方案 §17）：[line] 1..6 自下而上；[smallImage] 为该爻小象。
  */
@@ -44,6 +60,7 @@ data class CanonicalHexagramText(
 interface ClassicCorpus {
     val version: String
     val edition: String
+    val verificationStatus: CorpusVerificationStatus
     val corpusChecksum: String
     val all: List<CanonicalHexagramText>
 
@@ -53,6 +70,8 @@ interface ClassicCorpus {
 object CanonicalCorpus : ClassicCorpus {
     override val version: String get() = CanonicalTextsData.VERSION
     override val edition: String get() = CanonicalTextsData.EDITION
+    override val verificationStatus: CorpusVerificationStatus =
+        CorpusVerificationStatus.ELECTRONIC_STRUCTURE_VERIFIED
     override val corpusChecksum: String get() = CanonicalTextsData.CORPUS_CHECKSUM
     override val all: List<CanonicalHexagramText> get() = CanonicalTextsData.all
 

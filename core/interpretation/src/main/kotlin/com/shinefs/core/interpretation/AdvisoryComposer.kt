@@ -87,7 +87,7 @@ class AdvisoryComposer(
             text.specialUseText?.let { lines.add("特爻：$it") }
             text.specialUseSmallImage?.takeIf { r.changingLine == 6 && text.kingWenOrder in 1..2 }
                 ?.let { lines.add("小象曰：$it") }
-            lines.add("原典：周易通行本电子底本（${if (text.verified) "已核定" else "待核对"}）")
+            lines.add("原典：周易通行本电子底本（${corpus.verificationStatus.label}）")
             if (text.textualVariants.isNotEmpty()) {
                 lines.add("校勘注记：${text.textualVariants.joinToString("；")}")
             }
@@ -192,7 +192,7 @@ class AdvisoryComposer(
             "依据出处：" + r.rule.sourceRefs.joinToString("；") { it.title },
             "说明：${ruleAssumptions(r.rule.ruleId)}",
             "核对状态：${ruleStatusLabel(r.rule.status)}",
-            "典籍：周易通行本电子底本；历法：传统农历历表；方位基准：${r.spaceContext?.let { northReferenceLabel(it.northReference) } ?: "未使用"}",
+            "典籍：周易通行本电子底本（${corpus.verificationStatus.label}）；历法：传统农历历表；方位基准：${r.spaceContext?.let { northReferenceLabel(it.northReference) } ?: "未使用"}",
             "解读方式：本地固定规则，不使用智能生成、不含随机内容、无需联网",
         ),
     )

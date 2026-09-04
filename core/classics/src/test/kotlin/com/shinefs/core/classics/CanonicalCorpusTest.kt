@@ -67,6 +67,8 @@ class CanonicalCorpusTest {
     fun `版本与来源声明`() {
         assertEquals("zhouyi-corpus-v1", CanonicalCorpus.version)
         assertTrue(CanonicalCorpus.edition.contains("wikisource"))
+        assertEquals(CorpusVerificationStatus.ELECTRONIC_STRUCTURE_VERIFIED, CanonicalCorpus.verificationStatus)
+        assertTrue(CanonicalCorpus.verificationStatus.evidence.contains("独立第二来源全量校勘未完成"))
         assertNotNull(CanonicalCorpus.byKingWenOrder(1))
         assertEquals("未济", CanonicalCorpus.byKingWenOrder(64)!!.name)
     }

@@ -890,3 +890,30 @@
 
 - 引导优先级调整为磁场干扰优先，避免姿态同时异常时把用户引向错误的校正动作；调整后测试与 lint 复检通过。
 - 11D 达标，进入 11E：原典 verification status 与用户可见措辞收口。
+
+---
+
+## Cycle 11E — 原典 verification status 与措辞收口（2026-09-04）
+
+### Plan
+
+- 将电子底本结构/内容校验、第二独立来源部分校勘、第二独立来源全量逐卦逐爻校勘拆成显式 `CorpusVerificationStatus`。
+- 当前证据只有电子底本、checksum、结构校验、代码锚点抽查和异文记录；在第二来源全量校勘完成前，所有原典用户文案不得使用“已核定原典”。
+- 保留既有 `verified` 数据字段作为兼容/门禁事实，不改动 64 卦、384 爻及 checksum 内容。
+
+### Do
+
+- `core:classics` 新增 `CorpusVerificationStatus` 三档及 label/evidence，`ClassicCorpus` 暴露 `verificationStatus`；当前 `CanonicalCorpus` 为 `ELECTRONIC_STRUCTURE_VERIFIED`。
+- 离线解释报告第四、九段、规则页、原典列表/详情页统一使用 status 文案；规则状态中的“已核定”仍只描述已登记的演算规则，不冒充原典校勘状态。
+- `YIJING_RULES.md` 增加 status 取值、证据边界和版本记录；新增原典 status 与报告文案测试。
+
+### Check
+
+- `:core:classics:test`：通过（64 卦/384 爻/用九用六/checksum/来源与 status）。
+- `:core:interpretation:test`：通过（九段报告含“电子底本已校验”，不含原典“已核定”句式）。
+- `:app:testDebugUnitTest` 与 `:app:lintDebug`：通过（0 error）。
+
+### Act / Re-Check
+
+- 检索确认生产 UI 中不存在“已核定原典”或“六十四卦内容已核对”等过强原典措辞；代码注释和演算 `RuleStatus` 的内部语义保持不变。
+- 11E 达标，进入 11F：GitHub Actions 远端 unit test/lint/Debug/Release 构建门禁。

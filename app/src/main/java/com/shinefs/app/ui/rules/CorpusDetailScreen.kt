@@ -71,7 +71,7 @@ fun CorpusDetailScreen(
         }
         Spacer(Modifier.height(6.dp))
         Text(
-            "典籍状态：${if (e.verified) "已核定" else "待核对"}\n底本：《周易》通行本电子底本",
+            "典籍状态：${AppGraph.classicCorpus.verificationStatus.label}\n底本：《周易》通行本电子底本",
             color = ShineColors.GoldMuted,
             fontSize = 11.sp,
             lineHeight = 16.sp,

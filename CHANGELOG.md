@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### V2.1 Cycle 11E（2026-09-04）— 原典 verification status
+- 新增 `CorpusVerificationStatus`：`ELECTRONIC_STRUCTURE_VERIFIED`、`DUAL_SOURCE_PARTIAL`、`DUAL_SOURCE_FULL`，把电子底本校验与独立第二来源逐条校勘明确区分。
+- 规则页、六十四卦列表/详情和离线九段报告统一显示“电子底本已校验”；在双来源全量校勘完成前不显示“已核定原典”。
+- 新增 status 与报告措辞回归测试，保留 `verified` 作为电子数据门禁事实，不将其误解为双来源全量校勘。
+
 ### V2.1 Cycle 11D（2026-09-04）— 起卦前动态持握引导
 - 新增纯状态 `PreCastGuidanceResolver`，按实时姿态、稳定度、磁场干扰、磁场读数和传感器精度给出具体动作提示。
 - 罗盘页增加轻量动态持握卡：平放/竖持/过渡/无效姿态使用不同提示与动效；首次通过后记忆引导已完成，后续仍保留紧凑状态反馈。

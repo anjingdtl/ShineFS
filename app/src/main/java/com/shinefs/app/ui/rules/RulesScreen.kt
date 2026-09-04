@@ -74,9 +74,9 @@ fun RulesScreen(
 
         SectionTitle("周易原典")
         val corpus = AppGraph.classicCorpus
-        StatusRow("典籍状态", if (corpus.all.all { it.verified }) "已核定" else "待核对")
+        StatusRow("典籍状态", corpus.verificationStatus.label)
         StatusRow("底本", "《周易》通行本电子底本")
-        StatusRow("核对情况", "六十四卦内容已核对")
+        StatusRow("核对情况", corpus.verificationStatus.evidence)
         Spacer(Modifier.height(6.dp))
         ActionButton(
             text = "浏览六十四卦原典",
@@ -175,7 +175,7 @@ fun CorpusListScreen(
     ) {
         ScreenHeader(title = "周易原典", onBack = onBack)
         Text(
-            "已核定 · 六十四卦原典可查",
+            "电子底本已校验 · 六十四卦原典可查",
             color = ShineColors.JadeAccent,
             fontSize = 12.sp,
             modifier = Modifier.padding(bottom = 6.dp),
