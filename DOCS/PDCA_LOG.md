@@ -555,3 +555,31 @@
 - **遗留**: 无。**Next**: Cycle 10E — ClassicCorpus 原典库。
 
 **验收判定：Cycle 10D 达标（A/B/C 三模式 ✓ 五古例金标准 ✓ RuleManifest ✓ CalculationTrace ✓ 空间不改卦 ✓），Cycle 10D 关闭。**
+
+---
+
+## Cycle 10E — ClassicCorpus 周易原典库（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §33-10E：64卦辞、384爻辞、64彖、64大象、384小象、用九、用六；双源核验、版本化、checksum。
+- **Scope**: 新建 `:core:classics`（模型 + 仓储 + 生成数据）；`edition/` 数据管线（fetch_wikisource.py 抓取存档 + build_corpus.py 解析转换生成）；raw/ 64 卦 wikitext 入库为版本证据。
+- **Out of scope**: 文言传/序卦/杂卦（登记为后续扩展）；ctext 复核（API 已需认证，S-AE1 降级弃用）。
+
+### Do
+
+- **数据管线**: 维基文库 allpages 枚举 + 逐页抓取（429 退避重试 + 断点续抓）→ wikitext 解析（经/彖/大象/小象/用爻，兼容跨行 span、逗号爻题、习坎前缀）→ OpenCC t2s（白名单规范：乾/无保留、遯→遁）→ 结构校验 → Kotlin 数据（1424 行，逐卦 + 全库 SHA-256）。
+- **口径裁定**: 卦辞卦名前缀剥离（坤：元亨…→"元亨…"），坎卦"習坎"属卦辞正文保留全形；异文（{{*|…}}）抽为 textualVariants 透明字段（现存 1 条：乾彖"一作太和"）。
+
+### Check
+
+- `:core:classics:test`：**9/9 PASS**；全仓 `test` 全绿。
+- 双源核验：源A（维基文库底本）×源B（结构化锚点核对，乾坤全爻 + 散卦 20+ 锚点，去标点比对句读差异）。
+- **Problems found（Check 拦截）**: ①"干"污染扫描——全部为正当用字（终日干干/干蛊/噬干胏）②咸/鼎/大过锚点句读与卦名前缀预期差——去标点化锚点修正③heredoc 编码事故污染生成器——Write 工具 UTF-8 重写管线后重建（教训入档：含中文文件一律不用 bash heredoc 改写）④listOf 尾逗号/null 发射两处生成器 bug。
+
+### Act
+
+- **遗留**: S-AE1 ctext 复核待凭证；文言传等扩展数据待后续版本；锚点抽查覆盖 ~30%（结构校验 100%）。
+- **Next**: Cycle 10F — InterpretationCore。
+
+**验收判定：Cycle 10E 达标（64/384/2 完整 ✓ 双源核验 ✓ checksum ✓ 版本化 ✓），Cycle 10E 关闭。**

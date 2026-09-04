@@ -32,8 +32,9 @@
 
 | sourceId | 来源 | 说明 |
 |---|---|---|
-| S-AE1 | 中国哲学书电子化计划（ctext.org）《周易》 | 电子文本 A，卦爻辞+彖象逐卦比对 |
-| S-AE2 | 维基文库（zh.wikisource.org）《周易》 | 电子文本 B，独立校对来源 |
+| S-AE1 | ~~中国哲学书电子化计划（ctext.org）~~ | ⚠️ Cycle 10E 实测：gettext API 已要求认证（ERR_REQUIRES_AUTHENTICATION），本轮降级弃用；保留编号待未来有凭证时复核 |
+| S-AE2 | 维基文库（zh.wikisource.org）《周易》64 卦分页 | **电子底本源**：wikitext 存档于 `core/classics/edition/raw/`（64 文件入库为版本证据）；OpenCC t2s 转写简体 + 白名单规范化（乾/无/遯→遁）；构建管线 `core/classics/edition/fetch_wikisource.py` + `build_corpus.py` |
+| S-AE3 | Agent 结构化录入核对（双源之"源B"） | 乾/坤全爻 + 散卦 20+ 锚点抽查（CanonicalCorpusTest）；句读风格随电子底本，锚点比对去标点 |
 
 ## 3. B 级来源（宋代象数与梅花易数传统）
 
