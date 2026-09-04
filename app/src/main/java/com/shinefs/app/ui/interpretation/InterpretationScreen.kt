@@ -29,43 +29,32 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shinefs.app.ai.AiInterpreter
-import com.shinefs.app.ai.AiStatus
 import com.shinefs.app.data.DivinationCase
-import com.shinefs.app.interpret.RuleBasedInterpreter
 import com.shinefs.app.ui.compass.ActionButton
 import com.shinefs.app.ui.compass.ScreenHeader
 import com.shinefs.app.ui.theme.ShineColors
-import com.shinefs.core.yijing.data.Hexagrams
-import com.shinefs.core.yijing.text.ClassicTextRepository
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * 解卦页（产品方案 §9.4）：固定八段结构 + 卦例管理（收藏/备注/删除）。
- * 原典依仓储返回（fixture 显著标注未核定）；AI 不可用时降级为确定性摘要，
- * **任何情况下不出空白页**。
+ * 解卦页（V2.0 方案 §24 固定九段）：渲染本地规则引擎生成的完整报告
+ * （0 AI；报告随卦例留存，可离线复算）。V1 fixture 旧例显示 legacy 横幅。
  */
 @Composable
 fun InterpretationScreen(
     caseId: String,
     caseLoader: suspend (String) -> DivinationCase?,
-    classicTexts: ClassicTextRepository,
-    interpreter: AiInterpreter,
-    interpreter2: RuleBasedInterpreter,
+    recompute: (DivinationCase) -> String?,
     onBack: () -> Unit,
     onUpdateCase: ((DivinationCase) -> Unit)? = null,
     onDeleteCase: (suspend (String) -> Unit)? = null,
 ) {
     var caseState by remember { mutableStateOf<DivinationCase?>(null) }
-    var aiText by remember { mutableStateOf<String?>(null) }
     var noteText by remember { mutableStateOf("") }
     var confirmDelete by remember { mutableStateOf(false) }
     var deleteTargetId by remember { mutableStateOf<String?>(null) }
     var noteInitialized by remember { mutableStateOf(false) }
+    var recomputeText by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(caseId) {
         val loaded = withContext(Dispatchers.IO) { caseLoader(caseId) }
@@ -73,10 +62,6 @@ fun InterpretationScreen(
         if (!noteInitialized) {
             noteText = loaded?.note ?: ""
             noteInitialized = true
-        }
-        loaded?.let { c ->
-            val result = interpreter.interpret(c)
-            aiText = if (result.status == AiStatus.OK) result.plainText else null
         }
     }
 
@@ -101,86 +86,61 @@ fun InterpretationScreen(
             Text("读取卦例…", color = ShineColors.TextSecondary, modifier = Modifier.padding(24.dp))
             return@Column
         }
-        // 可变工作副本（收藏/备注就地更新），id 不变期间保持
         var case by remember(loaded.id) { mutableStateOf(loaded) }
 
-        val original = Hexagrams.byKingWenOrder(case.originalHexagramOrder)
-        val changed = Hexagrams.byKingWenOrder(case.changedHexagramOrder)
-        val classic = classicTexts.byKingWenOrder(case.originalHexagramOrder)
-
-        SectionTitle("一、测量结果")
-        SectionBody(
-            buildString {
-                appendLine("场景：${case.sceneName}")
-                appendLine("定盘时间：${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(case.timestamp))}")
-                append("方位：${String.format(Locale.US, "%.1f", case.azimuth ?: 0f)}°　向 ${case.facingMountain}　坐 ${case.sittingMountain}（稳定度 ${case.stability}）")
-            },
-        )
-
-        SectionTitle("二、卦象结果")
-        SectionBody(
-            "本卦 《${original.chineseName}》${original.symbol}（第${original.kingWenOrder}卦）　" +
-                "动爻 ${interpreter2.lineName(case.changingLine)}　" +
-                "变卦 《${changed.chineseName}》${changed.symbol}（第${changed.kingWenOrder}卦）\n" +
-                "上卦${case.upperTrigram} · 下卦${case.lowerTrigram}；规则：${case.ruleDisplayName}",
-        )
-
-        SectionTitle("三、原典依据")
-        if (classic != null) {
-            SectionBody(
-                buildString {
-                    appendLine("《周易·${classic.hexagramName}》")
-                    appendLine("卦辞：${classic.judgment}")
-                    append(classic.imageText)
-                },
+        if (case.legacyFixture) {
+            Banner(
+                "V1 联调期卦例（legacy-fixture）：起卦口径为临时 Fixture 规则，仅供查看，" +
+                    "不属于 V2 正式演算结果（rules-v0.1）。",
+                ShineColors.CinnabarBright,
             )
-            if (!classic.verified) {
-                Badge("原典为临时联调数据（${classic.version}，未核定）· 正式底本待决策 D-09", ShineColors.CinnabarBright)
-            } else {
-                Badge("原典版本：${classic.version}（已核定）", ShineColors.JadeAccent)
-            }
-            if (!classic.hasLineTexts) {
-                Badge("爻辞未录入：动爻（${interpreter2.lineName(case.changingLine)}）原文待原典核定入库", ShineColors.GoldMuted)
-            }
-        } else {
-            SectionBody("本卦原典数据尚未录入。")
-            Badge("原典数据待核定入库（D-09：底本与录入流程决策后补全 64 卦）", ShineColors.CinnabarBright)
         }
 
-        SectionTitle("四、象义解析")
-        SectionBody(interpreter2.symbolism(case))
-
-        SectionTitle("五、空间解读")
-        SectionBody(interpreter2.spatial(case))
-
-        SectionTitle("六、宜忌与注意")
-        SectionBody(interpreter2.advisories())
-
-        SectionTitle("七、AI 白话解读")
-        if (aiText != null) {
-            SectionBody(aiText!!)
-            Badge("由 AI 生成，仅供参考；卦象与原典以上文确定性结果为准", ShineColors.GoldMuted)
+        val report = case.reportText
+        if (report != null) {
+            // 九段报告：按「一、二、…九、」标题行分节渲染
+            val lines = report.split("\n")
+            var i = 0
+            while (i < lines.size) {
+                val line = lines[i]
+                if (line.length > 2 && line[1] == '、' && line[0] in '一'..'九') {
+                    SectionTitle(line)
+                    val body = StringBuilder()
+                    var j = i + 1
+                    while (j < lines.size && !(lines[j].length > 2 && lines[j][1] == '、' && lines[j][0] in '一'..'九')) {
+                        if (body.isNotEmpty()) body.append('\n')
+                        body.append(lines[j])
+                        j++
+                    }
+                    if (body.isNotEmpty()) SectionBody(body.toString())
+                    i = j
+                } else {
+                    i++
+                }
+            }
         } else {
+            SectionTitle("卦象结果（V1 旧例）")
             SectionBody(
-                buildString {
-                    appendLine("AI 解读未配置（或不可用）。以下为确定性摘要：")
-                    appendLine()
-                    append(interpreter2.symbolism(case).lineSequence().take(2).joinToString("\n"))
-                },
+                "本卦 ${case.originalHexagramName}（第${case.originalHexagramOrder}卦） · " +
+                    "第${case.changingLine}爻动 · 变卦 ${case.changedHexagramName}；" +
+                    "规则：${case.ruleDisplayName}（${case.rulesVersion}）。",
             )
-            Badge("AI 仅负责白话解释，不参与卦象计算；AI 不可用时完整结果不受影响", ShineColors.JadeAccent)
+            SectionTitle("规则来源与版本")
+            SectionBody("V1 旧例无九段报告与复算轨迹。")
         }
 
-        SectionTitle("八、规则来源与版本")
-        SectionBody(
-            buildString {
-                appendLine("规则标识：${case.ruleId}")
-                appendLine("规则名称：${case.ruleDisplayName}")
-                appendLine("规则版本：${case.rulesVersion}（DOCS/YIJING_RULES.md）")
-                appendLine("解释版本：${case.interpretationVersion}")
-                append("原典版本：${classic?.version ?: "未入库"}")
-            },
-        )
+        SectionTitle("离线复算")
+        if (recomputeText == null && !case.legacyFixture) {
+            ActionButton(
+                text = "按原规则版本复算",
+                enabled = true,
+                primary = false,
+                contentDesc = "shinefs_recompute",
+            ) {
+                recomputeText = recompute(case)
+            }
+        }
+        recomputeText?.let { SectionBody(it) }
 
         if (onUpdateCase != null && onDeleteCase != null) {
             SectionTitle("卦例管理")
@@ -279,11 +239,15 @@ private fun SectionBody(body: String) {
 }
 
 @Composable
-private fun Badge(text: String, color: Color) {
+private fun Banner(text: String, color: Color) {
     Text(
         text,
         color = color,
-        fontSize = 11.sp,
-        modifier = Modifier.padding(top = 6.dp),
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ShineColors.BackgroundRaised, RoundedCornerShape(8.dp))
+            .padding(12.dp),
     )
 }

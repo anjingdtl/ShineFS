@@ -636,3 +636,34 @@
 - **Next**: Cycle 10H — App V2 接入。
 
 **验收判定：Cycle 10G 达标（多圈数学修复+回归 ✓ 精度分离 ✓ 时空融合 ✓ 真机清单升级 ✓），Cycle 10G 关闭。**
+
+
+---
+
+## Cycle 10H — App V2 接入（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §33-10H：移除生产 Fixture 和 AI，接入正式核心，更新首页/罗盘/起卦/结果/原典/历史/设置/规则来源。
+- **Scope**: AppGraph 重写（正式核心链）；DivinationServiceV2（时间/时空合参编排 + 复算）；Room schema v2（方案 §28 全字段 + Migration 1→2）；InterpretationScreen 九段报告重写；TimeCastScreen/RulesScreen/CorpusList/CorpusDetail 新页；CompassScreen 时间盘 + 精度分行；HomeScreen 六入口（方案 §31）；删除 ai/* + interpret/RuleBasedInterpreter + V1 DivinationService + CastModesScreen；Fixture 两类移至 test 源集。
+- **Out of scope**: 后天端法 UI（类象表已就绪，正式入口待后续版本）；真机 E2E（10J）。
+
+### Do
+
+- **数据**: DivinationCase V2 全字段（castMode/zone/版本×3/政策×2/北参考/农历/四数/互卦/体用/五行/时令/轨迹/报告全文/legacyFixture）+ Entity v2（31 列迁移）。
+- **UI**: 首页六入口；罗盘页时间盘（农历/年干支/日干支/时辰/节气，2s 刷新）+ 朝向/磁力计精度分行；时间起卦页（时间盘 + 一键起卦）；九段报告页（legacy 横幅 + 离线复算按钮 + 收藏/备注/删除）；规则与典籍页（规则卡/原典版本/checksum/历法/日界设置）+ 64 卦原典浏览（卦辞/彖/大象/逐爻小象/用九用六/校勘注记）。
+- **移除**: AiInterpreter/OfflineAiInterpreter、RuleBasedInterpreter、V1 DivinationService（ruleExplain 临时口径）、FixtureClassicTexts/FixtureDirectionRule 出生产链。
+
+### Check
+
+- **148/148 测试全绿**（yijing 55 / calendar 30 / compass 23 / divination 15 / classics 9 / interpretation 4 / app 12）；Lint 0 error；Debug + Release（7.6MB unsigned）构建成功。
+- 残留扫描：主源集 0 AI 引用、0 Fixture 引用、0 Random/毫秒取模入演算、Manifest 0 网络权限。
+- 新增 DivinationServiceV2Test：全字段留存/同毫秒同输出/空间不改时间卦/离线复算一致。
+
+### Act
+
+- **Problems found**: changedHexagramName 类型笔误（编译期拦截）；跨协程作用域/重复 import 等 3 处编译期拦截。
+- **遗留**: 端法 UI 入口（后续版本）；Custom time picker（后续）。
+- **Next**: Cycle 10I — 数据迁移。
+
+**验收判定：Cycle 10H 达标（0 生产 Fixture ✓ 0 AI ✓ 正式核心全接入 ✓ 九段报告 ✓ 148 测试 ✓），Cycle 10H 关闭。**

@@ -50,6 +50,7 @@ import com.shinefs.app.ui.theme.ShineColors
 import com.shinefs.core.compass.CompassState
 import com.shinefs.core.compass.StabilityLevel
 import com.shinefs.core.yijing.rules.Orientation
+import com.shinefs.app.AppGraph
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -92,6 +93,17 @@ fun CompassScreen(
     var sealVisible by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
 
+    // 时间盘（V2.0 方案 §30）：农历/年支/时辰/节气，每 2 秒刷新
+    var timeCtx by remember { mutableStateOf<com.shinefs.core.calendar.model.YijingTimeContext?>(null) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            timeCtx = AppGraph.timeResolver.resolve(
+                System.currentTimeMillis(), AppGraph.timeZone, AppGraph.dayBoundaryPolicy(),
+            )
+            kotlinx.coroutines.delay(2000)
+        }
+    }
+
     val displayAzimuth = locked?.azimuth ?: liveAzimuth
     val orientation = displayAzimuth?.let { runCatching { Orientation.fromAzimuth(it) }.getOrNull() }
     val canLock = uiState.capability.level == CompassCapabilityLevel.FULL &&
@@ -111,7 +123,8 @@ fun CompassScreen(
             facingElement = o.facingElement,
             timestamp = System.currentTimeMillis(),
             stability = compass.stability.label,
-            accuracy = compass.accuracy.label,
+            accuracy = compass.orientationAccuracy.label,
+            magneticAccuracy = compass.magneticAccuracy.label,
         )
         sealVisible = true
     }
@@ -186,8 +199,31 @@ fun CompassScreen(
         }
         Spacer(Modifier.height(12.dp))
 
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(ShineColors.BackgroundRaised, RoundedCornerShape(8.dp))
+                .padding(12.dp)
+                .semantics { contentDescription = "shinefs_time_panel" },
+        ) {
+            Text(
+                "时间盘 · ${timeCtx?.calendarVersion ?: "…"}",
+                color = ShineColors.GoldPrimary,
+                fontSize = 13.sp,
+                fontFamily = FontFamily.Serif,
+            )
+            Spacer(Modifier.height(6.dp))
+            StatusRow("农历", timeCtx?.lunarDisplay ?: "…")
+            StatusRow("年干支", timeCtx?.let { "${it.yearStem.chinese}${it.yearBranch.chinese}年" } ?: "…")
+            StatusRow("日干支", timeCtx?.dayGanzhi?.name ?: "…")
+            StatusRow("时辰", timeCtx?.shichen?.display ?: "…")
+            StatusRow("节气", timeCtx?.solarTerm?.term?.chinese ?: "…")
+        }
+        Spacer(Modifier.height(12.dp))
+
         StatusRow("稳定度", stabilityLabel(compass.stability))
-        StatusRow("传感器精度", compass.accuracy.label)
+        StatusRow("朝向精度", compass.orientationAccuracy.label)
+        StatusRow("磁力计精度", compass.magneticAccuracy.label)
         StatusRow(
             "磁场环境",
             if (compass.magneticInterference) "异常（${compass.magneticMagnitudeUt?.toInt()}µT）" else "正常",

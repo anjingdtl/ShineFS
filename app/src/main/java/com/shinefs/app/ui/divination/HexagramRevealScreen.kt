@@ -55,7 +55,6 @@ import kotlinx.coroutines.withContext
 fun HexagramRevealScreen(
     caseId: String,
     caseLoader: suspend (String) -> com.shinefs.app.data.DivinationCase?,
-    ruleExplain: String,
     onBackToHome: () -> Unit,
     onOpenInterpretation: (String) -> Unit,
 ) {
@@ -110,14 +109,25 @@ fun HexagramRevealScreen(
             fontSize = 13.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
-        Text(
-            "向 ${case.facingMountain} 坐 ${case.sittingMountain} · ${String.format("%.1f", case.azimuth ?: 0f)}°",
-            color = ShineColors.TextSecondary,
-            fontSize = 13.sp,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 2.dp),
-        )
+        if (case.azimuth != null && case.facingMountain != null) {
+            Text(
+                "向 ${case.facingMountain} 坐 ${case.sittingMountain} · ${String.format("%.1f", case.azimuth)}°",
+                color = ShineColors.TextSecondary,
+                fontSize = 13.sp,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 2.dp),
+            )
+        } else {
+            Text(
+                "传统时间起卦（无空间数据）",
+                color = ShineColors.TextSecondary,
+                fontSize = 13.sp,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 2.dp),
+            )
+        }
         Spacer(Modifier.height(20.dp))
 
         Row(
@@ -162,7 +172,7 @@ fun HexagramRevealScreen(
         )
         Text(
             "规则：${case.ruleDisplayName}（${case.rulesVersion}）",
-            color = if (case.ruleId.startsWith("fixture")) ShineColors.CinnabarBright else ShineColors.TextSecondary,
+            color = if (case.legacyFixture) ShineColors.CinnabarBright else ShineColors.TextSecondary,
             fontSize = 12.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 2.dp),
         )
@@ -183,7 +193,7 @@ fun HexagramRevealScreen(
         ) { showRule = !showRule }
         if (showRule) {
             Spacer(Modifier.height(8.dp))
-            HintCard("算法依据", ruleExplain)
+            HintCard("演算轨迹", case.calculationTrace ?: "（V1 旧例无轨迹）")
         }
         Spacer(Modifier.height(8.dp))
         HintCard("卦例留存", "本卦例已存入记录（规则版本 ${case.rulesVersion} / 解释版本 ${case.interpretationVersion}），可在卦例记录中查看。")

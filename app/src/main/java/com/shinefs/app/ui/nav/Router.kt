@@ -12,10 +12,13 @@ sealed interface Dest {
     data object Home : Dest
     data object HouseAudit : Dest
     data object History : Dest
+    data object TimeCast : Dest
+    data object Rules : Dest
+    data object CorpusList : Dest
+    data class CorpusDetail(val kingWenOrder: Int) : Dest
 
     /** houseAuditId/sceneId 非空时表示从宅居测局进入（场景已预选，定盘后直达起卦）。 */
     data class Compass(val houseAuditId: String? = null, val sceneId: String? = null) : Dest
-    data object CastModes : Dest
     data class SceneSelect(
         val reading: LockedReading,
         val houseAuditId: String? = null,

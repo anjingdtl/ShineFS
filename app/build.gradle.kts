@@ -47,6 +47,10 @@ kotlin {
 dependencies {
     implementation(project(":core:compass"))
     implementation(project(":core:yijing"))
+    implementation(project(":core:calendar"))
+    implementation(project(":core:divination"))
+    implementation(project(":core:classics"))
+    implementation(project(":core:interpretation"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
