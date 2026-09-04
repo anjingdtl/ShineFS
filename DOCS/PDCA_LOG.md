@@ -609,3 +609,30 @@
 - **遗留**: 无。**Next**: Cycle 10G — 罗盘引擎修复与时空融合。
 
 **验收判定：Cycle 10F 达标（九段报告 ✓ 0 AI ✓ 确定性 ✓ 来源引文 ✓），Cycle 10F 关闭。**
+
+
+---
+
+## Cycle 10G — 罗盘引擎修复与时空融合（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §33-10G：多圈旋转 Bug、Sensor Accuracy 分离、时间+罗盘同时锁定、YijingMomentContext、空间方应、真机清单升级。
+- **Scope**: CircularMath.shortestDiff 负余数修复；CompassState 精度双字段 + accuracyState；CompassEngine.AccuracySource 分流；CompassController 按传感器类型路由；YijingSpaceContextFactory（罗盘状态→空间上下文）；REAL_DEVICE_TEST V2 增补（8/9/10 三节）。
+
+### Do
+
+- **根因修复**: 旧 shortestDiff `((d+540)%360)-180` 在累计角偏移 |d|>540°（同向两圈）时负被除数取模落入 (-540,-180]（期望 +90 实得 -270）；改为先模后平移双分支，任意量级正确。回归锚点固化。
+- **新增测试**: MultiTurnRotationTest（顺/逆时针五圈、正反交替、快速转动不误判毛刺、盘面累积旋转十圈一致性、精度分离互不覆盖）+ YijingSpaceContextFactoryTest（全字段/无定位不伪造/跨零）。
+
+### Check
+
+- `:core:compass:test` 14+9=23、`:core:divination:test` 12+3=15 全绿；全仓 test + :app:assembleDebug 全绿。
+- 模拟器无法验证真磁场项 → 真机清单 §8/§9/§10（CONDITIONAL PASS 边界维持）。
+
+### Act
+
+- **遗留**: android.icu 设备端交叉核验 androidTest 待 10J 一并跑（模拟器可执行）。
+- **Next**: Cycle 10H — App V2 接入。
+
+**验收判定：Cycle 10G 达标（多圈数学修复+回归 ✓ 精度分离 ✓ 时空融合 ✓ 真机清单升级 ✓），Cycle 10G 关闭。**

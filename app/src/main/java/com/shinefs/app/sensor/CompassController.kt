@@ -87,7 +87,13 @@ class CompassController(context: Context) {
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            engine.onAccuracy(SensorAccuracy.fromAndroidValue(accuracy))
+            // 精度分离（V2.0 方案 §6.6-2）：按传感器类型路由，互不覆盖
+            when (sensor?.type) {
+                Sensor.TYPE_MAGNETIC_FIELD ->
+                    engine.onAccuracy(SensorAccuracy.fromAndroidValue(accuracy), CompassEngine.AccuracySource.MAGNETIC)
+                else ->
+                    engine.onAccuracy(SensorAccuracy.fromAndroidValue(accuracy), CompassEngine.AccuracySource.ORIENTATION)
+            }
             publish()
         }
     }

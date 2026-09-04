@@ -85,9 +85,15 @@ class CompassEngine(
         return state
     }
 
+    /** 精度事件源：朝向（Rotation Vector / 回退链）与磁力计各自独立，互不覆盖。 */
+    enum class AccuracySource { ORIENTATION, MAGNETIC }
+
     @Synchronized
-    fun onAccuracy(accuracy: SensorAccuracy): CompassState {
-        state = state.copy(accuracy = accuracy)
+    fun onAccuracy(accuracy: SensorAccuracy, source: AccuracySource = AccuracySource.ORIENTATION): CompassState {
+        state = when (source) {
+            AccuracySource.ORIENTATION -> state.copy(orientationAccuracy = accuracy)
+            AccuracySource.MAGNETIC -> state.copy(magneticAccuracy = accuracy)
+        }
         return state
     }
 

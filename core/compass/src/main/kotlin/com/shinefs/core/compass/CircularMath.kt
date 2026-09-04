@@ -11,9 +11,20 @@ object CircularMath {
         return if (result >= 360f) 0f else result
     }
 
-    /** 从 from 到 to 的最短有符号差，范围 [-180, 180)。 */
+    /**
+     * 从 from 到 to 的最短有符号差，范围 [-180, 180)。
+     *
+     * 修复（Cycle 10G，V2.0 方案 §6.6-1）：旧式 `((to-from+540)%360)-180` 在累计角偏移
+     * 超过 ±540°（同向连续两圈以上）时，负被除数取模产生 (-540,-180] 区间的错值
+     * （例：期望 +90 实得 -270）。先取模再平移的双分支修正对任意量级输入均正确。
+     */
     fun shortestDiff(from: Float, to: Float): Float {
-        return ((to - from + 540f) % 360f) - 180f
+        val d = (to - from) % 360f
+        return when {
+            d >= 180f -> d - 360f
+            d < -180f -> d + 360f
+            else -> d
+        }
     }
 
     /** 环形均值（方向统计均值角）。输入为角度列表。 */
