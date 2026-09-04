@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ShineFS canonical bagua mark.
+    Brand order, clockwise from the top: 乾、兑、离、震、坤、巽、坎、艮。
+    This is the standard first-heaven badge orientation (乾上、坤下), intentionally
+    separated from the compass's postnatal measurement ring.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:pathData="M54,19 a35,35 0 1,0 0.001,0 z"
+        android:strokeColor="@color/bagua_outline"
+        android:strokeWidth="2.1"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M54,22.5 a31.5,31.5 0 1,0 0.001,0 z"
+        android:strokeColor="@color/bagua_outline"
+        android:strokeWidth="1.7"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M54,24 a30,30 0 1,0 0.001,0 z"
+        android:strokeColor="@color/bagua_muted"
+        android:strokeWidth="0.8"
+        android:fillColor="#00000000" />
+
+    <!-- 坎：阴、阳、阴；品牌图位：左 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="270">
+        <path android:pathData="M48,24.5 H52.3 V26.7 H48 Z M55.7,24.5 H60 V26.7 H55.7 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,28.8 H60 V31 H48 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,33.1 H52.3 V35.3 H48 Z M55.7,33.1 H60 V35.3 H55.7 Z" android:fillColor="@color/bagua_gold" />
+    </group>
+
+    <!-- 艮：阳、阴、阴；品牌图位：左上 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="315">
+        <path android:pathData="M48,24.5 H60 V26.7 H48 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,28.8 H52.3 V31 H48 Z M55.7,28.8 H60 V31 H55.7 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,33.1 H52.3 V35.3 H48 Z M55.7,33.1 H60 V35.3 H55.7 Z" android:fillColor="@color/bagua_gold" />
+    </group>
+
+    <!-- 震：阴、阴、阳；品牌图位：右下 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="135">
+        <path android:pathData="M48,24.5 H52.3 V26.7 H48 Z M55.7,24.5 H60 V26.7 H55.7 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,28.8 H52.3 V31 H48 Z M55.7,28.8 H60 V31 H55.7 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,33.1 H60 V35.3 H48 Z" android:fillColor="@color/bagua_gold" />
+    </group>
+
+    <!-- 巽：阳、阳、阴；品牌图位：左下 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="225">
+        <path android:pathData="M48,24.5 H60 V26.7 H48 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,28.8 H60 V31 H48 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,33.1 H52.3 V35.3 H48 Z M55.7,33.1 H60 V35.3 H55.7 Z" android:fillColor="@color/bagua_gold" />
+    </group>
+
+    <!-- 离：阳、阴、阳；品牌图位：右 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="90">
+        <path android:pathData="M48,24.5 H60 V26.7 H48 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,28.8 H52.3 V31 H48 Z M55.7,28.8 H60 V31 H55.7 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,33.1 H60 V35.3 H48 Z" android:fillColor="@color/bagua_gold" />
+    </group>
+
+    <!-- 坤：阴、阴、阴；品牌图位：下 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="180">
+        <path android:pathData="M48,24.5 H52.3 V26.7 H48 Z M55.7,24.5 H60 V26.7 H55.7 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,28.8 H52.3 V31 H48 Z M55.7,28.8 H60 V31 H55.7 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,33.1 H52.3 V35.3 H48 Z M55.7,33.1 H60 V35.3 H55.7 Z" android:fillColor="@color/bagua_gold" />
+    </group>
+
+    <!-- 兑：阴、阳、阳；品牌图位：右上 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="45">
+        <path android:pathData="M48,24.5 H52.3 V26.7 H48 Z M55.7,24.5 H60 V26.7 H55.7 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,28.8 H60 V31 H48 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,33.1 H60 V35.3 H48 Z" android:fillColor="@color/bagua_gold" />
+    </group>
+
+    <!-- 乾：阳、阳、阳；品牌图位：上 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="0">
+        <path android:pathData="M48,24.5 H60 V26.7 H48 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,28.8 H60 V31 H48 Z" android:fillColor="@color/bagua_gold" />
+        <path android:pathData="M48,33.1 H60 V35.3 H48 Z" android:fillColor="@color/bagua_gold" />
+    </group>
+
+    <!-- 中央太极，作为八卦资产的天池核心。 -->
+    <path
+        android:pathData="M54,38 a16,16 0 1,0 0.001,0 z"
+        android:fillColor="@color/bagua_ink"
+        android:strokeColor="@color/bagua_outline"
+        android:strokeWidth="1.4" />
+    <path
+        android:pathData="M54,39 a15,15 0 1,0 0.001,0 z"
+        android:fillColor="@color/bagua_ivory" />
+    <!-- Standard S-curve: black right half, black upper lobe, ivory lower lobe. -->
+    <path
+        android:pathData="M54,39 A15,15 0 0,1 54,69 L54,39 Z"
+        android:fillColor="@color/bagua_ink" />
+    <path android:pathData="M54,39 a7.5,7.5 0 1,0 0.001,0 z" android:fillColor="@color/bagua_ink" />
+    <path android:pathData="M54,54 a7.5,7.5 0 1,0 0.001,0 z" android:fillColor="@color/bagua_ivory" />
+    <path android:pathData="M54,44.3 a2.2,2.2 0 1,0 0.001,0 z" android:fillColor="@color/bagua_ivory" />
+    <path android:pathData="M54,59.3 a2.2,2.2 0 1,0 0.001,0 z" android:fillColor="@color/bagua_ink" />
+</vector>

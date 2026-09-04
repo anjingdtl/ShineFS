@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Monochrome companion of bagua_core: same eight real trigram patterns. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M54,19 a35,35 0 1,0 0.001,0 z M54,22.5 a31.5,31.5 0 1,0 0.001,0 z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.1"
+        android:fillColor="#00000000" />
+
+    <!-- 坎：品牌图位左 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="270">
+        <path android:pathData="M48,24.5 H52.3 V26.7 H48 Z M55.7,24.5 H60 V26.7 H55.7 Z M48,28.8 H60 V31 H48 Z M48,33.1 H52.3 V35.3 H48 Z M55.7,33.1 H60 V35.3 H55.7 Z" android:fillColor="#FFFFFFFF" />
+    </group>
+    <!-- 艮：品牌图位左上 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="315">
+        <path android:pathData="M48,24.5 H60 V26.7 H48 Z M48,28.8 H52.3 V31 H48 Z M55.7,28.8 H60 V31 H55.7 Z M48,33.1 H52.3 V35.3 H48 Z M55.7,33.1 H60 V35.3 H55.7 Z" android:fillColor="#FFFFFFFF" />
+    </group>
+    <!-- 震：品牌图位右下 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="135">
+        <path android:pathData="M48,24.5 H52.3 V26.7 H48 Z M55.7,24.5 H60 V26.7 H55.7 Z M48,28.8 H52.3 V31 H48 Z M55.7,28.8 H60 V31 H55.7 Z M48,33.1 H60 V35.3 H48 Z" android:fillColor="#FFFFFFFF" />
+    </group>
+    <!-- 巽：品牌图位左下 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="225">
+        <path android:pathData="M48,24.5 H60 V26.7 H48 Z M48,28.8 H60 V31 H48 Z M48,33.1 H52.3 V35.3 H48 Z M55.7,33.1 H60 V35.3 H55.7 Z" android:fillColor="#FFFFFFFF" />
+    </group>
+    <!-- 离：品牌图位右 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="90">
+        <path android:pathData="M48,24.5 H60 V26.7 H48 Z M48,28.8 H52.3 V31 H48 Z M55.7,28.8 H60 V31 H55.7 Z M48,33.1 H60 V35.3 H48 Z" android:fillColor="#FFFFFFFF" />
+    </group>
+    <!-- 坤：品牌图位下 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="180">
+        <path android:pathData="M48,24.5 H52.3 V26.7 H48 Z M55.7,24.5 H60 V26.7 H55.7 Z M48,28.8 H52.3 V31 H48 Z M55.7,28.8 H60 V31 H55.7 Z M48,33.1 H52.3 V35.3 H48 Z M55.7,33.1 H60 V35.3 H55.7 Z" android:fillColor="#FFFFFFFF" />
+    </group>
+    <!-- 兑：品牌图位右上 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="45">
+        <path android:pathData="M48,24.5 H52.3 V26.7 H48 Z M55.7,24.5 H60 V26.7 H55.7 Z M48,28.8 H60 V31 H48 Z M48,33.1 H60 V35.3 H48 Z" android:fillColor="#FFFFFFFF" />
+    </group>
+    <!-- 乾：品牌图位上 -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="0">
+        <path android:pathData="M48,24.5 H60 V26.7 H48 Z M48,28.8 H60 V31 H48 Z M48,33.1 H60 V35.3 H48 Z" android:fillColor="#FFFFFFFF" />
+    </group>
+
+    <path
+        android:pathData="M54,38 a16,16 0 1,0 0.001,0 z"
+        android:fillColor="#FFFFFFFF" />
+    <path
+        android:pathData="M54,39 A15,15 0 0,0 54,69 A7.5,7.5 0 0,0 54,54 A7.5,7.5 0 0,1 54,39 Z"
+        android:fillColor="#00000000" />
+</vector>

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#0C0C0F</color>
+    <color name="bagua_outline">#B8955A</color>
+    <color name="bagua_gold">#D9BC7A</color>
+    <color name="bagua_muted">#7E6A44</color>
+    <color name="bagua_ink">#15161A</color>
+    <color name="bagua_ivory">#E8E2D4</color>
 </resources>

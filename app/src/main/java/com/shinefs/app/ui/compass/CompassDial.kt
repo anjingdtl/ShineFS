@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -30,8 +31,12 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.shinefs.app.R
+import com.shinefs.app.ui.assets.drawPostnatalBagua
 import com.shinefs.app.ui.theme.ShineColors
 import com.shinefs.core.compass.StabilityLevel
 import com.shinefs.core.compass.CircularMath
@@ -59,6 +64,7 @@ fun CompassDial(
     modifier: Modifier = Modifier,
 ) {
     val textMeasurer = rememberTextMeasurer()
+    val baguaCorePainter = painterResource(R.drawable.bagua_core)
 
     // 盘面旋转角：目标 ≡ -azimuth (mod 360)，按最短路径累积，避免 359→0 反向绕整圈
     var targetRotation by remember { mutableFloatStateOf(0f) }
@@ -116,9 +122,9 @@ fun CompassDial(
                 drawDegreeNumerals(c, r, textMeasurer)
                 drawDirectionRing(c, r, textMeasurer)
                 drawMountainRing(c, r, textMeasurer, facingMountain)
-                drawTrigramRing(c, r, textMeasurer)
+                drawTrigramRing(c, r)
                 drawElementRing(c, r)
-                drawTianchi(c, r, sway)
+                drawTianchi(c, r, sway, baguaCorePainter)
             }
 
             drawFacingPointer(c, r)
@@ -235,20 +241,16 @@ private fun DrawScope.drawMountainRing(c: Offset, r: Float, tm: androidx.compose
     }
 }
 
-private fun DrawScope.drawTrigramRing(c: Offset, r: Float, tm: androidx.compose.ui.text.TextMeasurer) {
-    val radius = r * 0.545f
-    Trigram.entries.forEach { trigram ->
-        val layout = tm.measure(
-            trigram.symbol,
-            TextStyle(color = ShineColors.GoldPrimary, fontSize = 17.sp),
-        )
-        rotate(trigram.directionAngle, pivot = c) {
-            drawText(
-                layout,
-                topLeft = Offset(c.x - layout.size.width / 2f, c.y - radius - layout.size.height / 2f),
-            )
-        }
-    }
+private fun DrawScope.drawTrigramRing(c: Offset, r: Float) {
+    drawPostnatalBagua(
+        center = c,
+        glyphRadius = r * 0.545f,
+        glyphWidth = r * 0.085f,
+        lineStroke = r * 0.011f,
+        lineGap = r * 0.022f,
+        lineSpacing = r * 0.030f,
+        color = ShineColors.GoldBright,
+    )
 }
 
 /** 五行层：随二十四山领卦着色的暗弧（克制，仅细描）。 */
@@ -269,16 +271,21 @@ private fun DrawScope.drawElementRing(c: Offset, r: Float) {
     drawCircle(ShineColors.GoldMuted, radius = ringR, center = c, style = Stroke(1f))
 }
 
-/** 天池：玄黑水色圆 + 太极 + 磁针（印于盘面，针尖指盘面北）。swayDeg 为微摆角。 */
-private fun DrawScope.drawTianchi(c: Offset, r: Float, swayDeg: Float) {
+/** 天池：玄黑水色圆 + 八卦核心资产 + 磁针（印于盘面，针尖指盘面北）。 */
+private fun DrawScope.drawTianchi(c: Offset, r: Float, swayDeg: Float, baguaCore: Painter) {
     val poolR = r * 0.40f
     drawCircle(ShineColors.TianchiWater, radius = poolR, center = c)
     drawCircle(ShineColors.GoldMuted, radius = poolR, center = c, style = Stroke(1.2f))
 
-    // 太极（小幅居上，磁针叠于其上）
-    val taijiR = poolR * 0.52f
-    val taijiCenter = Offset(c.x, c.y - poolR * 0.22f)
-    drawTaiji(taijiCenter, taijiR)
+    // 桌面图标与罗盘核心使用同一个透明矢量资产，保证卦爻、比例和色彩完全一致。
+    val coreSize = poolR * 2f
+    withTransform({
+        translate(left = c.x - coreSize / 2f, top = c.y - coreSize / 2f)
+    }) {
+        with(baguaCore) {
+            draw(size = Size(coreSize, coreSize), alpha = 0.96f)
+        }
+    }
 
     // 磁针：北半朱砂（菱形细针），南半素金
     val needleLen = poolR * 0.92f
@@ -301,39 +308,6 @@ private fun DrawScope.drawTianchi(c: Offset, r: Float, swayDeg: Float) {
         drawCircle(ShineColors.BackgroundDeep, radius = northW * 0.45f, center = c)
         drawCircle(ShineColors.GoldMuted, radius = northW * 0.45f, center = c, style = Stroke(1f))
     }
-}
-
-private fun DrawScope.drawTaiji(center: Offset, radius: Float) {
-    val ivory = ShineColors.Ivory
-    val black = ShineColors.InkBlack
-    drawCircle(ivory, radius = radius, center = center)
-    // 右半黑
-    drawArc(
-        color = black,
-        startAngle = -90f, sweepAngle = 180f, useCenter = true,
-        topLeft = Offset(center.x - radius, center.y - radius),
-        size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
-    )
-    // 上小圆：上半黑（黑入白）
-    val smallR = radius / 2f
-    val topC = Offset(center.x, center.y - smallR)
-    drawArc(
-        color = black,
-        startAngle = 180f, sweepAngle = 180f, useCenter = true,
-        topLeft = Offset(topC.x - smallR, topC.y - smallR),
-        size = androidx.compose.ui.geometry.Size(smallR * 2, smallR * 2),
-    )
-    // 下小圆：下半白（白入黑）
-    val bottomC = Offset(center.x, center.y + smallR)
-    drawArc(
-        color = ivory,
-        startAngle = 0f, sweepAngle = 180f, useCenter = true,
-        topLeft = Offset(bottomC.x - smallR, bottomC.y - smallR),
-        size = androidx.compose.ui.geometry.Size(smallR * 2, smallR * 2),
-    )
-    drawCircle(ivory, radius = smallR * 0.28f, center = topC)
-    drawCircle(black, radius = smallR * 0.28f, center = bottomC)
-    drawCircle(ShineColors.GoldMuted, radius = radius, center = center, style = Stroke(1f))
 }
 
 /** 顶部固定向首指针（朱砂，指向盘心方向，不随盘旋转；位于山环外侧不压字）。 */
