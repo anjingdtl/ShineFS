@@ -474,3 +474,32 @@
 - **Next**: Cycle 10B — CalendarCore。
 
 **验收判定：Cycle 10A 达标（来源登记 ✓ 规则冻结 ✓ 待决策项成册 ✓ 无来源规则零进入），Cycle 10A 关闭。**
+
+---
+
+## Cycle 10B — CalendarCore 历法一级核心（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §5/§33-10B：传统历法、农历年月日、闰月、十二时辰、年支、干支基础、节气上下文、日界策略、时间 CalculationTrace。
+- **Scope**: 新建 `:core:calendar` 纯 Kotlin JVM 模块（零新依赖）；`YijingTimeResolver` 装配 `YijingTimeContext`；内置 1900–2100 版本化历表（checksum）；Meeus 节气算法；日界双策略。
+- **Out of scope**: android.icu 设备端交叉核验（转 10G/10J androidTest）；真太阳时（TD-V2-04 不引入）。
+- **风险**: ①历表数据正确性（对策：春节 30 年锚点 + 闰月年清单 + 2033 问题专项 + 7.3 万日全量往返）②API 24 兼容（决策：epochMillis+java.util.TimeZone，不启用 desugaring）③节气精度（声明 ±2 分钟，仅上下文用）。
+
+### Do
+
+- **Added**: `core/calendar/`（CivilTime / YijingTimeResolver / model×7 / provider（接口+表实现）/ table（201 年历表+SHA-256）/ calc（干支、Meeus 节气+Espenak-Meeus ΔT））+ 30 JVM 测试。
+- **决策**: 生产历法走内置历表（全 JVM 可测、版本化、checksum），android.icu 仅作设备端核验源（方案 §5.2 允许）。
+
+### Check
+
+- `:core:calendar:test`：**30/30 PASS**（含 7.3 万日全量往返、春节 2000–2029 逐年、2033 闰冬月、DST 1988、晚子时换日对比、确定性）。
+- 全仓回归：`:app:testDebugUnitTest` + 其余 core 模块全绿（见 commit CI 输出）。
+
+### Act
+
+- **Problems found（Check 抓到并修复）**: ①`yearDays` 位遍历写成整数遍历（33009 天荒谬值→测试当场拦截，改 12 位掩码）②`epochDayToCivilDate` yoe 公式符号记反（1900-03-01 往返出 1900-02-29，手工三点验算后修正 `-1460/+36524/-146096`）③Kotlin floorDiv/floorMod 是 infix 不能函数式调用（改 Math.floorDiv/floorMod）。
+- **遗留**: ICU 设备端抽样核验（androidTest，10G/10J）；2100 年后扩展（不支持，fail-fast）。
+- **Next**: Cycle 10C — YijingCore 2.0（互卦/体用/五行/时令）。
+
+**验收判定：Cycle 10B 达标（农历 ✓ 闰月 ✓ 时辰 ✓ 日界双策略 ✓ 节气 ✓ 干支 ✓ Trace ✓ 30 测试全绿），Cycle 10B 关闭。**

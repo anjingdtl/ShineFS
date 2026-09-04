@@ -18,3 +18,4 @@ rootProject.name = "ShineFS"
 include(":app")
 include(":core:yijing")
 include(":core:compass")
+include(":core:calendar")

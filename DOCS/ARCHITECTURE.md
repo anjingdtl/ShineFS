@@ -1,7 +1,8 @@
 # ShineFS 架构说明（ARCHITECTURE）
 
 > 维护规则：每个 PDCA Cycle 结束时同步更新本文件。
-> 当前状态：**V1.0 建设收口**（2026-09-04，Cycle 00–09 全部关闭；真机罗盘验收清单见 DOCS/REAL_DEVICE_TEST.md）
+> 当前状态：**V2.0 建设中**（2026-09-04 起，Cycle 10A+；V1.0 已于 Cycle 00–09 收口，真机罗盘验收清单见 DOCS/REAL_DEVICE_TEST.md）
+> V2.0 方案：`DOCS/ShineFS_V2.0_完全离线周易时空演算_完整建设方案.md`（分层：事实层→演算层→规则关系层→解释层）
 
 ## 1. 项目定位
 
@@ -52,14 +53,33 @@ ShineFS/
 └─ CHANGELOG.md
 ```
 
-### 目标结构（按方案 §17 演进，未到期不得提前建设）
+### 目标结构（V2.0 方案 §3/§4 演进）
 
 ```text
 ├─ app/                    # Compose 壳 + 导航
-├─ core/yijing/            # ✅ 纯 Kotlin 术数核心（Cycle 01 已建）
-├─ core/compass/           # 传感器罗盘引擎（Cycle 02）
-└─ feature/*               # 页面模块（Cycle 03+）
+├─ core/calendar/          # ✅ Cycle 10B：历法一级核心（纯 Kotlin JVM，无新依赖）
+├─ core/yijing/            # ✅ 纯 Kotlin 术数核心（Cycle 01 建，10C 升级 2.0）
+├─ core/compass/           # ✅ 传感器罗盘引擎（Cycle 02；10G 修复多圈/Accuracy）
+├─ core/divination/        # Cycle 10D：起卦核心（梅花时间法/后天端法/时空合参）
+├─ core/classics/          # Cycle 10E：周易原典库（版本化+checksum）
+└─ core/interpretation/    # Cycle 10F：本地规则解释器（0 AI）
 ```
+
+### core:calendar（Cycle 10B）
+
+```text
+core/calendar/src/main/kotlin/com/shinefs/core/calendar/
+├─ CivilTime.kt              # epochMillis ↔ 民用时刻 ↔ 儒略历日序（Hinnant civil 算法）
+├─ YijingTimeResolver.kt     # 总装配：时刻+时区+日界策略 → YijingTimeContext + CalendarTrace
+├─ model/                    # Ganzhi/Shichen/SolarTerm/ChineseDate/Policies/YijingTimeContext/CalendarTrace
+├─ provider/                 # ChineseCalendarProvider 接口 + TableChineseCalendarProvider 生产实现
+├─ table/                    # LunarTableData（1900–2100 历表 + SHA-256 checksum）/ TableLunarCalendar
+└─ calc/                     # GanzhiCalculator（日/年干支、月建）/ SolarTermCalculator（Meeus 视黄经）
+```
+
+**API 24 兼容决策**：不启用 core library desugaring（保持零新依赖离线构建），
+公开 API 用 `epochMillis + java.util.TimeZone`（替代方案建议稿中的 java.time 类型）；
+deviation 已登记于 YIJING_RULES §9 与 SOURCE_CATALOG S-E01。
 
 ### 关键解耦约束（Cycle 01 起生效）
 
