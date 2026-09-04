@@ -1,0 +1,55 @@
+name: Android CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Unit, lint and Android builds
+    runs-on: ubuntu-latest
+    env:
+      # app/build.gradle.kts permits an unsigned Release variant only in CI;
+      # local/release publishing still requires the configured keystore.
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        shell: bash
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: JVM unit tests
+        run: ./gradlew test --stacktrace
+
+      - name: Android lint
+        run: ./gradlew lintDebug --stacktrace
+
+      - name: Debug build
+        run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Release variant build
+        run: ./gradlew :app:assembleRelease --stacktrace

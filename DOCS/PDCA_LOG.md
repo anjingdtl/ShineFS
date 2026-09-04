@@ -917,3 +917,30 @@
 
 - 检索确认生产 UI 中不存在“已核定原典”或“六十四卦内容已核对”等过强原典措辞；代码注释和演算 `RuleStatus` 的内部语义保持不变。
 - 11E 达标，进入 11F：GitHub Actions 远端 unit test/lint/Debug/Release 构建门禁。
+
+---
+
+## Cycle 11F — GitHub Actions CI（2026-09-04）
+
+### Plan
+
+- 建立 main push、main PR 和手动触发的远端构建门禁，覆盖 JVM unit test、Android lint、Debug 与 Release variant。
+- 保持本地正式发布的环境签名约束；CI 只验证 Release variant 是否可构建，不把 debug keystore 或发布私钥写入仓库。
+- 使用项目既有 Gradle wrapper、JDK 17、compileSdk 36 和 Android 依赖版本，避免引入无关构建工具。
+
+### Do
+
+- 新增 `.github/workflows/android.yml`：checkout、Java 17、Android SDK、Gradle setup 后依次执行 `test`、`lintDebug`、`:app:assembleDebug`、`:app:assembleRelease`。
+- `app/build.gradle.kts` 增加 CI unsigned Release 分支：仅当 `CI=true` 且没有正式签名环境时允许构建；本地 release 仍缺签名即 fail-fast。
+- CI 设置最小 `contents: read` 权限、同分支并发取消旧运行，避免无关权限和资源浪费。
+
+### Check
+
+- 本机清空全部 Release 签名环境并设置 `CI=true`，`:app:assembleRelease --stacktrace`：通过。
+- Release 构建仍保留正式签名路径；未改变 `SHINEFS_RELEASE_*` / 兼容旧变量的优先级和 keystore 存在性检查。
+- Workflow 静态检查：四项目标命令、Java 17、Android 36、main push/PR 触发和只读权限均已核对。
+
+### Act / Re-Check
+
+- CI 与本机发布职责明确分离：远端的 unsigned APK 仅为 variant 编译证据，不可作为发布包；正式发布仍须签名并单独验签。
+- 11F 达标，进入 11G：模拟器/飞行模式 E2E、ADB 设备矩阵核验与真实设备可用性复查。

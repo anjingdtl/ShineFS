@@ -12,12 +12,17 @@ fun signingEnv(primary: String, legacy: String): String? =
 val releaseBuildRequested = gradle.startParameter.taskNames.any {
     it.contains("release", ignoreCase = true)
 }
+val ciBuild = System.getenv("CI").equals("true", ignoreCase = true)
 val releaseStoreFileValue = signingEnv("SHINEFS_RELEASE_STORE_FILE", "SHINE_WRITER_RELEASE_STORE_FILE")
 val releaseStorePasswordValue = signingEnv("SHINEFS_RELEASE_STORE_PASSWORD", "SHINE_WRITER_RELEASE_STORE_PASSWORD")
 val releaseKeyAliasValue = signingEnv("SHINEFS_RELEASE_KEY_ALIAS", "SHINE_WRITER_RELEASE_KEY_ALIAS")
 val releaseKeyPasswordValue = signingEnv("SHINEFS_RELEASE_KEY_PASSWORD", "SHINE_WRITER_RELEASE_KEY_PASSWORD")
+val releaseSigningConfigured = releaseStoreFileValue != null &&
+    releaseStorePasswordValue != null &&
+    releaseKeyAliasValue != null &&
+    releaseKeyPasswordValue != null
 
-if (releaseBuildRequested) {
+if (releaseBuildRequested && !releaseSigningConfigured && !ciBuild) {
     val missing = buildList {
         if (releaseStoreFileValue == null) add("SHINEFS_RELEASE_STORE_FILE/SHINE_WRITER_RELEASE_STORE_FILE")
         if (releaseStorePasswordValue == null) add("SHINEFS_RELEASE_STORE_PASSWORD/SHINE_WRITER_RELEASE_STORE_PASSWORD")
@@ -54,7 +59,7 @@ android {
     // There is deliberately no debug-keystore fallback for Release.
     signingConfigs {
         create("release") {
-            if (releaseBuildRequested) {
+            if (releaseSigningConfigured) {
                 storeFile = file(releaseStoreFileValue!!)
                 storePassword = releaseStorePasswordValue!!
                 keyAlias = releaseKeyAliasValue!!
@@ -68,7 +73,9 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // CI verifies the release variant as an unsigned artifact; local release
+            // builds keep the environment-only signing requirement above.
+            signingConfig = if (releaseSigningConfigured) signingConfigs.getByName("release") else null
         }
     }
 

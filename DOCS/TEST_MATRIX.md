@@ -14,6 +14,7 @@
 | HoldPose 与双姿态 | 平放/竖持/过渡/无效、迟滞、快速姿态变化抑制、Display Rotation、双姿态误差≤5° | ✅(11C) | 11C |
 | 起卦前动态引导 | 实时提示姿态/稳定/磁扰/精度；条件满足后自动通过并启用定盘 | ✅(11D) | 11D |
 | 原典 verification status | 电子底本/双来源部分/双来源全量三档；未 full 不显示“已核定原典” | ✅(11E) | 11E |
+| GitHub Actions CI | push/PR main 自动执行 unit test、lintDebug、assembleDebug、assembleRelease | ✅(11F) | 11F |
 
 ## 1. 算法测试（JVM 单元测试，`core/yijing`）
 

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### V2.1 Cycle 11F（2026-09-04）— GitHub Actions CI
+- 新增 `.github/workflows/android.yml`：main push/PR 与手动触发均执行 JVM unit test、Android lint、Debug 构建和 Release variant 构建。
+- Release 构建在 CI 中允许 unsigned variant 仅用于构建验证；本地发布仍要求环境变量提供正式 keystore，不引入 debug keystore fallback。
+- 已在本机清空签名环境并以 `CI=true` 验证 `:app:assembleRelease` 可重复通过。
+
 ### V2.1 Cycle 11E（2026-09-04）— 原典 verification status
 - 新增 `CorpusVerificationStatus`：`ELECTRONIC_STRUCTURE_VERIFIED`、`DUAL_SOURCE_PARTIAL`、`DUAL_SOURCE_FULL`，把电子底本校验与独立第二来源逐条校勘明确区分。
 - 规则页、六十四卦列表/详情和离线九段报告统一显示“电子底本已校验”；在双来源全量校勘完成前不显示“已核定原典”。
