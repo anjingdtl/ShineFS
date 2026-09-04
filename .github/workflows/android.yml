@@ -50,6 +50,27 @@ jobs:
         shell: bash
         run: ./gradlew test --stacktrace --no-daemon --console=plain --continue
 
+      - name: Summarize JVM test failures
+        if: always()
+        shell: bash
+        run: |
+          shopt -s nullglob globstar
+          failed=0
+          reports=(app/build/test-results/**/*.xml core/**/build/test-results/**/*.xml)
+          for report in "${reports[@]}"; do
+            suite=$(grep -m1 '<testsuite ' "$report" || true)
+            [[ -z "$suite" ]] && continue
+            failures=$(sed -n 's/.*failures="\([0-9][0-9]*\)".*/\1/p' <<< "$suite")
+            errors=$(sed -n 's/.*errors="\([0-9][0-9]*\)".*/\1/p' <<< "$suite")
+            if [[ "${failures:-0}" != "0" || "${errors:-0}" != "0" ]]; then
+              echo "::error file=$report,title=JVM test suite failed::failures=${failures:-0} errors=${errors:-0} report=$report"
+              failed=1
+            fi
+          done
+          if [[ "$failed" == "0" ]]; then
+            echo "No failed JVM test suites were found in the generated XML reports."
+          fi
+
       - name: Android lint
         run: ./gradlew lintDebug --stacktrace
 
