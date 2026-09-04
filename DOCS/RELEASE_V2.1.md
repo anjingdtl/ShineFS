@@ -22,9 +22,9 @@ V2.1 已完成 Cycle 11A～11H 的代码、测试、迁移、文档和 CI 收口
 | 11E | `f214ff5` | 原典 `CorpusVerificationStatus` 与措辞收口 |
 | 11F | `fba898c` | GitHub Actions CI 与 Release 签名边界 |
 | 11G | `fe4b5a2` | 模拟器飞行模式 E2E 与设备边界记录 |
-| 11H | 本报告所属最终发布提交（以 `git log` 为准） | 版本、历史测量留痕、仓库卫生与最终验收 |
+| 11H | `4f69b13`；CI 修复链 `c3f63dd` / `9929e16` / `62f8611` / `88202cf` | 版本、历史测量留痕、仓库卫生、CI 收口与最终验收 |
 
-上述 Cycle 提交均在 `main` 上按 Cycle 完成推送；11H 提交完成后以远端 `origin/main` 和 Actions 运行结果为最终依据。
+上述 Cycle 提交均在 `main` 上按 Cycle 完成推送；11H 的 CI 诊断链先后修复 wrapper 执行权限、报告可见性、失败摘要和 Fixture 时区隐式依赖，最终 run 以 `88202cf` 为 head 并全绿。
 
 ## 3. 已交付能力
 
@@ -48,7 +48,7 @@ V2.1 已完成 Cycle 11A～11H 的代码、测试、迁移、文档和 CI 收口
 | Debug | `./gradlew :app:assembleDebug` | BUILD SUCCESSFUL；最终 APK 已安装到模拟器 |
 | Release variant | `CI=true ./gradlew :app:assembleRelease`；本地 legacy 环境签名路径 | BUILD SUCCESSFUL；`com.shinefs.app` / code 3 / name 2.1；APK v2 签名验证通过 |
 | 设备端 | `./gradlew :app:connectedDebugAndroidTest` | 3/3；`CalendarDeviceSmokeTest` failures=0/errors=0/skipped=0 |
-| GitHub Actions | `.github/workflows/android.yml`，最新 `main` SHA | 11H 推送后核对最新运行并回填 URL |
+| GitHub Actions | `.github/workflows/android.yml`，run `33853300999`，head `88202cf` | **PASS**；unit test、lint、Debug、Release 全部 success；[Actions run](https://github.com/anjingdtl/ShineFS/actions/runs/33853300999) |
 
 CI 的 unsigned Release APK 只证明 variant 可编译，不能直接作为对外发布包；正式包必须通过 `SHINEFS_RELEASE_*` 或兼容旧变量提供的 keystore 签名路径。
 

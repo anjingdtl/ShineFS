@@ -1011,4 +1011,5 @@
 
 ### Commit / Push
 
-- Cycle 11H 提交哈希在最终提交后回填到 `DOCS/RELEASE_V2.1.md` 与本节对应发布记录；完成后推送 `main`，再核对 GitHub Actions 最新运行。
+- Cycle 11H 主收口提交为 `4f69b13`；CI 修复/诊断链为 `c3f63dd`、`9929e16`、`62f8611`、`88202cf`，均已推送 `main`。
+- Actions run `33853300999`（head `88202cf`）已全绿：JVM unit test、Lint、Debug、Release 和报告上传均 success。
