@@ -13,7 +13,7 @@ import java.time.ZoneId
  */
 class FixtureDirectionRuleTest {
 
-    private val rule = FixtureDirectionRule()
+    private val rule = FixtureDirectionRule(ZoneId.of("Asia/Shanghai"))
 
     @Test
     fun `同输入必同输出`() {

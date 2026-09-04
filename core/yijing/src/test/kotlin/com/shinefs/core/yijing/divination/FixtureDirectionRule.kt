@@ -18,7 +18,7 @@ import java.time.ZoneId
  * 时间口径为公历数字直取，这是**临时选择**而非术数定论；
  * 正式口径（农历/干支/梅花易数取数等）见 DOCS/YIJING_RULES.md 待决策项。
  */
-class FixtureDirectionRule : DirectionDivinationRule {
+class FixtureDirectionRule(private val timeZone: ZoneId) : DirectionDivinationRule {
 
     override val ruleId: String = "fixture-direction"
     override val displayName: String = "方位起卦 · 临时联调口径（非正式）"
@@ -27,7 +27,9 @@ class FixtureDirectionRule : DirectionDivinationRule {
         val azimuth = ((input.azimuth % 360f) + 360f) % 360f
         val upper = LaterHeavenBagua.trigramAt(azimuth)
 
-        val t = Instant.ofEpochMilli(input.epochMillis).atZone(ZoneId.systemDefault())
+        // Fixture tests must not inherit the runner's default timezone; production
+        // V2.1 paths inject the device timezone explicitly at the app boundary.
+        val t = Instant.ofEpochMilli(input.epochMillis).atZone(timeZone)
         val y = t.year
         val mo = t.monthValue
         val d = t.dayOfMonth
