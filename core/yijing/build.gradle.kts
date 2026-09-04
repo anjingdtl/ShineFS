@@ -9,5 +9,6 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":core:calendar"))
     testImplementation(libs.junit)
 }

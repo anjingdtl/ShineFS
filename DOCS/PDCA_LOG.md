@@ -503,3 +503,29 @@
 - **Next**: Cycle 10C — YijingCore 2.0（互卦/体用/五行/时令）。
 
 **验收判定：Cycle 10B 达标（农历 ✓ 闰月 ✓ 时辰 ✓ 日界双策略 ✓ 节气 ✓ 干支 ✓ Trace ✓ 30 测试全绿），Cycle 10B 关闭。**
+
+---
+
+## Cycle 10C — YijingCore 2.0（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §33-10C：复核八卦/64卦/384变卦（V1 已有），新增互卦、体用、五行关系、时令上下文。
+- **Scope**: `core:yijing` 新增 `model/Element`（五行+关系判定）、`nuclear/`（互卦+双策略）、`tiyong/`（体用）、`element/SeasonalQi`（时令事实层）；依赖 `:core:calendar`（SolarTerm）。
+- **Out of scope**: 旺衰细目（TD-V2-05）；乾坤无互策略启用（仅登记）。
+
+### Do
+
+- **Added**: Element（相生循环序枚举，generates=+1/controls=+2）、TrigramElements、ElementRelations（5 关系枚举）、NuclearOps（STANDARD_234_345 默认 / LEGACY 登记）、TiYongOps、SeasonalQi（节气月令 + 辰戌丑未土旺标记，独立字段）。
+- **Tests**: +9 用例（互卦 64 全覆盖+锚点 7 例+策略、体用 384 全覆盖+观梅占链路、五行 25 对穷举、时令边界）。
+
+### Check
+
+- `:core:yijing:test`：**55/55 PASS**（42 旧 + 13 新）。
+- **Problems found**: 3 处测试预期笔误（既济互应为未济、姤中互为纯乾、泰互为归妹、小寒属丑月土旺）——实现经手工逐爻重算确认正确，测试当场拦截的是我录入时的口算错误，修正后全绿（体现锚点测试价值）。
+
+### Act
+
+- **遗留**: 无。**Next**: Cycle 10D — DivinationCore。
+
+**验收判定：Cycle 10C 达标（64 互卦 ✓ 384 体用 ✓ 五行生克 ✓ 时令 ✓），Cycle 10C 关闭。**
