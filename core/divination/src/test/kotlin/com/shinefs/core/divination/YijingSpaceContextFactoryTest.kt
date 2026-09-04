@@ -1,7 +1,11 @@
 package com.shinefs.core.divination
 
 import com.shinefs.core.compass.CompassEngine
+import com.shinefs.core.compass.NorthReference
 import com.shinefs.core.compass.SensorAccuracy
+import com.shinefs.core.compass.StabilityLevel
+import com.shinefs.core.compass.pose.HoldPose
+import com.shinefs.core.compass.snapshot.LockedCompassSnapshot
 import com.shinefs.core.divination.context.YijingSpaceContextFactory
 import com.shinefs.core.yijing.model.Trigram
 import org.junit.Assert.assertEquals
@@ -44,5 +48,44 @@ class YijingSpaceContextFactoryTest {
         assertEquals("子", ctx.facingMountain) // 359.5° ∈ [352.5, 360) → 子
         assertEquals("午", ctx.sittingMountain)
         assertEquals(Trigram.KAN, ctx.directionTrigram) // 北
+    }
+
+    @Test
+    fun `真实定盘快照字段原样进入空间上下文`() {
+        val snapshot = LockedCompassSnapshot(
+            capturedAt = 77L,
+            rawAzimuth = 181.8f,
+            smoothedAzimuth = 182.4f,
+            pitchDeg = 6.2f,
+            rollDeg = -1.3f,
+            holdPose = HoldPose.UPRIGHT,
+            holdPoseConfidence = 0.8f,
+            poseStableMillis = 900L,
+            stability = StabilityLevel.GOOD,
+            stabilityStdDeg = 0.3f,
+            orientationAccuracy = SensorAccuracy.HIGH,
+            magneticAccuracy = SensorAccuracy.MEDIUM,
+            magneticMagnitudeUt = 51.2f,
+            magneticInterference = false,
+            northReference = NorthReference.MAGNETIC,
+            displayRotation = 1,
+            facingMountain = "午",
+            sittingMountain = "子",
+            directionTrigram = "离",
+        )
+        val context = YijingSpaceContextFactory.fromLockedCompassSnapshot(snapshot)!!
+
+        assertEquals(snapshot.capturedAt, context.snapshotCapturedAt)
+        assertEquals(snapshot.rawAzimuth, context.rawAzimuth)
+        assertEquals(snapshot.smoothedAzimuth, context.smoothedAzimuth)
+        assertEquals(snapshot.holdPose, context.holdPose)
+        assertEquals(snapshot.holdPoseConfidence, context.holdPoseConfidence, 0.001f)
+        assertEquals(snapshot.poseStableMillis, context.poseStableMillis)
+        assertEquals(snapshot.pitchDeg, context.pitchDeg)
+        assertEquals(snapshot.rollDeg, context.rollDeg)
+        assertEquals(snapshot.stabilityStdDeg, context.stabilityStdDeg)
+        assertEquals(snapshot.magneticMagnitudeUt, context.magneticMagnitudeUt)
+        assertEquals(SensorAccuracy.HIGH, context.sensorAccuracy!!.orientationAccuracy)
+        assertEquals(SensorAccuracy.MEDIUM, context.sensorAccuracy.magneticAccuracy)
     }
 }

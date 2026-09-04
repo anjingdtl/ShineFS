@@ -49,6 +49,18 @@ data class DivinationCaseEntity(
     @ColumnInfo(defaultValue = "MAGNETIC") val northReference: String,
     val rawAzimuth: Float?,
     val smoothedAzimuth: Float?,
+    val snapshotCapturedAt: Long?,
+    @ColumnInfo(defaultValue = "") val holdPose: String,
+    @ColumnInfo(defaultValue = "0") val holdPoseConfidence: Float,
+    @ColumnInfo(defaultValue = "0") val poseStableMillis: Long,
+    @ColumnInfo(defaultValue = "0") val displayRotation: Int,
+    val pitchDeg: Float?,
+    val rollDeg: Float?,
+    val stabilityStdDeg: Float?,
+    @ColumnInfo(defaultValue = "") val orientationAccuracy: String,
+    @ColumnInfo(defaultValue = "") val magneticAccuracy: String,
+    val magneticMagnitudeUt: Float?,
+    @ColumnInfo(defaultValue = "0") val magneticInterference: Boolean,
     @ColumnInfo(defaultValue = "0") val lunarYear: Int,
     @ColumnInfo(defaultValue = "0") val lunarMonth: Int,
     @ColumnInfo(defaultValue = "0") val lunarDay: Int,
@@ -95,7 +107,7 @@ interface DivinationCaseDao {
     fun markLegacyFixtures()
 }
 
-@Database(entities = [DivinationCaseEntity::class], version = 3, exportSchema = true)
+@Database(entities = [DivinationCaseEntity::class], version = 4, exportSchema = true)
 abstract class ShineDatabase : RoomDatabase() {
     abstract fun divinationCaseDao(): DivinationCaseDao
 
@@ -141,6 +153,24 @@ abstract class ShineDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE divination_cases ADD COLUMN utcOffsetMinutes INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE divination_cases ADD COLUMN localDateTime TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        /** v3 → v4：保存定盘瞬间真实姿态、精度与磁场快照字段。 */
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN snapshotCapturedAt INTEGER")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN holdPose TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN holdPoseConfidence REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN poseStableMillis INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN displayRotation INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN pitchDeg REAL")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN rollDeg REAL")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN stabilityStdDeg REAL")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN orientationAccuracy TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN magneticAccuracy TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN magneticMagnitudeUt REAL")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN magneticInterference INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

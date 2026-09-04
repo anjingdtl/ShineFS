@@ -48,7 +48,9 @@ import com.shinefs.app.sensor.CompassCapabilityLevel
 import com.shinefs.app.sensor.CompassController
 import com.shinefs.app.ui.theme.ShineColors
 import com.shinefs.core.compass.CompassState
+import com.shinefs.core.compass.PreCastReadiness
 import com.shinefs.core.compass.StabilityLevel
+import com.shinefs.core.compass.pose.HoldPose
 import com.shinefs.core.yijing.rules.Orientation
 import com.shinefs.app.AppGraph
 import java.text.SimpleDateFormat
@@ -106,10 +108,9 @@ fun CompassScreen(
 
     val displayAzimuth = locked?.azimuth ?: liveAzimuth
     val orientation = displayAzimuth?.let { runCatching { Orientation.fromAzimuth(it) }.getOrNull() }
+    val readiness = uiState.readiness
     val canLock = uiState.capability.level == CompassCapabilityLevel.FULL &&
-        liveAzimuth != null && locked == null &&
-        compass.stability == StabilityLevel.GOOD &&
-        !compass.magneticInterference && !compass.tooTilted
+        liveAzimuth != null && locked == null && readiness.ready
 
     fun doLock() {
         val az = liveAzimuth ?: return
@@ -120,20 +121,28 @@ fun CompassScreen(
             AppGraph.timeZone,
             AppGraph.dayBoundaryPolicy(),
         )
+        val snapshot = controller.captureSnapshot(
+            capturedAt = timestamp,
+            northReference = com.shinefs.core.compass.NorthReference.MAGNETIC,
+            facingMountain = o.facingMountain,
+            sittingMountain = o.sittingMountain,
+            directionTrigram = o.facingTrigram.chineseName,
+        ) ?: return
         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         locked = LockedReading(
-            azimuth = az,
+            azimuth = snapshot.smoothedAzimuth ?: az,
             facingMountain = o.facingMountain,
             sittingMountain = o.sittingMountain,
             facingTrigram = o.facingTrigram.chineseName,
             facingElement = o.facingElement,
             timestamp = timestamp,
-            stability = compass.stability.label,
-            accuracy = compass.orientationAccuracy.label,
-            magneticAccuracy = compass.magneticAccuracy.label,
+            stability = snapshot.stability.label,
+            accuracy = snapshot.orientationAccuracy.label,
+            magneticAccuracy = snapshot.magneticAccuracy.label,
             zoneId = lockedTime.zoneId,
             localDateTime = lockedTime.localDateTime,
             utcOffsetMinutes = lockedTime.utcOffsetMinutes,
+            snapshot = snapshot,
         )
         sealVisible = true
     }
@@ -232,6 +241,16 @@ fun CompassScreen(
         Spacer(Modifier.height(12.dp))
 
         StatusRow("稳定度", stabilityLabel(compass.stability))
+        StatusRow("持握姿态", holdPoseLabel(uiState.holdPose.pose))
+        val poseAngles = uiState.holdPose.let { pose ->
+            if (pose.pitchDeg.isFinite() && pose.rollDeg.isFinite()) {
+                "pitch ${String.format(Locale.US, "%.1f", pose.pitchDeg)}° · " +
+                    "roll ${String.format(Locale.US, "%.1f", pose.rollDeg)}°"
+            } else {
+                "等待姿态读数"
+            }
+        }
+        StatusRow("姿态角", poseAngles)
         StatusRow("方位准确度", compass.orientationAccuracy.label)
         StatusRow("磁场准确度", compass.magneticAccuracy.label)
         StatusRow(
@@ -239,7 +258,9 @@ fun CompassScreen(
             if (compass.magneticInterference) "异常（约 ${compass.magneticMagnitudeUt?.toInt()} 微特斯拉）" else "正常",
             warn = compass.magneticInterference,
         )
-        if (lk == null && compass.tooTilted) StatusRow("持机姿态", "倾斜过大，请正对前方竖持手机", warn = true)
+        if (lk == null && uiState.holdPose.stableMillis > 0L && !uiState.holdPose.valid) {
+            StatusRow("姿态状态", "${uiState.holdPose.pose.label}，${uiState.holdPose.stableMillis}ms", warn = true)
+        }
         if (lk == null && uiState.calibrationRecommended) {
             StatusRow("读数校正", "准确度不足：请持机在空中缓慢画「8」字，让读数恢复稳定", warn = true)
         }
@@ -254,7 +275,7 @@ fun CompassScreen(
             ) { doLock() }
             if (!canLock && uiState.capability.level == CompassCapabilityLevel.FULL) {
                 Text(
-                    text = lockHint(compass),
+                        text = lockHint(compass, uiState.holdPose.pose, readiness),
                     color = ShineColors.TextSecondary,
                     fontSize = 12.sp,
                     modifier = Modifier
@@ -345,11 +366,21 @@ fun ActionButton(
     }
 }
 
-private fun lockHint(c: CompassState): String = when {
+private fun lockHint(c: CompassState, pose: HoldPose, readiness: PreCastReadiness): String = when {
     c.magneticInterference -> "磁场环境异常，已暂停定盘：请远离金属与磁体"
-    c.tooTilted -> "请正对前方竖持手机，减少倾斜"
+    pose == HoldPose.FLAT || pose == HoldPose.UPRIGHT ->
+        readiness.primaryReason
+    pose == HoldPose.TRANSITION -> "请将手机再放平一些或再竖直一些"
+    pose == HoldPose.INVALID -> "当前姿态无效，请让屏幕朝上或竖直持握"
     c.stability != StabilityLevel.GOOD -> "稳定度需达到「良好」，请持稳手机"
     else -> "等待罗盘读数稳定…"
+}
+
+private fun holdPoseLabel(pose: HoldPose): String = when (pose) {
+    HoldPose.FLAT -> "平放 · 已识别"
+    HoldPose.UPRIGHT -> "竖持 · 已识别"
+    HoldPose.TRANSITION -> "过渡态 · 请调整"
+    HoldPose.INVALID -> "无效 · 请调整"
 }
 
 /** 系统级"减少动画"设置（ANIMATOR_DURATION_SCALE == 0 时禁用装饰性动画）。 */

@@ -5,6 +5,7 @@ import com.shinefs.core.compass.NorthReference
 import com.shinefs.core.compass.SensorAccuracy
 import com.shinefs.core.compass.SensorAccuracyState
 import com.shinefs.core.compass.StabilityLevel
+import com.shinefs.core.compass.snapshot.LockedCompassSnapshot
 import com.shinefs.core.yijing.model.Trigram
 import com.shinefs.core.yijing.rules.LaterHeavenBagua
 import com.shinefs.core.yijing.rules.Mountains24
@@ -16,6 +17,36 @@ import com.shinefs.core.yijing.rules.Mountains24
  * 北参考默认磁北（TD-V2-08）。
  */
 object YijingSpaceContextFactory {
+
+    /** V2.1：直接把定盘瞬间的不可变快照映射为空间上下文。 */
+    fun fromLockedCompassSnapshot(
+        snapshot: LockedCompassSnapshot,
+    ): YijingSpaceContext? {
+        val azimuth = snapshot.smoothedAzimuth ?: return null
+        val sitting = (azimuth + 180f) % 360f
+        return YijingSpaceContext(
+            rawAzimuth = snapshot.rawAzimuth,
+            smoothedAzimuth = azimuth,
+            northReference = snapshot.northReference,
+            facingMountain = snapshot.facingMountain ?: Mountains24.mountainAt(azimuth),
+            sittingMountain = snapshot.sittingMountain ?: Mountains24.mountainAt(sitting),
+            directionTrigram = LaterHeavenBagua.trigramAt(azimuth),
+            sensorAccuracy = SensorAccuracyState(
+                snapshot.orientationAccuracy,
+                snapshot.magneticAccuracy,
+            ),
+            stable = snapshot.stability == StabilityLevel.GOOD,
+            magneticInterference = snapshot.magneticInterference,
+            holdPose = snapshot.holdPose,
+            holdPoseConfidence = snapshot.holdPoseConfidence,
+            poseStableMillis = snapshot.poseStableMillis,
+            pitchDeg = snapshot.pitchDeg,
+            rollDeg = snapshot.rollDeg,
+            stabilityStdDeg = snapshot.stabilityStdDeg,
+            magneticMagnitudeUt = snapshot.magneticMagnitudeUt,
+            snapshotCapturedAt = snapshot.capturedAt,
+        )
+    }
 
     /**
      * V2 旧导航对象适配器：只把已有读数映射为空间事实，不创建 CompassEngine、

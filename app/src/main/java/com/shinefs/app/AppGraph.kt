@@ -91,7 +91,11 @@ object AppGraph {
             ShineDatabase::class.java,
             "shinefs.db",
         )
-            .addMigrations(ShineDatabase.MIGRATION_1_2, ShineDatabase.MIGRATION_2_3)
+            .addMigrations(
+                ShineDatabase.MIGRATION_1_2,
+                ShineDatabase.MIGRATION_2_3,
+                ShineDatabase.MIGRATION_3_4,
+            )
             .build()
         caseRepository = RoomCaseRepository(database.divinationCaseDao())
         // Cycle 10I：V1 Fixture 卦例统一标记 legacy-fixture（幂等；后台线程避免主线程 DB）。

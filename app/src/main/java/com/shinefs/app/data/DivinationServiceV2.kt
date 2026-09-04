@@ -10,6 +10,7 @@ import com.shinefs.core.divination.result.DivinationResult
 import com.shinefs.core.divination.rule.MeihuaTimeDivinationRuleV1
 import com.shinefs.core.divination.rule.TimeCastWithSpatialResponse
 import com.shinefs.core.interpretation.AdvisoryComposer
+import com.shinefs.core.compass.snapshot.LockedCompassSnapshot
 import java.util.TimeZone
 import java.util.UUID
 
@@ -28,6 +29,8 @@ data class LockedReading(
     val zoneId: String? = null,
     val localDateTime: String? = null,
     val utcOffsetMinutes: Int? = null,
+    /** V2.1 定盘瞬间复制的真实状态；没有该字段的旧调用方只走显式兼容路径。 */
+    val snapshot: LockedCompassSnapshot? = null,
 )
 
 /**
@@ -69,16 +72,18 @@ class DivinationServiceV2(
             reading.zoneId?.let(TimeZone::getTimeZone) ?: currentTimeZone(),
             dayBoundaryPolicy,
         )
-        val space = YijingSpaceContextFactory.fromLegacyReading(
-            rawAzimuth = reading.azimuth,
-            smoothedAzimuth = reading.azimuth,
-            facingMountain = reading.facingMountain,
-            sittingMountain = reading.sittingMountain,
-            facingTrigram = reading.facingTrigram,
-            stable = reading.stability == "良好",
-            orientationAccuracy = reading.accuracy,
-            magneticAccuracy = reading.magneticAccuracy,
-        ) ?: error("时空起卦缺少有效的定盘读数")
+        val space = reading.snapshot?.let(YijingSpaceContextFactory::fromLockedCompassSnapshot)
+            ?: YijingSpaceContextFactory.fromLegacyReading(
+                rawAzimuth = reading.azimuth,
+                smoothedAzimuth = reading.azimuth,
+                facingMountain = reading.facingMountain,
+                sittingMountain = reading.sittingMountain,
+                facingTrigram = reading.facingTrigram,
+                stable = reading.stability == "良好",
+                orientationAccuracy = reading.accuracy,
+                magneticAccuracy = reading.magneticAccuracy,
+            )
+            ?: error("时空起卦缺少有效的定盘读数")
         val result = spaceRule.cast(YijingMomentContext(time, space, null, reading.timestamp))
         return save(result, scene, houseAuditId, DivinationCase.CAST_MODE_TIME_SPACE, reading)
     }
@@ -98,12 +103,12 @@ class DivinationServiceV2(
             timestamp = t.epochMillis,
             sceneId = scene.id,
             sceneName = scene.name,
-            azimuth = reading?.azimuth,
+            azimuth = sp?.smoothedAzimuth ?: reading?.azimuth,
             facingMountain = sp?.facingMountain ?: reading?.facingMountain,
             sittingMountain = sp?.sittingMountain ?: reading?.sittingMountain,
             facingTrigram = sp?.directionTrigram?.chineseName ?: reading?.facingTrigram,
             facingElement = sp?.directionTrigram?.element ?: reading?.facingElement,
-            stability = reading?.stability,
+            stability = if (sp?.stable == true) "良好" else reading?.stability,
             ruleId = result.rule.ruleId,
             ruleDisplayName = displayRuleName(result.rule.ruleId),
             rulesVersion = DivinationCase.RULES_VERSION,
@@ -127,6 +132,18 @@ class DivinationServiceV2(
             northReference = sp?.northReference?.name,
             rawAzimuth = sp?.rawAzimuth,
             smoothedAzimuth = sp?.smoothedAzimuth,
+            snapshotCapturedAt = reading?.snapshot?.capturedAt,
+            holdPose = sp?.holdPose?.name ?: reading?.snapshot?.holdPose?.name,
+            holdPoseConfidence = sp?.holdPoseConfidence,
+            poseStableMillis = sp?.poseStableMillis,
+            displayRotation = reading?.snapshot?.displayRotation,
+            pitchDeg = sp?.pitchDeg,
+            rollDeg = sp?.rollDeg,
+            stabilityStdDeg = sp?.stabilityStdDeg,
+            orientationAccuracy = sp?.sensorAccuracy?.orientationAccuracy?.name,
+            magneticAccuracy = sp?.sensorAccuracy?.magneticAccuracy?.name,
+            magneticMagnitudeUt = sp?.magneticMagnitudeUt,
+            magneticInterference = sp?.magneticInterference,
             lunarYear = t.lunarYear,
             lunarMonth = t.lunarMonth,
             lunarDay = t.lunarDay,

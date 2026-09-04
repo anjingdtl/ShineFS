@@ -3,6 +3,7 @@ package com.shinefs.core.divination.context
 import com.shinefs.core.calendar.model.YijingTimeContext
 import com.shinefs.core.compass.NorthReference
 import com.shinefs.core.compass.SensorAccuracyState
+import com.shinefs.core.compass.pose.HoldPose
 import com.shinefs.core.yijing.model.Trigram
 
 /**
@@ -27,6 +28,14 @@ data class YijingSpaceContext(
     val sensorAccuracy: SensorAccuracyState?,
     val stable: Boolean,
     val magneticInterference: Boolean,
+    val holdPose: HoldPose = HoldPose.INVALID,
+    val holdPoseConfidence: Float = 0f,
+    val poseStableMillis: Long = 0L,
+    val pitchDeg: Float? = null,
+    val rollDeg: Float? = null,
+    val stabilityStdDeg: Float? = null,
+    val magneticMagnitudeUt: Float? = null,
+    val snapshotCapturedAt: Long? = null,
 )
 
 /** 占测事件（物象占用）：版本化类象表条目 id + 展示名。 */

@@ -6,8 +6,8 @@ import org.junit.Test
 class CompassCapabilityTest {
 
     @Test
-    fun `有RotationVector即为FULL`() {
-        assertEquals(CompassCapabilityLevel.FULL, CompassCapability.of(true, false, false).level)
+    fun `无磁力计即使有RotationVector也只能LIMITED`() {
+        assertEquals(CompassCapabilityLevel.LIMITED, CompassCapability.of(true, false, false).level)
     }
 
     @Test

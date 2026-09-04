@@ -803,3 +803,32 @@
 
 - 首版跨日断言误把 UTC 与洛杉矶日期直接作对象相等，修正为各自明确的本地日期时间后复检通过。
 - 11A 验收达标，进入 11B：真实 `LockedCompassSnapshot` 与 Room 空间快照字段。
+
+---
+
+## Cycle 11B — 真实定盘快照与空间留痕（2026-09-04）
+
+### Plan
+
+- 定义不可变 `LockedCompassSnapshot`，定盘瞬间只复制当前 `CompassState`、`HoldPoseState` 与 Display Rotation。
+- 时空起卦直接消费快照；禁止新建 `CompassEngine`、重复喂角度或人工制造稳定状态。
+- 将 raw/smoothed azimuth、pitch/roll、姿态、姿态置信度/持续时间、稳定标准差、双传感器精度、磁场强度/干扰、显示旋转写入 Room 历史。
+
+### Do
+
+- 新增 `core:compass` 的 `LockedCompassSnapshot`、`CompassSnapshotFactory`、`HoldPoseState` 与 `PreCastReadiness` 数据模型。
+- `CompassController` 增加真实状态复制 API；`DivinationServiceV2` 以快照生成 `YijingSpaceContext`，旧导航对象仅走显式 legacy 适配器，不创建假 `CompassState`。
+- Room schema 升至 v4，加入 `MIGRATION_3_4` 与所有定盘元数据字段；历史 domain/entity mapper 同步。
+- `CompassCapability` 修正为必须存在磁力计才允许完整方向模式；无磁力计设备保持 LIMITED，不伪造方向。
+
+### Check
+
+- `:core:compass:test`：新增姿态、显示旋转、双 resolver、PreCastReadiness 测试通过。
+- `:core:divination:test`：快照字段映射与既有空间测试通过；`:app:testDebugUnitTest`：通过。
+- 全仓 `test`、`lintDebug`、`assembleDebug`：通过；Room schema `4.json` 已由 KSP 生成。
+- 代码扫描确认生产链已无 `CompassEngine().apply { repeat(...) }` 的假稳定构造。
+
+### Act / Re-Check
+
+- 编译期发现服务仍读取不存在的 `YijingSpaceContext.stability` 属性，改用 `stable` 布尔事实后全量复检通过。
+- 11B 验收达标，进入 11C：HoldPose 防抖、平放/竖持双姿态与 Display Rotation 真机一致性。

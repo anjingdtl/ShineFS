@@ -2,6 +2,11 @@ package com.shinefs.app.data
 
 import com.shinefs.core.calendar.CivilTime
 import com.shinefs.core.calendar.model.CivilDateTime
+import com.shinefs.core.compass.NorthReference
+import com.shinefs.core.compass.SensorAccuracy
+import com.shinefs.core.compass.StabilityLevel
+import com.shinefs.core.compass.pose.HoldPose
+import com.shinefs.core.compass.snapshot.LockedCompassSnapshot
 import java.util.TimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -84,6 +89,57 @@ class DivinationServiceV2Test {
         assertEquals("MAGNETIC", spaceCase.northReference)
         assertEquals(DivinationCase.CAST_MODE_TIME_SPACE, spaceCase.castMode)
         assertTrue(spaceCase.reportText!!.contains("七、方位与方应"))
+    }
+
+    @Test
+    fun `时空合参只消费真实快照而不重建稳定状态`() {
+        val snapshot = LockedCompassSnapshot(
+            capturedAt = fixedMillis,
+            rawAzimuth = 181.1f,
+            smoothedAzimuth = 182.4f,
+            pitchDeg = 12.5f,
+            rollDeg = -4.25f,
+            holdPose = HoldPose.UPRIGHT,
+            holdPoseConfidence = 0.88f,
+            poseStableMillis = 1_200L,
+            stability = StabilityLevel.GOOD,
+            stabilityStdDeg = 0.18f,
+            orientationAccuracy = SensorAccuracy.HIGH,
+            magneticAccuracy = SensorAccuracy.MEDIUM,
+            magneticMagnitudeUt = 48.6f,
+            magneticInterference = false,
+            northReference = NorthReference.MAGNETIC,
+            displayRotation = 1,
+            facingMountain = "午",
+            sittingMountain = "子",
+            directionTrigram = "离",
+            samples = 87,
+            glitchSuppressed = 2,
+        )
+        val reading = LockedReading(
+            azimuth = 0f,
+            facingMountain = "不应使用",
+            sittingMountain = "不应使用",
+            facingTrigram = "不应使用",
+            facingElement = "不应使用",
+            timestamp = fixedMillis,
+            stability = "不稳定",
+            accuracy = "低",
+            magneticAccuracy = "不可靠",
+            snapshot = snapshot,
+        )
+        val result = service().castTimeSpace(reading, Scenes.generic)
+
+        assertEquals(182.4f, result.azimuth!!, 0.001f)
+        assertEquals(181.1f, result.rawAzimuth!!, 0.001f)
+        assertEquals("UPRIGHT", result.holdPose)
+        assertEquals(12.5f, result.pitchDeg!!, 0.001f)
+        assertEquals(-4.25f, result.rollDeg!!, 0.001f)
+        assertEquals(48.6f, result.magneticMagnitudeUt!!, 0.001f)
+        assertEquals(1, result.displayRotation)
+        assertEquals(fixedMillis, result.snapshotCapturedAt)
+        assertEquals("HIGH", result.orientationAccuracy)
+        assertEquals("MEDIUM", result.magneticAccuracy)
     }
 
     @Test

@@ -59,11 +59,30 @@ ShineFS/
 ├─ app/                    # Compose 壳 + 导航
 ├─ core/calendar/          # ✅ Cycle 10B：历法一级核心（纯 Kotlin JVM，无新依赖）
 ├─ core/yijing/            # ✅ 纯 Kotlin 术数核心（Cycle 01 建，10C 升级 2.0）
-├─ core/compass/           # ✅ 传感器罗盘引擎（Cycle 02；10G 修复多圈/Accuracy）
+├─ core/compass/           # ✅ 传感器罗盘引擎（11B 快照；11C 姿态/双姿态 resolver）
 ├─ core/divination/        # Cycle 10D：起卦核心（梅花时间法/后天端法/时空合参）
 ├─ core/classics/          # Cycle 10E：周易原典库（版本化+checksum）
 └─ core/interpretation/    # Cycle 10F：本地规则解释器（0 AI）
 ```
+
+### V2.1 传感器与定盘链（Cycle 11B）
+
+```text
+core/compass/
+├─ pose/                    # HoldPose / HoldPoseState / HoldPoseDetector
+├─ orientation/             # DisplayRotationMapping + Flat/UprightOrientationResolver
+├─ snapshot/                # LockedCompassSnapshot（定盘瞬间不可变复制）
+└─ PreCastReadiness.kt      # 姿态、稳定、磁场、精度四项门禁
+
+app/sensor/
+├─ CompassController        # Rotation Vector 优先、加速度计/磁力计回退、状态流
+├─ DisplayRotationProvider  # 读取真实 Display Rotation
+└─ CompassSnapshotFactory   # 当前状态 → 快照，禁止重建引擎
+```
+
+时空起卦的空间上下文只能由真实快照生成；`fromCompassState` 与
+`fromLegacyReading` 仅为旧测试/旧导航数据的兼容入口，不得用于新定盘 UI。
+Room 当前 schema 为 v4，时间元数据（v3）与定盘元数据（v4）均保留迁移链。
 
 ### core:calendar（Cycle 10B）
 

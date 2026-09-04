@@ -1,0 +1,471 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "6efbd8f6a30ae60d5973ddf133e4931f",
+    "entities": [
+      {
+        "tableName": "divination_cases",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `sceneId` TEXT NOT NULL, `sceneName` TEXT NOT NULL, `azimuth` REAL, `facingMountain` TEXT, `sittingMountain` TEXT, `facingTrigram` TEXT, `facingElement` TEXT, `stability` TEXT, `ruleId` TEXT NOT NULL, `ruleDisplayName` TEXT NOT NULL, `rulesVersion` TEXT NOT NULL, `interpretationVersion` TEXT NOT NULL, `upperTrigram` TEXT NOT NULL, `lowerTrigram` TEXT NOT NULL, `originalHexagramOrder` INTEGER NOT NULL, `originalHexagramName` TEXT NOT NULL, `changingLine` INTEGER NOT NULL, `changedHexagramOrder` INTEGER NOT NULL, `changedHexagramName` TEXT NOT NULL, `castMode` TEXT NOT NULL DEFAULT 'TIME', `zoneId` TEXT NOT NULL DEFAULT 'Asia/Shanghai', `utcOffsetMinutes` INTEGER NOT NULL DEFAULT 0, `localDateTime` TEXT NOT NULL DEFAULT '', `calendarVersion` TEXT NOT NULL DEFAULT '', `ruleVersion` TEXT NOT NULL DEFAULT '', `classicCorpusVersion` TEXT NOT NULL DEFAULT '', `dayBoundaryPolicy` TEXT NOT NULL DEFAULT 'CIVIL_MIDNIGHT', `leapMonthPolicy` TEXT NOT NULL DEFAULT 'SAME_MONTH_NUMBER', `northReference` TEXT NOT NULL DEFAULT 'MAGNETIC', `rawAzimuth` REAL, `smoothedAzimuth` REAL, `snapshotCapturedAt` INTEGER, `holdPose` TEXT NOT NULL DEFAULT '', `holdPoseConfidence` REAL NOT NULL DEFAULT 0, `poseStableMillis` INTEGER NOT NULL DEFAULT 0, `displayRotation` INTEGER NOT NULL DEFAULT 0, `pitchDeg` REAL, `rollDeg` REAL, `stabilityStdDeg` REAL, `orientationAccuracy` TEXT NOT NULL DEFAULT '', `magneticAccuracy` TEXT NOT NULL DEFAULT '', `magneticMagnitudeUt` REAL, `magneticInterference` INTEGER NOT NULL DEFAULT 0, `lunarYear` INTEGER NOT NULL DEFAULT 0, `lunarMonth` INTEGER NOT NULL DEFAULT 0, `lunarDay` INTEGER NOT NULL DEFAULT 0, `leapMonthFlag` INTEGER NOT NULL DEFAULT 0, `yearBranch` TEXT NOT NULL DEFAULT '', `hourBranch` TEXT NOT NULL DEFAULT '', `yearBranchNumber` INTEGER NOT NULL DEFAULT 0, `lunarMonthNumber` INTEGER NOT NULL DEFAULT 0, `lunarDayNumber` INTEGER NOT NULL DEFAULT 0, `hourBranchNumber` INTEGER NOT NULL DEFAULT 0, `nuclearHexagramOrder` INTEGER NOT NULL DEFAULT 0, `nuclearHexagramName` TEXT NOT NULL DEFAULT '', `tiTrigram` TEXT NOT NULL DEFAULT '', `yongTrigram` TEXT NOT NULL DEFAULT '', `elementRelation` TEXT NOT NULL DEFAULT '', `seasonalQi` TEXT NOT NULL DEFAULT '', `solarTerm` TEXT NOT NULL DEFAULT '', `calculationTrace` TEXT, `reportText` TEXT, `legacyFixture` INTEGER NOT NULL DEFAULT 0, `houseAuditId` TEXT, `favorite` INTEGER NOT NULL, `note` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sceneId",
+            "columnName": "sceneId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sceneName",
+            "columnName": "sceneName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "azimuth",
+            "columnName": "azimuth",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facingMountain",
+            "columnName": "facingMountain",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sittingMountain",
+            "columnName": "sittingMountain",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facingTrigram",
+            "columnName": "facingTrigram",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facingElement",
+            "columnName": "facingElement",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stability",
+            "columnName": "stability",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ruleId",
+            "columnName": "ruleId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ruleDisplayName",
+            "columnName": "ruleDisplayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rulesVersion",
+            "columnName": "rulesVersion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "interpretationVersion",
+            "columnName": "interpretationVersion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "upperTrigram",
+            "columnName": "upperTrigram",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lowerTrigram",
+            "columnName": "lowerTrigram",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originalHexagramOrder",
+            "columnName": "originalHexagramOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originalHexagramName",
+            "columnName": "originalHexagramName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changingLine",
+            "columnName": "changingLine",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changedHexagramOrder",
+            "columnName": "changedHexagramOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changedHexagramName",
+            "columnName": "changedHexagramName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "castMode",
+            "columnName": "castMode",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'TIME'"
+          },
+          {
+            "fieldPath": "zoneId",
+            "columnName": "zoneId",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'Asia/Shanghai'"
+          },
+          {
+            "fieldPath": "utcOffsetMinutes",
+            "columnName": "utcOffsetMinutes",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "localDateTime",
+            "columnName": "localDateTime",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "calendarVersion",
+            "columnName": "calendarVersion",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "ruleVersion",
+            "columnName": "ruleVersion",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "classicCorpusVersion",
+            "columnName": "classicCorpusVersion",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "dayBoundaryPolicy",
+            "columnName": "dayBoundaryPolicy",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'CIVIL_MIDNIGHT'"
+          },
+          {
+            "fieldPath": "leapMonthPolicy",
+            "columnName": "leapMonthPolicy",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'SAME_MONTH_NUMBER'"
+          },
+          {
+            "fieldPath": "northReference",
+            "columnName": "northReference",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'MAGNETIC'"
+          },
+          {
+            "fieldPath": "rawAzimuth",
+            "columnName": "rawAzimuth",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "smoothedAzimuth",
+            "columnName": "smoothedAzimuth",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "snapshotCapturedAt",
+            "columnName": "snapshotCapturedAt",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "holdPose",
+            "columnName": "holdPose",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "holdPoseConfidence",
+            "columnName": "holdPoseConfidence",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "poseStableMillis",
+            "columnName": "poseStableMillis",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "displayRotation",
+            "columnName": "displayRotation",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "pitchDeg",
+            "columnName": "pitchDeg",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rollDeg",
+            "columnName": "rollDeg",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stabilityStdDeg",
+            "columnName": "stabilityStdDeg",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "orientationAccuracy",
+            "columnName": "orientationAccuracy",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "magneticAccuracy",
+            "columnName": "magneticAccuracy",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "magneticMagnitudeUt",
+            "columnName": "magneticMagnitudeUt",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "magneticInterference",
+            "columnName": "magneticInterference",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lunarYear",
+            "columnName": "lunarYear",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lunarMonth",
+            "columnName": "lunarMonth",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lunarDay",
+            "columnName": "lunarDay",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "leapMonthFlag",
+            "columnName": "leapMonthFlag",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "yearBranch",
+            "columnName": "yearBranch",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "hourBranch",
+            "columnName": "hourBranch",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "yearBranchNumber",
+            "columnName": "yearBranchNumber",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lunarMonthNumber",
+            "columnName": "lunarMonthNumber",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lunarDayNumber",
+            "columnName": "lunarDayNumber",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "hourBranchNumber",
+            "columnName": "hourBranchNumber",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "nuclearHexagramOrder",
+            "columnName": "nuclearHexagramOrder",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "nuclearHexagramName",
+            "columnName": "nuclearHexagramName",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "tiTrigram",
+            "columnName": "tiTrigram",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "yongTrigram",
+            "columnName": "yongTrigram",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "elementRelation",
+            "columnName": "elementRelation",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "seasonalQi",
+            "columnName": "seasonalQi",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "solarTerm",
+            "columnName": "solarTerm",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "calculationTrace",
+            "columnName": "calculationTrace",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "reportText",
+            "columnName": "reportText",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "legacyFixture",
+            "columnName": "legacyFixture",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "houseAuditId",
+            "columnName": "houseAuditId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "favorite",
+            "columnName": "favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6efbd8f6a30ae60d5973ddf133e4931f')"
+    ]
+  }
+}

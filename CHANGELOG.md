@@ -5,6 +5,11 @@
 - 时间上下文与卦例历史新增 `zoneId`、UTC offset、本地日期时间及可追溯 instant 轨迹；Room schema v3 支持旧库迁移。
 - 新增上海、洛杉矶、UTC、东京及跨本地日边界回归测试。
 
+### V2.1 Cycle 11B（2026-09-04）— 真实定盘快照
+- 新增不可变 `LockedCompassSnapshot`，锁定瞬间复制真实 raw/smoothed、姿态、稳定度、精度与磁场状态。
+- 时空起卦移除虚假 `CompassEngine` 重建，Room schema v4 留存定盘姿态、pitch/roll、Display Rotation、精度和磁场元数据。
+- 无磁力计设备不再标记为完整电子罗盘；新增快照、空间映射与起卦前门禁回归测试。
+
 ### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
 
 #### 收尾优化与发布验收

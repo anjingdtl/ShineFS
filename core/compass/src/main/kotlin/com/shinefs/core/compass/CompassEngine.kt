@@ -36,7 +36,12 @@ class CompassEngine(
 
     /** 输入一帧原始方位角（度）。pitch/roll 可选，用于倾斜判定。返回最新状态。 */
     @Synchronized
-    fun onAzimuth(rawAzimuthDeg: Float, pitchDeg: Float? = null, rollDeg: Float? = null): CompassState {
+    fun onAzimuth(
+        rawAzimuthDeg: Float,
+        pitchDeg: Float? = null,
+        rollDeg: Float? = null,
+        tooTiltedOverride: Boolean? = null,
+    ): CompassState {
         require(!rawAzimuthDeg.isNaN()) { "azimuth must not be NaN" }
         val raw = CircularMath.normalize(rawAzimuthDeg)
 
@@ -68,8 +73,9 @@ class CompassEngine(
             std <= fairStdDeg -> StabilityLevel.FAIR
             else -> StabilityLevel.UNSTABLE
         }
-        val tooTilted = (pitchDeg != null && kotlin.math.abs(pitchDeg) > tiltLimitDeg) ||
+        val calculatedTooTilted = (pitchDeg != null && kotlin.math.abs(pitchDeg) > tiltLimitDeg) ||
             (rollDeg != null && kotlin.math.abs(rollDeg) > tiltLimitDeg)
+        val tooTilted = tooTiltedOverride ?: calculatedTooTilted
 
         state = state.copy(
             samples = state.samples + 1,

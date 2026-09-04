@@ -3,7 +3,7 @@ package com.shinefs.app.sensor
 /**
  * 设备罗盘能力（纯逻辑，JVM 可测；Android 侧由 CompassController 探测传感器后传入）。
  *
- * FULL：可测磁方位（有 Rotation Vector，或 磁力计+加速度计 回退组合）。
+ * FULL：可测磁方位（必须有磁力计，且有 Rotation Vector 或 加速度计回退组合）。
  * LIMITED：无磁力计——不得伪造方向，罗盘页仅可用有限模式（提示 + 手动输入方位）。
  */
 enum class CompassCapabilityLevel { FULL, LIMITED }
@@ -14,7 +14,7 @@ data class CompassCapability(
     val hasAccelerometer: Boolean,
 ) {
     val level: CompassCapabilityLevel
-        get() = if (hasRotationVector || (hasMagneticField && hasAccelerometer)) {
+        get() = if (hasMagneticField && (hasRotationVector || hasAccelerometer)) {
             CompassCapabilityLevel.FULL
         } else {
             CompassCapabilityLevel.LIMITED
