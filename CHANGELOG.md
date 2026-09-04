@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### V2.1 Cycle 11G（2026-09-04）— 飞行模式 E2E 与设备边界记录
+- 在 `emulator-5554` / Medium_Phone API 37.1 / 飞行模式下完成传统时间起卦和罗盘时空合参两条闭环；`connectedDebugAndroidTest` 3/3 通过，Room 空间历史字段实查通过。
+- 增加 V2.1 真机清单：平放/竖持、过渡态、四种 Display Rotation、双姿态 ≤5°、磁扰、校正和无磁力计降级均明确验收口径。
+- 如实保留物理真机未连接边界；模拟器虚拟磁力计结果不升级为真机磁场准确度结论。
+
 ### V2.1 Cycle 11F（2026-09-04）— GitHub Actions CI
 - 新增 `.github/workflows/android.yml`：main push/PR 与手动触发均执行 JVM unit test、Android lint、Debug 构建和 Release variant 构建。
 - Release 构建在 CI 中允许 unsigned variant 仅用于构建验证；本地发布仍要求环境变量提供正式 keystore，不引入 debug keystore fallback。

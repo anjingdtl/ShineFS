@@ -944,3 +944,33 @@
 
 - CI 与本机发布职责明确分离：远端的 unsigned APK 仅为 variant 编译证据，不可作为发布包；正式发布仍须签名并单独验签。
 - 11F 达标，进入 11G：模拟器/飞行模式 E2E、ADB 设备矩阵核验与真实设备可用性复查。
+
+---
+
+## Cycle 11G — 飞行模式 E2E 与设备矩阵边界（2026-09-04）
+
+### Plan
+
+- 在最新 V2.1 Debug 包上复跑设备端历法测试，并在无网络/飞行模式下验证时间起卦与罗盘时空合参两条用户闭环。
+- 通过 ADB UI dump、截图、logcat 和 Room WAL 查询确认 readiness 自动通过、真实快照落库、历史字段留痕以及报告时空一致性。
+- 检查是否有物理 Android 真机可用；若没有，不伪造真机结论，继续完成模拟器证据并留下可执行的真机矩阵。
+
+### Do
+
+- 复跑 `:app:connectedDebugAndroidTest`，修复首次残留 Release 签名包导致的 `INSTALL_FAILED_UPDATE_INCOMPATIBLE` 测试环境问题后重新安装 Debug 包。
+- 保持模拟器 `airplane_mode_on=1`，执行首页→传统时间起卦→卦象→九段解读；再执行首页→风水罗盘→readiness→定盘→场景→卦象→时空报告。
+- 在罗盘页验证 UI 出现“姿态正确，已自动通过”、锁定徽标、持握姿态/角度/精度/磁场行；使用 `run-as` + sqlite3 读取 `divination_cases`，核对真实空间历史字段。
+- 更新 `REAL_DEVICE_TEST.md`：修正 V2.0 时代“平放应报倾斜”的旧预期，加入平放/竖持一致性、过渡态和 Display Rotation 条目。
+
+### Check
+
+- `:app:connectedDebugAndroidTest`：3/3 通过；报告 XML `failures=0`、`errors=0`。
+- 飞行模式时间起卦和时空合参均到达报告页；空间报告保留锁定方位与锁定时刻，时间卦未混入空间字段。
+- Room 查询确认空间行含 `UPRIGHT`、姿态置信度/稳定时长、Display Rotation、pitch/roll、朝向/磁力计精度、磁场强度和干扰；纯时间行空间字段为空。
+- 末次 `logcat` 无 `FATAL EXCEPTION`、`ANR in`；ADB 设备清单仅有 `emulator-5554`，未发现物理 Android 真机。
+
+### Act / Re-Check
+
+- 首次 androidTest 的 0 tests 已归因于已安装包签名冲突，不作为通过证据；卸载命令在模拟器返回内部错误，但 `pm clear`/Debug 重装后重新测试为 3/3，后续不再沿用首次报告。
+- 物理磁场、真机姿态跨姿势误差、四旋转实测和无磁力计降级保持未验证，V2.1 罗盘模块判定为 CONDITIONAL PASS，不把模拟器传感器当真机证据。
+- 11G 达标，进入 11H：仓库卫生、版本/发布文档、最终全量 Re-Check 与 PASS 判定。

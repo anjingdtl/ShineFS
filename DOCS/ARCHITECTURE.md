@@ -1,7 +1,7 @@
 # ShineFS 架构说明（ARCHITECTURE）
 
 > 维护规则：每个 PDCA Cycle 结束时同步更新本文件。
-> 当前状态：**V2.1 Cycle 11F 完成**（2026-09-04；设备时区、真实定盘快照、HoldPose 双姿态算法、动态 readiness 引导、原典 verification status 与 GitHub Actions CI 已接入；真机 E2E 继续在 11G 收口）
+> 当前状态：**V2.1 Cycle 11G 完成**（2026-09-04；设备时区、真实定盘快照、HoldPose 双姿态算法、动态 readiness 引导、原典 verification status、GitHub Actions CI 与模拟器飞行模式 E2E 已接入；物理真机矩阵待设备连接）
 > V2.0 方案：`DOCS/ShineFS_V2.0_完全离线周易时空演算_完整建设方案.md`（分层：事实层→演算层→规则关系层→解释层）
 
 ## 1. 项目定位

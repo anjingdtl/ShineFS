@@ -11,10 +11,12 @@
 | 点击瞬间一致性 | 时间起卦 UI 与核心使用同一点击毫秒 | ✅(11A) | 11A |
 | Room 时间元数据 | schema v3、MIGRATION_2_3、zone/offset/localDateTime 留痕 | ✅(11A) | 11A |
 | 真实罗盘快照 | 禁止重建 CompassState；raw/smoothed/姿态/精度/磁场全字段 | ✅(11B) | 11B |
-| HoldPose 与双姿态 | 平放/竖持/过渡/无效、迟滞、快速姿态变化抑制、Display Rotation、双姿态误差≤5° | ✅(11C) | 11C |
+| HoldPose 与双姿态 | 平放/竖持/过渡/无效、迟滞、快速姿态变化抑制、Display Rotation、双姿态误差≤5° | ✅ JVM(11C) / ⬜ 真机 | 11C/11G |
 | 起卦前动态引导 | 实时提示姿态/稳定/磁扰/精度；条件满足后自动通过并启用定盘 | ✅(11D) | 11D |
 | 原典 verification status | 电子底本/双来源部分/双来源全量三档；未 full 不显示“已核定原典” | ✅(11E) | 11E |
-| GitHub Actions CI | push/PR main 自动执行 unit test、lintDebug、assembleDebug、assembleRelease | ✅(11F) | 11F |
+| GitHub Actions CI | push/PR main 自动执行 unit test、lintDebug、assembleDebug、assembleRelease | ✅ workflow(11F) / 🚧 远端首跑 | 11F |
+| 飞行模式 E2E | 模拟器无网：首页→时间起卦→报告、罗盘→ready→定盘→场景→报告、Room 快照字段 | ✅(11G) | 11G |
+| 真实设备矩阵 | 真机 0/90/180/270°、平放/竖持误差≤5°、磁扰、校正、无磁力计降级 | ⬜（物理设备未连接） | 11G |
 
 ## 1. 算法测试（JVM 单元测试，`core/yijing`）
 
