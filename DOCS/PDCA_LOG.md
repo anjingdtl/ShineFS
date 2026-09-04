@@ -583,3 +583,29 @@
 - **Next**: Cycle 10F — InterpretationCore。
 
 **验收判定：Cycle 10E 达标（64/384/2 完整 ✓ 双源核验 ✓ checksum ✓ 版本化 ✓），Cycle 10E 关闭。**
+
+---
+
+## Cycle 10F — InterpretationCore 本地规则解释器（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §33-10F：卦象结构、动爻、体用、五行、旺衰、方应、本地白话报告，完全无 AI。
+- **Scope**: 新建 `:core:interpretation`（模板 + 结构化变量）；九段报告 AdvisoryComposer；ElementInterpreter（5 关系模板，描述性措辞不断绝对吉凶）；SeasonalInterpreter（事实层）；LinePositionInterpreter（《系辞》明文引文）；SpatialResponseInterpreter。
+- **Out of scope**: 旺衰细目（TD-V2-05）；文言传引用（扩展）。
+
+### Do
+
+- **Added**: InterpretationModels（Section/Report）+ interpreters×4 + AdvisoryComposer（九段：时空数据/起卦过程/卦象结果/周易原典/互卦与体用/五行与时令/方位与方应/本地白话释义/规则来源与版本）。
+- **爻位释义口径**: 采用《系辞下》明文（初辞拟之/二多誉/三多凶/四多惧/五多功/卒成之终），A 级来源，不自造。
+
+### Check
+
+- `:core:interpretation:test`：**4/4 PASS**（九段结构、观梅占全报告锚点、确定性、系辞引文）；全仓 `test` 全绿。
+- **Problems found**: 字符串内嵌 ASCII 引号破坏字面量（改「」）；跨模块 smart cast（局部 val）；compass 传递依赖不可见（显式依赖）——均为编译期拦截。
+
+### Act
+
+- **遗留**: 无。**Next**: Cycle 10G — 罗盘引擎修复与时空融合。
+
+**验收判定：Cycle 10F 达标（九段报告 ✓ 0 AI ✓ 确定性 ✓ 来源引文 ✓），Cycle 10F 关闭。**
