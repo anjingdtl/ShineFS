@@ -1,7 +1,7 @@
 # ShineFS 架构说明（ARCHITECTURE）
 
 > 维护规则：每个 PDCA Cycle 结束时同步更新本文件。
-> 当前状态：**V2.1 Cycle 11G 完成**（2026-09-04；设备时区、真实定盘快照、HoldPose 双姿态算法、动态 readiness 引导、原典 verification status、GitHub Actions CI 与模拟器飞行模式 E2E 已接入；物理真机矩阵待设备连接）
+> 当前状态：**V2.1 Cycle 11H 完成**（2026-09-04；设备时区、真实定盘快照、HoldPose 双姿态算法、动态 readiness 引导、原典 verification status、GitHub Actions CI、模拟器飞行模式 E2E 与历史测量留痕已接入；物理真机矩阵待设备连接）
 > V2.0 方案：`DOCS/ShineFS_V2.0_完全离线周易时空演算_完整建设方案.md`（分层：事实层→演算层→规则关系层→解释层）
 
 ## 1. 项目定位
@@ -22,7 +22,7 @@
 | minSdk | 24（Android 7.0） | |
 | compileSdk / targetSdk | 36 / 36 | 模拟器 AVD 为 API 37.1，兼容 |
 | applicationId | `com.shinefs.app` | |
-| 版本 | versionCode 2 / versionName 2.0 | V2.0 Release |
+| 版本 | versionCode 3 / versionName 2.1 | V2.1；物理真机硬件项仍为条件通过 |
 | 测试 | JUnit 4.13.2（JVM）+ AndroidJUnitRunner | JVM 与设备端验收分开执行 |
 
 依赖清单见 `gradle/libs.versions.toml`（版本目录单一事实源）。
@@ -65,7 +65,7 @@ ShineFS/
 └─ core/interpretation/    # Cycle 10F：本地规则解释器（0 AI）
 ```
 
-### V2.1 传感器与定盘链（Cycle 11B–11C）
+### V2.1 传感器与定盘链（Cycle 11B–11H）
 
 ```text
 core/compass/
@@ -78,6 +78,9 @@ app/sensor/
 ├─ CompassController        # Rotation Vector 优先、加速度计/磁力计回退、状态流
 ├─ DisplayRotationProvider  # 读取真实 Display Rotation
 └─ CompassSnapshotFactory   # 当前状态 → 快照，禁止重建引擎
+
+历史详情页直接展示定盘快照中的姿态、pitch/roll、姿态稳定时长、双精度、磁场强度/干扰、
+稳定标准差、Display Rotation、北向基准与定盘本地时间，确保用户查看的记录与起卦瞬间事实一致。
 ```
 
 时空起卦的空间上下文只能由真实快照生成；`fromCompassState` 与
@@ -120,12 +123,12 @@ deviation 已登记于 YIJING_RULES §9 与 SOURCE_CATALOG S-E01。
 4. **经典文本可溯源**：卦辞爻辞必须来自人工核定的版本化数据文件，禁止大模型生成。
 5. **视觉规范**：玄黑/古铜金/朱砂传统数术风格；禁止赛博科技指南针风格。
 
-## 5. 数据与状态
+## 5. 数据与状态（V2.1）
 
-- 数据库：**无**（Room 计划于 Cycle 07 引入，用于卦例与规则版本存储）。
-- 持久化：**无**（DataStore 计划用于用户设置）。
-- 传感器：**无**（SensorManager/Rotation Vector 计划于 Cycle 02 引入）。
-- AI 层：**无**（Cycle 05 仅做接口抽象）。
+- 数据库：Room `ShineDatabase`，当前 schema v4；卦例历史保留时间元数据、真实定盘快照、姿态、Display Rotation、精度和磁场字段。
+- 持久化：Room 负责卦例；SharedPreferences 只记录换日策略与首次持握引导完成事实。
+- 传感器：`CompassController` 使用 Rotation Vector 优先、加速度计/磁力计回退，并持续维护 HoldPose、readiness 和磁场干扰状态。
+- AI 层：**无**；解释报告由本地固定规则生成。
 
 ## 6. 构建与验证基线
 
@@ -136,6 +139,11 @@ deviation 已登记于 YIJING_RULES §9 与 SOURCE_CATALOG S-E01。
 | `adb install` → emulator-5554 | Success |
 | 启动 `com.shinefs.app` | 进程存活，logcat 无 crash/ANR |
 | 首页截图 | `DOCS/assets/cycle00_home.png`（玄黑底，四入口占位，渲染无异常） |
+
+V2.1 当前门禁：`test`、`lintDebug`、`:app:assembleDebug`、`:app:assembleRelease`；设备端
+`connectedDebugAndroidTest`；模拟器飞行模式 E2E；GitHub Actions workflow
+`.github/workflows/android.yml`。Release 在 CI 中允许 unsigned variant 仅用于构建验证，
+本地正式发布仍必须提供环境签名。
 
 ## 7. 环境事实（Windows 本机）
 

@@ -72,6 +72,7 @@ class AdvisoryComposerTest {
         assertTrue(text.contains("巳日乃孚"))
         assertTrue(text.contains("泽中有火"))
         assertTrue(text.contains("电子底本已校验"))
+        assertTrue(text.contains("规则核对状态："))
         assertTrue(!text.contains("原典：周易通行本电子底本（已核定）"))
         // 体用五行
         assertTrue(text.contains("体卦兑（金）"))

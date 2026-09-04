@@ -24,6 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +37,7 @@ import com.shinefs.app.ui.compass.ScreenHeader
 import com.shinefs.app.ui.theme.ShineColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 /**
  * 解卦页（V2.0 方案 §24 固定九段）：渲染本地规则引擎生成的完整报告
@@ -126,6 +129,14 @@ fun InterpretationScreen(
             )
             SectionTitle("起卦依据")
             SectionBody("旧卦例暂无完整报告与起卦过程。")
+        }
+
+        if (case.castMode == DivinationCase.CAST_MODE_TIME_SPACE || case.holdPose != null) {
+            SectionTitle("定盘测量留痕")
+            SectionBody(
+                measurementMetadata(case),
+                modifier = Modifier.semantics { contentDescription = "shinefs_measurement_metadata" },
+            )
         }
 
         SectionTitle("离线核对")
@@ -224,17 +235,68 @@ private fun SectionTitle(title: String) {
 }
 
 @Composable
-private fun SectionBody(body: String) {
+private fun SectionBody(body: String, modifier: Modifier = Modifier) {
     Text(
         body,
         color = ShineColors.TextPrimary,
         fontSize = 14.sp,
         lineHeight = 22.sp,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(ShineColors.BackgroundRaised, RoundedCornerShape(8.dp))
             .padding(12.dp),
     )
+}
+
+private fun measurementMetadata(case: DivinationCase): String = buildString {
+    append("测量姿态：${poseLabel(case.holdPose)}")
+    case.holdPoseConfidence?.let {
+        append("（置信度 ${String.format(Locale.ROOT, "%.0f", it * 100f)}%）")
+    }
+    case.poseStableMillis?.let { append("\n姿态稳定：${it}ms") }
+    case.azimuth?.let { append("\n方向：${String.format(Locale.ROOT, "%.1f", it)}°") }
+    if (case.facingMountain != null) {
+        append("\n向山：${case.facingMountain}　坐山：${case.sittingMountain ?: "—"}")
+    }
+    case.pitchDeg?.let { pitch ->
+        val roll = case.rollDeg?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "—"
+        append("\n姿态角：pitch ${String.format(Locale.ROOT, "%.1f", pitch)}° · roll ${roll}°")
+    }
+    append("\n方向精度：${accuracyLabel(case.orientationAccuracy)}")
+    append("\n磁场精度：${accuracyLabel(case.magneticAccuracy)}")
+    append("\n磁场状态：${if (case.magneticInterference == true) "异常" else "正常"}")
+    case.magneticMagnitudeUt?.let {
+        append("（${String.format(Locale.ROOT, "%.1f", it)} 微特斯拉）")
+    }
+    case.stabilityStdDeg?.let {
+        append("\n稳定标准差：${String.format(Locale.ROOT, "%.2f", it)}°")
+    }
+    append("\n北向：${northReferenceLabel(case.northReference)}")
+    case.displayRotation?.let { append("\n显示旋转：${Math.floorMod(it, 4) * 90}°") }
+    case.localDateTime?.takeIf { it.isNotBlank() }?.let { append("\n定盘时间：${it.replace('T', ' ')}") }
+}
+
+private fun poseLabel(value: String?): String = when (value) {
+    "FLAT" -> "平放"
+    "UPRIGHT" -> "竖持"
+    "TRANSITION" -> "过渡"
+    "INVALID" -> "无效"
+    else -> "未记录"
+}
+
+private fun accuracyLabel(value: String?): String = when (value) {
+    "HIGH" -> "高"
+    "MEDIUM" -> "中"
+    "LOW" -> "低"
+    "UNRELIABLE" -> "不可靠"
+    "NO_CONTACT" -> "无接触"
+    else -> "未记录"
+}
+
+private fun northReferenceLabel(value: String?): String = when (value) {
+    "TRUE" -> "真北"
+    "MAGNETIC" -> "磁北"
+    else -> "未记录"
 }
 
 @Composable

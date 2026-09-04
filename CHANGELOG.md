@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+### V2.1 Cycle 11H（2026-09-04）— 发布收口与历史测量留痕
+- 版本升级为 `versionCode 3` / `versionName 2.1`，新增 `DOCS/RELEASE_V2.1.md`，汇总 Cycle 11A～11H 的提交、门禁与证据边界。
+- 历史详情页增加定盘测量留痕：持握姿态/置信度/稳定时长、方位与坐山向山、pitch/roll、方向/磁场精度、磁场强度/干扰、稳定标准差、北向、Display Rotation 和本地定盘时间。
+- 清理仓库内已生成的 Python `__pycache__`/`.pyc` 缓存，并将缓存规则单独归档到 `.gitignore`；不改变业务代码或历史数据。
+- 最终判定为 **CONDITIONAL PASS**：代码、自动化门禁、CI 工作流与模拟器飞行模式闭环通过；物理 Android 真机未连接，磁场硬件与跨设备姿态矩阵仍待执行。
+
 ### V2.1 Cycle 11G（2026-09-04）— 飞行模式 E2E 与设备边界记录
 - 在 `emulator-5554` / Medium_Phone API 37.1 / 飞行模式下完成传统时间起卦和罗盘时空合参两条闭环；`connectedDebugAndroidTest` 3/3 通过，Room 空间历史字段实查通过。
 - 增加 V2.1 真机清单：平放/竖持、过渡态、四种 Display Rotation、双姿态 ≤5°、磁扰、校正和无磁力计降级均明确验收口径。

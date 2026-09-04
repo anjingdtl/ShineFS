@@ -16,6 +16,8 @@
 | 原典 verification status | 电子底本/双来源部分/双来源全量三档；未 full 不显示“已核定原典” | ✅(11E) | 11E |
 | GitHub Actions CI | push/PR main 自动执行 unit test、lintDebug、assembleDebug、assembleRelease | ✅ workflow(11F) / 🚧 远端首跑 | 11F |
 | 飞行模式 E2E | 模拟器无网：首页→时间起卦→报告、罗盘→ready→定盘→场景→报告、Room 快照字段 | ✅(11G) | 11G |
+| 历史详情测量留痕 | 姿态/置信度/稳定时长、pitch/roll、方向/磁场精度、磁场强度/干扰、标准差、北向、旋转、本地时间 | ✅(11H) | 11H |
+| V2.1 版本与发布报告 | versionCode 3、versionName 2.1、Cycle 11A～11H 提交和证据边界归档 | ✅(11H) | 11H |
 | 真实设备矩阵 | 真机 0/90/180/270°、平放/竖持误差≤5°、磁扰、校正、无磁力计降级 | ⬜（物理设备未连接） | 11G |
 
 ## 1. 算法测试（JVM 单元测试，`core/yijing`）

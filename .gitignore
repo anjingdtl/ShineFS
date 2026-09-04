@@ -28,8 +28,10 @@ Thumbs.db
 *.log
 test-logs/
 
-# Release output / local script cache
+# Release output
 release/
+
+# Python caches
 __pycache__/
 *.pyc
 

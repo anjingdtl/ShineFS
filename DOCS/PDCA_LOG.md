@@ -974,3 +974,41 @@
 - 首次 androidTest 的 0 tests 已归因于已安装包签名冲突，不作为通过证据；卸载命令在模拟器返回内部错误，但 `pm clear`/Debug 重装后重新测试为 3/3，后续不再沿用首次报告。
 - 物理磁场、真机姿态跨姿势误差、四旋转实测和无磁力计降级保持未验证，V2.1 罗盘模块判定为 CONDITIONAL PASS，不把模拟器传感器当真机证据。
 - 11G 达标，进入 11H：仓库卫生、版本/发布文档、最终全量 Re-Check 与 PASS 判定。
+
+---
+
+## Cycle 11H — 发布收口、历史测量留痕与最终门禁（2026-09-04）
+
+### Plan
+
+- 在不改变 V2.1 核心算法与既有 Room 迁移链的前提下，完成版本号、历史详情、仓库卫生、发布报告和最终验收文档收口。
+- 对最新代码重新执行全量 JVM test、lint、Debug/Release 构建、设备端测试以及飞行模式用户闭环；所有结论区分自动化/模拟器证据与物理真机证据。
+- 检查仓库内缓存、构建产物和签名边界，确保提交只包含源码、测试、工作流和必要文档，不提交 APK、密钥或临时日志。
+
+### Do
+
+- `app/build.gradle.kts` 升级为 `versionCode=3`、`versionName="2.1"`。
+- 解读历史详情页新增真实定盘测量留痕：HoldPose/置信度/稳定时长、方位/坐山向山、pitch/roll、方向与磁场精度、磁场强度/干扰、稳定标准差、北向、Display Rotation 和定盘本地时间。
+- `.gitignore` 将 Python 缓存规则独立归档；已发现的 `core/classics/edition/__pycache__/build_corpus.cpython-314.pyc` 从仓库移出至本机可恢复隔离目录，仓库内不再保留 `__pycache__` 或 `*.pyc`。
+- 更新 `ARCHITECTURE.md`、`TEST_MATRIX.md`、`CHANGELOG.md`，新增 `RELEASE_V2.1.md`，并在本记录归档最终 Cycle 11H 证据与遗留边界。
+
+### Check
+
+- 代码门禁：`test`、`lintDebug`、`:app:assembleDebug`、`:app:assembleRelease` 均需在最终提交上通过；Release CI 路径允许 unsigned variant，本地正式发布仍要求环境签名。
+- 设备端：`connectedDebugAndroidTest` 需 3/3；飞行模式下重新执行传统时间起卦和罗盘时空合参，核对 readiness 自动通过、真实快照入库、历史详情留痕、报告时间/方位一致及 0 FATAL/0 ANR。
+- CI：GitHub Actions 必须保留 main push/PR、JDK 17、Android 36、unit test/lint/Debug/Release 四项门禁，并核对最新提交的远端运行结果。
+- 物理设备：再次核对 ADB；若仍无 Android 真机，不把模拟器 Goldfish 传感器结果升级为磁场硬件或跨姿态真机结论。
+
+### Act
+
+- 发现的普通工程问题在本 Cycle 内直接修复：历史详情 `Modifier.semantics` 所需 Compose 导入补齐；缓存清理采用可恢复的仓外隔离移动，避免工具侧删除限制造成不可恢复操作。
+- 最终结论采用证据边界：自动化/代码/CI/模拟器飞行模式均通过；物理真机 0/90/180/270°、平放/竖持误差、磁扰标定、8 字校准和无磁力计降级仍列为待执行项。
+
+### Re-Check
+
+- 以最终版本号和最终历史详情代码重新跑全量命令、设备端测试、飞行模式 E2E、Room 查询和 logcat 扫描；只在上述证据齐备后提交 11H。
+- 11H 结论：**CONDITIONAL PASS**。没有文献实质冲突、Android 坐标体系冲突或无法解释的跨设备系统性偏差；唯一阻断完整 PASS 的因素是本机未连接物理 Android 真机。
+
+### Commit / Push
+
+- Cycle 11H 提交哈希在最终提交后回填到 `DOCS/RELEASE_V2.1.md` 与本节对应发布记录；完成后推送 `main`，再核对 GitHub Actions 最新运行。

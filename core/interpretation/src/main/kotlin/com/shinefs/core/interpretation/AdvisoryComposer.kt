@@ -191,7 +191,7 @@ class AdvisoryComposer(
             "起卦方法：${ruleDisplayName(r.rule.ruleId)}",
             "依据出处：" + r.rule.sourceRefs.joinToString("；") { it.title },
             "说明：${ruleAssumptions(r.rule.ruleId)}",
-            "核对状态：${ruleStatusLabel(r.rule.status)}",
+            "规则核对状态：${ruleStatusLabel(r.rule.status)}",
             "典籍：周易通行本电子底本（${corpus.verificationStatus.label}）；历法：传统农历历表；方位基准：${r.spaceContext?.let { northReferenceLabel(it.northReference) } ?: "未使用"}",
             "解读方式：本地固定规则，不使用智能生成、不含随机内容、无需联网",
         ),

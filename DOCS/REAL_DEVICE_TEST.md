@@ -1,6 +1,6 @@
 # ShineFS 真机测试清单（REAL_DEVICE_TEST）
 
-> 生成：Cycle 09；V2.1 更新至 Cycle 11G / 2026-09-04
+> 生成：Cycle 09；V2.1 更新至 Cycle 11H / 2026-09-04
 > 原因：以下能力依赖**真实磁场传感器硬件行为**，模拟器虚拟传感器无法等效验证
 > （已证实：模拟器 9 轴融合不响应方位角注入，仅俯仰/横滚经重力传导）。
 > 结论状态：**CONDITIONAL PASS**。V2.1 模拟器飞行模式闭环已通过；物理 Android 真机尚未连接，磁场硬件、跨姿态实测误差和无磁力计降级仍待执行。
@@ -140,3 +140,29 @@
 | 日期 | 机型/系统 | Display Rotation | 平放/竖持误差 | 磁场范围/干扰 | 结果 | 证据 |
 |---|---|---:|---:|---|---|---|
 | — | — | — | — | — | 待执行 | 物理设备未连接 |
+
+---
+
+# V2.1 Cycle 11H 最终 Re-Check（2026-09-04）
+
+## 12.1 最终设备状态
+
+| 项目 | 记录 |
+|---|---|
+| ADB 设备 | 仍仅 `emulator-5554`：`Medium_Phone` / API 37.1 / x86_64 |
+| 物理真机 | 未连接；没有可执行真实磁场硬件矩阵的 Android 设备 |
+| 飞行模式 | `airplane_mode_on=1` |
+| 最终包 | `app-debug.apk`，versionCode 3 / versionName 2.1 |
+
+## 12.2 最终自动化与闭环
+
+- 167 个唯一 JVM 用例、181 次 Debug/Release variant 执行：0 failure、0 error、0 skipped。
+- `connectedDebugAndroidTest`：`CalendarDeviceSmokeTest` 3/3，失败和错误均为 0。
+- 飞行模式下重新完成传统时间起卦和罗盘时空合参；罗盘 readiness 自动通过，定盘后进入单项测量、卦象和解卦报告。
+- 最终报告 UI dump 看到 `shinefs_measurement_metadata`，包含竖持、置信度、姿态稳定时长、pitch/roll、方向/磁场精度、磁场状态/强度、稳定标准差、北向、Display Rotation 和定盘本地时间。
+- Room 查询确认 `snapshotCapturedAt` 与 `timestamp` 相等；空间行保存 `UPRIGHT`、约 89% 置信度、约 61772ms 稳定时长、0°旋转、pitch 85.276°、roll 0.020°、HIGH/HIGH、约 48.760µT、干扰 0、GMT/UTC+0:00。
+- 最终 logcat 检索 `FATAL EXCEPTION|ANR in` 为 0 条，App 进程存活。
+
+## 12.3 证据边界
+
+本 Cycle 的设备证据仍是模拟器接线/导航/持久化/离线闭环证据，不是物理磁场精度证据。平放/竖持 ≤5°、四种 Display Rotation、磁铁/金属干扰阈值与恢复、8 字校准和无磁力计降级继续保持 ⬜；连接物理设备后按 §1–§5 原步骤逐项回填。V2.1 因此维持 **CONDITIONAL PASS**。
