@@ -47,7 +47,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: JVM unit tests
-        run: ./gradlew test --stacktrace
+        shell: bash
+        run: ./gradlew test --stacktrace --no-daemon --console=plain --continue
 
       - name: Android lint
         run: ./gradlew lintDebug --stacktrace
@@ -57,3 +58,15 @@ jobs:
 
       - name: Release variant build
         run: ./gradlew :app:assembleRelease --stacktrace
+
+      - name: Upload Gradle reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shinefs-gradle-reports-${{ github.run_id }}
+          path: |
+            app/build/test-results/**
+            core/**/build/test-results/**
+            app/build/reports/**
+            core/**/build/reports/**
+          if-no-files-found: warn
