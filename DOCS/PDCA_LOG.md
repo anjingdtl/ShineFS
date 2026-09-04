@@ -832,3 +832,33 @@
 
 - 编译期发现服务仍读取不存在的 `YijingSpaceContext.stability` 属性，改用 `stable` 布尔事实后全量复检通过。
 - 11B 验收达标，进入 11C：HoldPose 防抖、平放/竖持双姿态与 Display Rotation 真机一致性。
+
+---
+
+## Cycle 11C — HoldPose 防抖与双姿态方位一致性（2026-09-04）
+
+### Plan
+
+- 在不改变既有 `CompassEngine` 平滑/磁扰规则的前提下，补齐平放、竖持、过渡、无效四态识别及稳定迟滞。
+- 统一自然传感器坐标、Display Rotation 与“手机顶部=向”的定义，确保同一物理方向换持握姿态不会产生固定角度偏移。
+- 对快速大幅度姿态跳变先判为无效，避免过渡采样进入定盘快照；以 JVM 属性测试锁定 5° 误差门限。
+
+### Do
+
+- `HoldPoseDetector` 增加平放/竖持进入与退出阈值、800ms settle、重力/法向量有效性检查及 250ms/45° 剧烈变化抑制。
+- `DisplayRotationMapping` 明确四种显示旋转的 right/top 自然轴；`OrientationMath` 对旋转矩阵的显示 right/top 做单位化、水平投影和姿态角计算。
+- `FlatOrientationResolver` 与 `UprightOrientationResolver` 共享物理顶部方向解析，但由 HoldPose 选择门禁；`CompassController` 注入 `DisplayRotationProvider` 以便真机测试。
+- 新增 `HoldPoseDetectorTest`、`DisplayRotationMappingTest`、`DualPoseConsistencyTest`，覆盖迟滞、过渡、无效姿态、快速变化及 24 个方向×4 个 Display Rotation。
+- 新建 [`COMPASS_HOLD_POSE.md`](COMPASS_HOLD_POSE.md)，记录坐标约定、阈值、快照字段与设备验证方法。
+
+### Check
+
+- `:core:compass:test`：通过；HoldPose、Display Rotation、平放/竖持 resolver 与双姿态属性测试通过。
+- `:core:divination:test`：通过；`:app:testDebugUnitTest`：通过。
+- 双姿态属性测试在 0/90/180/270° 和 0°–345° 每 15°方向均满足误差 ≤5°；未发现需要用 UI 提示掩盖的坐标偏移。
+
+### Act / Re-Check
+
+- 初次补充属性测试时发现测试矩阵把自然轴与显示轴混用，导致竖持在 ROTATION_90 下无法构造有效姿态；改为先构造显示 right/top 的物理向量，再按 `DisplayRotationMapping` 逆填自然轴，复检通过。
+- 快速姿态变化用例的首版时间间隔不足以进入算法的剧烈变化窗口，调整为明确的 100ms 跳变后复检通过。
+- 11C 达标，进入 11D：起卦前动态持握引导、自动通过与用户可理解的 readiness 文案。

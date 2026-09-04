@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### V2.1 Cycle 11C（2026-09-04）— HoldPose 与双姿态方位一致性
+- 新增 HoldPoseDetector：平放、竖持、过渡、无效姿态识别，进入/退出迟滞、稳定等待与快速大幅姿态变化抑制。
+- 新增 Display Rotation 轴映射及平放/竖持 resolver；两种姿态统一以真实手机顶部的水平投影求方位，不用持握提示掩盖坐标偏差。
+- 增加 0/90/180/270° 与多方向双姿态一致性属性测试，同一方向误差门限为 5°；CompassController 支持 DisplayRotationProvider 注入，便于设备矩阵验证。
+
 ### V2.1 Cycle 11A（2026-09-04）— 设备时区统一
 - 生产起卦默认读取设备当前时区，不再固定东八区；UI 时间盘与核心解析共用同一时区和点击瞬间。
 - 时间上下文与卦例历史新增 `zoneId`、UTC offset、本地日期时间及可追溯 instant 轨迹；Room schema v3 支持旧库迁移。

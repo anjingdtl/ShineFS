@@ -54,10 +54,10 @@ class HoldPoseDetectorTest {
             detector.update(25f, 0f, 1_000L, normal25, 9.8f).pose,
         )
         val normal80 = cos(Math.toRadians(80.0)).toFloat()
-        assertEquals(HoldPose.TRANSITION, detector.update(80f, 0f, 1_100L, normal80, 9.8f).pose)
-        assertEquals(HoldPose.TRANSITION, detector.update(80f, 0f, 1_700L, normal80, 9.8f).pose)
-        assertEquals(HoldPose.UPRIGHT, detector.update(80f, 0f, 1_900L, normal80, 9.8f).pose)
-        assertTrue(detector.update(80f, 0f, 2_000L, normal80, 9.8f).stableMillis >= 800L)
+        assertEquals(HoldPose.TRANSITION, detector.update(80f, 0f, 1_400L, normal80, 9.8f).pose)
+        assertEquals(HoldPose.TRANSITION, detector.update(80f, 0f, 2_000L, normal80, 9.8f).pose)
+        assertEquals(HoldPose.UPRIGHT, detector.update(80f, 0f, 2_300L, normal80, 9.8f).pose)
+        assertTrue(detector.update(80f, 0f, 2_400L, normal80, 9.8f).stableMillis >= 800L)
     }
 
     @Test
@@ -67,6 +67,14 @@ class HoldPoseDetectorTest {
         assertEquals(HoldPose.INVALID, down.pose)
         val badGravity = detector.update(0f, 0f, 100L, 1f, 20f)
         assertEquals(HoldPose.INVALID, badGravity.pose)
+    }
+
+    @Test
+    fun `短时间内剧烈姿态变化标记无效`() {
+        val detector = HoldPoseDetector()
+        detector.update(0f, 0f, 0L, 1f, 9.8f)
+        val state = detector.update(80f, 0f, 100L, cos(Math.toRadians(80.0)).toFloat(), 9.8f)
+        assertEquals(HoldPose.INVALID, state.pose)
     }
 
     @Test

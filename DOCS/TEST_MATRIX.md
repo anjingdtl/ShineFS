@@ -11,7 +11,7 @@
 | 点击瞬间一致性 | 时间起卦 UI 与核心使用同一点击毫秒 | ✅(11A) | 11A |
 | Room 时间元数据 | schema v3、MIGRATION_2_3、zone/offset/localDateTime 留痕 | ✅(11A) | 11A |
 | 真实罗盘快照 | 禁止重建 CompassState；raw/smoothed/姿态/精度/磁场全字段 | ✅(11B) | 11B |
-| HoldPose 与双姿态 | 平放/竖持/过渡/无效、迟滞、Display Rotation、双姿态误差 | ⬜ | 11C |
+| HoldPose 与双姿态 | 平放/竖持/过渡/无效、迟滞、快速姿态变化抑制、Display Rotation、双姿态误差≤5° | ✅(11C) | 11C |
 
 ## 1. 算法测试（JVM 单元测试，`core/yijing`）
 

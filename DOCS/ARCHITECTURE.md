@@ -1,7 +1,7 @@
 # ShineFS 架构说明（ARCHITECTURE）
 
 > 维护规则：每个 PDCA Cycle 结束时同步更新本文件。
-> 当前状态：**V2.1 Cycle 11A 完成**（2026-09-04；设备时区、UI 时间、核心时间与历史留痕已统一；真机姿态与空间快照继续在 11B–11G 收口）
+> 当前状态：**V2.1 Cycle 11C 完成**（2026-09-04；设备时区、真实定盘快照、HoldPose 防抖与双姿态/Display Rotation 算法已接入；真机标定与 E2E 继续在 11G 收口）
 > V2.0 方案：`DOCS/ShineFS_V2.0_完全离线周易时空演算_完整建设方案.md`（分层：事实层→演算层→规则关系层→解释层）
 
 ## 1. 项目定位
@@ -65,7 +65,7 @@ ShineFS/
 └─ core/interpretation/    # Cycle 10F：本地规则解释器（0 AI）
 ```
 
-### V2.1 传感器与定盘链（Cycle 11B）
+### V2.1 传感器与定盘链（Cycle 11B–11C）
 
 ```text
 core/compass/
@@ -83,6 +83,12 @@ app/sensor/
 时空起卦的空间上下文只能由真实快照生成；`fromCompassState` 与
 `fromLegacyReading` 仅为旧测试/旧导航数据的兼容入口，不得用于新定盘 UI。
 Room 当前 schema 为 v4，时间元数据（v3）与定盘元数据（v4）均保留迁移链。
+
+姿态与方位约束详见 [`COMPASS_HOLD_POSE.md`](COMPASS_HOLD_POSE.md)：
+`HoldPoseDetector` 以屏幕法向量/重力和 pitch/roll 判定平放、竖持、过渡、无效，
+带进入/退出迟滞、稳定等待及快速大幅变化抑制；两个 resolver 均取经 Display
+Rotation 补偿后的“手机顶部”水平投影，不使用固定 90°/180° 偏移。平放与竖持
+在同一物理顶部方向下的 JVM 属性测试要求误差不超过 5°。
 
 ### core:calendar（Cycle 10B）
 

@@ -43,6 +43,8 @@ class HoldPoseDetector(
     private val minGravityMagnitude: Float = 6f,
     private val maxGravityMagnitude: Float = 14f,
     private val screenDownThreshold: Float = -0.35f,
+    private val violentDeltaDeg: Float = 45f,
+    private val violentWindowMillis: Long = 250L,
 ) {
     init {
         require(flatEnterDeg in 0f..flatExitDeg)
@@ -51,11 +53,14 @@ class HoldPoseDetector(
         require(settleMillis >= 0L)
         require(minGravityMagnitude > 0f && maxGravityMagnitude > minGravityMagnitude)
         require(screenDownThreshold < 0f)
+        require(violentDeltaDeg > 0f && violentWindowMillis > 0L)
     }
 
     private var committedPose = HoldPose.INVALID
     private var candidatePose = HoldPose.INVALID
     private var candidateSince = 0L
+    private var lastTiltDeg = Float.NaN
+    private var lastTiltAt = 0L
 
     @Synchronized
     fun update(
@@ -81,7 +86,10 @@ class HoldPoseDetector(
             else -> hypot(pitchDeg.toDouble(), rollDeg.toDouble()).toFloat()
         }
 
-        val measured = if (!validAngles || !gravityValid || !normalValid || !tiltDeg.isFinite()) {
+        val violentChange = tiltDeg.isFinite() && lastTiltDeg.isFinite() &&
+            safeNow > lastTiltAt && safeNow - lastTiltAt <= violentWindowMillis &&
+            abs(tiltDeg - lastTiltDeg) >= violentDeltaDeg
+        val measured = if (!validAngles || !gravityValid || !normalValid || !tiltDeg.isFinite() || violentChange) {
             HoldPose.INVALID
         } else if (screenNormalVerticalComponent != null &&
             screenNormalVerticalComponent <= screenDownThreshold
@@ -95,6 +103,11 @@ class HoldPoseDetector(
                 tiltDeg >= uprightEnterDeg -> HoldPose.UPRIGHT
                 else -> HoldPose.TRANSITION
             }
+        }
+
+        if (tiltDeg.isFinite()) {
+            lastTiltDeg = tiltDeg
+            lastTiltAt = safeNow
         }
 
         val target = targetForMeasured(measured, tiltDeg)
@@ -121,6 +134,8 @@ class HoldPoseDetector(
         committedPose = HoldPose.INVALID
         candidatePose = HoldPose.INVALID
         candidateSince = 0L
+        lastTiltDeg = Float.NaN
+        lastTiltAt = 0L
     }
 
     private fun targetForMeasured(measured: HoldPose, tiltDeg: Float): HoldPose {

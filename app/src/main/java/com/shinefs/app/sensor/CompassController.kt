@@ -32,7 +32,10 @@ import kotlin.math.sqrt
  * 生命周期契约：[start]/[stop] 必须成对调用（Compose 端用 DisposableEffect 保证）；
  * stop 注销全部 listener 并重置引擎，重新 start 可完整恢复。
  */
-class CompassController(context: Context) {
+class CompassController(
+    context: Context,
+    private val displayRotationProvider: DisplayRotationProvider = AndroidDisplayRotationProvider(context),
+) {
 
     data class UiState(
         val capability: CompassCapability,
@@ -63,7 +66,6 @@ class CompassController(context: Context) {
     private val rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
     private val magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
     private val accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    private val displayRotationProvider: DisplayRotationProvider = AndroidDisplayRotationProvider(context)
     private val flatOrientationResolver: OrientationResolver = FlatOrientationResolver()
     private val uprightOrientationResolver: OrientationResolver = UprightOrientationResolver()
 
