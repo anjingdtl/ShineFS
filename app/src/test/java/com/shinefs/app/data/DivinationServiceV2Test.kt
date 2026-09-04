@@ -46,7 +46,7 @@ class DivinationServiceV2Test {
         assertNotNull(case.elementRelation)
         assertTrue(case.calculationTrace!!.contains("37 = 7+7+23"))
         assertTrue(case.reportText!!.contains("一、时空数据"))
-        assertTrue(case.reportText!!.contains("九、规则来源与版本"))
+        assertTrue(case.reportText!!.contains("九、起卦依据与说明"))
         assertTrue(!case.legacyFixture)
         assertEquals(1, repo.all().size)
     }

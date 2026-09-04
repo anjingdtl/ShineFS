@@ -207,7 +207,7 @@ fun CompassScreen(
                 .semantics { contentDescription = "shinefs_time_panel" },
         ) {
             Text(
-                "时间盘 · ${timeCtx?.calendarVersion ?: "…"}",
+                "时间盘 · 传统农历历表",
                 color = ShineColors.GoldPrimary,
                 fontSize = 13.sp,
                 fontFamily = FontFamily.Serif,
@@ -222,16 +222,16 @@ fun CompassScreen(
         Spacer(Modifier.height(12.dp))
 
         StatusRow("稳定度", stabilityLabel(compass.stability))
-        StatusRow("朝向精度", compass.orientationAccuracy.label)
-        StatusRow("磁力计精度", compass.magneticAccuracy.label)
+        StatusRow("方位准确度", compass.orientationAccuracy.label)
+        StatusRow("磁场准确度", compass.magneticAccuracy.label)
         StatusRow(
             "磁场环境",
-            if (compass.magneticInterference) "异常（${compass.magneticMagnitudeUt?.toInt()}µT）" else "正常",
+            if (compass.magneticInterference) "异常（约 ${compass.magneticMagnitudeUt?.toInt()} 微特斯拉）" else "正常",
             warn = compass.magneticInterference,
         )
         if (lk == null && compass.tooTilted) StatusRow("持机姿态", "倾斜过大，请正对前方竖持手机", warn = true)
         if (lk == null && uiState.calibrationRecommended) {
-            StatusRow("校准", "精度不可靠：请持机在空中缓慢画「8」字校准", warn = true)
+            StatusRow("读数校正", "准确度不足：请持机在空中缓慢画「8」字，让读数恢复稳定", warn = true)
         }
 
         Spacer(Modifier.height(14.dp))
@@ -272,7 +272,7 @@ fun CompassScreen(
             }
         }
         Spacer(Modifier.height(10.dp))
-        HintCard("校准说明", "若指针漂移或精度提示不可靠，请远离金属桌面、音箱、磁吸手机壳与汽车，并持机画 8 字校准后再定盘。")
+        HintCard("使用提示", "若指针漂移或读数不稳，请远离金属桌面、音箱、磁吸手机壳与汽车，并持机画 8 字让读数稳定后再定盘。")
     }
 }
 
@@ -339,7 +339,7 @@ private fun lockHint(c: CompassState): String = when {
     c.magneticInterference -> "磁场环境异常，已暂停定盘：请远离金属与磁体"
     c.tooTilted -> "请正对前方竖持手机，减少倾斜"
     c.stability != StabilityLevel.GOOD -> "稳定度需达到「良好」，请持稳手机"
-    else -> "等待传感器就绪…"
+    else -> "等待罗盘读数稳定…"
 }
 
 /** 系统级"减少动画"设置（ANIMATOR_DURATION_SCALE == 0 时禁用装饰性动画）。 */
@@ -392,12 +392,12 @@ private fun LimitedModeBanner() {
             .padding(12.dp),
     ) {
         Text(
-            "当前设备不具备完整电子罗盘传感能力，本功能仅可使用有限模式。",
+            "当前设备暂不支持完整电子罗盘功能，本页仅提供有限使用方式。",
             color = ShineColors.CinnabarBright,
             fontSize = 13.sp,
         )
         Text(
-            "将不显示传感器方位；后续版本可在起卦页使用手动输入方位。",
+            "暂不显示方位读数；后续可在起卦页手动填写方位。",
             color = ShineColors.TextSecondary,
             fontSize = 12.sp,
         )

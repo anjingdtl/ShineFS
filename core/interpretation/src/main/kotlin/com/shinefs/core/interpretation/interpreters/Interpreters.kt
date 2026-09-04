@@ -39,7 +39,7 @@ object SeasonalInterpreter {
         } else {
             append("体卦${tiElement.chinese}行非当令之气，力量受时令节制。")
         }
-        append("（仅呈现当令五行事实层，月令旺衰细目见规则清单待决策项）")
+        append("（这里只说明当令五行，未展开更细的旺衰判断。）")
     }
 }
 

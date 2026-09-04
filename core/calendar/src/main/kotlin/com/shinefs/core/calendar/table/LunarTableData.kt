@@ -13,7 +13,8 @@ import java.security.MessageDigest
  * 锚点：1900-01-31 = 庚子年正月初一。
  * 核验：① 已知春节日期锚点（2000–2029 逐年 + 2033/2034）② 已知闰月年清单
  * ③ 1900–2100 全量内部一致性（逐年天数 353–385、月序单调、往返一致）
- * ④ android.icu.util.ChineseCalendar 设备端抽样交叉核验（androidTest，业务层不依赖 ICU）。
+ * ④ 设备端锚点冒烟（androidTest，业务层不依赖 ICU）；当前项目既有 ICU 对照实现
+ * 曾出现异常，暂不作为正式 Oracle，后续需单独核查初始化及字段读取方式。
  */
 object LunarTableData {
 

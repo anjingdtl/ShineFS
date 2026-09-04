@@ -48,18 +48,22 @@ class YijingTimeResolver(
 
         val trace = CalendarTrace(
             listOf(
-                CalendarTraceEntry("公历时刻", "${civil.year}-${civil.month}-${civil.day} ${civil.hour}:" + String.format(java.util.Locale.ROOT, "%02d", civil.minute), zoneId),
+                CalendarTraceEntry(
+                    "公历时刻",
+                    "${civil.year}-${civil.month}-${civil.day} ${civil.hour}:" + String.format(java.util.Locale.ROOT, "%02d", civil.minute),
+                    if (zoneId == "Asia/Shanghai") "中国标准时间" else "当地时间",
+                ),
                 CalendarTraceEntry(
                     "有效日期",
                     "${effectiveCivil.year}-${effectiveCivil.month}-${effectiveCivil.day}",
-                    if (effectiveCivil != civil) "晚子时换日（${dayBoundaryPolicy}）" else "民用午夜日界（${dayBoundaryPolicy}）",
+                    if (effectiveCivil != civil) "晚子时换日（23:00）" else "民用午夜换日（00:00）",
                 ),
                 CalendarTraceEntry("农历", chinese.display),
                 CalendarTraceEntry("年干支", chinese.yearGanzhi.name, "年界=农历正月初一"),
                 CalendarTraceEntry("日干支", dayGanzhi.name),
-                CalendarTraceEntry("时辰", shichen.display, "时辰数=${shichen.number}"),
+                CalendarTraceEntry("时辰", shichen.display, "时辰序号=${shichen.number}"),
                 CalendarTraceEntry("节气", termInfo.term.chinese, "月建=${monthBranch.chinese}（节气月，不入起卦）"),
-                CalendarTraceEntry("历法版本", calendarProvider.version),
+                CalendarTraceEntry("历法", "传统农历历表"),
             ),
         )
 

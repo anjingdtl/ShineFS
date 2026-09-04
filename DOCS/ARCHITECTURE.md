@@ -1,7 +1,7 @@
 # ShineFS 架构说明（ARCHITECTURE）
 
 > 维护规则：每个 PDCA Cycle 结束时同步更新本文件。
-> 当前状态：**V2.0 建设收口**（2026-09-04，Cycle 10A–10J 全部完成；正式核心 148 JVM + 3 device 测试、飞行模式 E2E 通过；真机罗盘验收清单见 DOCS/REAL_DEVICE_TEST.md，罗盘模块 CONDITIONAL PASS）
+> 当前状态：**V2.0 Release 收尾**（2026-09-04；正式核心、离线链路与模拟器验收按 `DOCS/RELEASE_V2.0.md` 记录；真机罗盘验收清单见 `DOCS/REAL_DEVICE_TEST.md`，罗盘模块保持 CONDITIONAL PASS）
 > V2.0 方案：`DOCS/ShineFS_V2.0_完全离线周易时空演算_完整建设方案.md`（分层：事实层→演算层→规则关系层→解释层）
 
 ## 1. 项目定位
@@ -22,8 +22,8 @@
 | minSdk | 24（Android 7.0） | |
 | compileSdk / targetSdk | 36 / 36 | 模拟器 AVD 为 API 37.1，兼容 |
 | applicationId | `com.shinefs.app` | |
-| 版本 | versionCode 1 / versionName 1.0 | 基线壳 |
-| 测试 | JUnit 4.13.2（JVM） | 仪器化测试尚未引入 |
+| 版本 | versionCode 2 / versionName 2.0 | V2.0 Release |
+| 测试 | JUnit 4.13.2（JVM）+ AndroidJUnitRunner | JVM 与设备端验收分开执行 |
 
 依赖清单见 `gradle/libs.versions.toml`（版本目录单一事实源）。
 

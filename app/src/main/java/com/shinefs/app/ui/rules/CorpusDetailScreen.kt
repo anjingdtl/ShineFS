@@ -21,7 +21,7 @@ import com.shinefs.app.AppGraph
 import com.shinefs.app.ui.compass.ScreenHeader
 import com.shinefs.app.ui.theme.ShineColors
 
-/** 单卦原典详情页：卦辞 / 彖 / 大象 / 逐爻（爻辞+小象）/ 用九用六 / 版本与校验。 */
+/** 单卦原典详情页：卦辞 / 彖 / 大象 / 逐爻（爻辞+小象）/ 用九用六。 */
 @Composable
 fun CorpusDetailScreen(
     kingWenOrder: Int,
@@ -35,7 +35,7 @@ fun CorpusDetailScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 12.dp),
     ) {
-        ScreenHeader(title = "周易 · ${e?.name ?: "?"}卦", onBack = onBack)
+        ScreenHeader(title = "周易 · ${e?.name ?: "未知"}卦", onBack = onBack)
         if (e == null) {
             Text("未找到该卦", color = ShineColors.CinnabarBright)
             return@Column
@@ -71,8 +71,7 @@ fun CorpusDetailScreen(
         }
         Spacer(Modifier.height(6.dp))
         Text(
-            "版本 ${AppGraph.classicCorpus.version} · ${if (e.verified) "已核定" else "未核定"} · " +
-                "checksum ${e.checksum.take(12)}…\n${e.sourceEdition}",
+            "典籍状态：${if (e.verified) "已核定" else "待核对"}\n底本：《周易》通行本电子底本",
             color = ShineColors.GoldMuted,
             fontSize = 11.sp,
             lineHeight = 16.sp,

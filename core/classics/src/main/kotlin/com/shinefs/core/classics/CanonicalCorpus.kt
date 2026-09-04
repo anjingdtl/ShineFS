@@ -17,7 +17,8 @@ data class CanonicalLineText(
  *
  * 数据治理（DOCS/YIJING_RULES.md §10）：
  * - [sourceId]/[sourceEdition] 登记电子底本来源（S-AE2 维基文库通行本系统，构建管线见 edition/）；
- * - [verified] == true 仅表示通过双源结构核验与锚点抽查，异文仍以 [textualVariants] 透明保留；
+ * - [verified] == true 仅表示通过结构完整性校验、checksum、电子底本核对与代码锚点抽查，
+ *   不宣称存在独立古籍第二文本源；异文仍以 [textualVariants] 透明保留；
  * - [checksum] 为该卦全部字段的 SHA-256（[CanonicalCorpus.computeChecksum] 复算口径）；
  * - 禁止由 LLM 生成原典并标记已核定；[specialUseText] 仅乾（用九）/坤（用六）非空。
  */

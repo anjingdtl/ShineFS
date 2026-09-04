@@ -9,6 +9,7 @@ import com.shinefs.core.divination.result.DivinationResult
 import com.shinefs.core.divination.result.ResultAssembler
 import com.shinefs.core.divination.trace.CalculationTrace
 import com.shinefs.core.divination.trace.CalculationTraceEntry
+import com.shinefs.core.compass.NorthReference
 
 /**
  * 正式起卦模式 C：时间卦 + 罗盘方应（时空合参，V2.0 默认模式）。
@@ -45,7 +46,10 @@ class TimeCastWithSpatialResponse(
         val extraTrace = CalculationTrace(
             listOfNotNull(
                 space.smoothedAzimuth?.let {
-                    CalculationTraceEntry("方位角", String.format(java.util.Locale.ROOT, "%.1f°", it) + "（${space.northReference}）")
+                    CalculationTraceEntry(
+                        "方位角",
+                        String.format(java.util.Locale.ROOT, "%.1f°", it) + "（${northReferenceLabel(space.northReference)}）",
+                    )
                 },
                 space.facingMountain?.let { CalculationTraceEntry("向山", it) },
                 space.sittingMountain?.let { CalculationTraceEntry("坐山", it) },
@@ -71,4 +75,9 @@ class TimeCastWithSpatialResponse(
 
     private fun TrigramElementsCh(t: com.shinefs.core.yijing.model.Trigram): String =
         com.shinefs.core.yijing.model.TrigramElements.of(t).chinese
+
+    private fun northReferenceLabel(reference: NorthReference): String = when (reference) {
+        NorthReference.MAGNETIC -> "磁北"
+        NorthReference.TRUE -> "真北"
+    }
 }

@@ -2,6 +2,10 @@ package com.shinefs.core.interpretation
 
 import com.shinefs.core.classics.CanonicalCorpus
 import com.shinefs.core.classics.ClassicCorpus
+import com.shinefs.core.calendar.model.DayBoundaryPolicy
+import com.shinefs.core.calendar.model.LeapMonthPolicy
+import com.shinefs.core.compass.NorthReference
+import com.shinefs.core.divination.manifest.RuleStatus
 import com.shinefs.core.divination.result.DivinationResult
 import com.shinefs.core.interpretation.interpreters.ElementInterpreter
 import com.shinefs.core.interpretation.interpreters.LinePositionInterpreter
@@ -41,11 +45,11 @@ class AdvisoryComposer(
     private fun sectionOne(r: DivinationResult) = InterpretationSection(
         "一、时空数据",
         listOf(
-            "公历：${r.timeContext.civil.year}-${r.timeContext.civil.month}-${r.timeContext.civil.day} ${r.timeContext.civil.hour}:${String.format(java.util.Locale.ROOT, "%02d", r.timeContext.civil.minute)}（${r.timeContext.zoneId}）",
+            "公历：${r.timeContext.civil.year}-${r.timeContext.civil.month}-${r.timeContext.civil.day} ${r.timeContext.civil.hour}:${String.format(java.util.Locale.ROOT, "%02d", r.timeContext.civil.minute)}（${timeZoneLabel(r.timeContext.zoneId)}）",
             "农历：${r.timeContext.lunarDisplay}",
             "干支：${r.timeContext.dayGanzhi.name}日 ${r.timeContext.shichen.display}",
             "节气：${r.timeContext.solarTerm?.term?.chinese ?: "无数据"}（月建${r.timeContext.monthBranch?.chinese ?: "?"}）",
-            "历法：${r.timeContext.calendarVersion}；日界 ${r.timeContext.dayBoundaryPolicy}；闰月 ${r.timeContext.leapMonthPolicy}",
+            "历法：传统农历历表；换日：${dayBoundaryLabel(r.timeContext.dayBoundaryPolicy)}；闰月：${leapMonthLabel(r.timeContext.leapMonthPolicy)}",
         ),
     )
 
@@ -83,7 +87,7 @@ class AdvisoryComposer(
             text.specialUseText?.let { lines.add("特爻：$it") }
             text.specialUseSmallImage?.takeIf { r.changingLine == 6 && text.kingWenOrder in 1..2 }
                 ?.let { lines.add("小象曰：$it") }
-            lines.add("原典版本：${corpus.version}（${corpus.edition}）${if (text.verified) "，已核定" else "，未核定"}")
+            lines.add("原典：周易通行本电子底本（${if (text.verified) "已核定" else "待核对"}）")
             if (text.textualVariants.isNotEmpty()) {
                 lines.add("校勘注记：${text.textualVariants.joinToString("；")}")
             }
@@ -97,7 +101,7 @@ class AdvisoryComposer(
         listOfNotNull(
             r.nuclear?.let {
                 "互卦：上互${it.upper.chineseName} 下互${it.lower.chineseName} → 第${it.hexagram.kingWenOrder}卦 ${it.hexagram.chineseName}（事之中间环节）"
-            } ?: "互卦：无（策略生效）",
+            } ?: "互卦：无（按当前取法）",
             r.tiYong?.let { ty ->
                 "体用：动爻在第${r.changingLine}爻（${if (ty.movingPart == com.shinefs.core.yijing.tiyong.MovingPart.LOWER) "下" else "上"}卦），" +
                     "体卦${ty.ti.chineseName}（${TrigramElements.of(ty.ti).chinese}），用卦${ty.yong.chineseName}（${TrigramElements.of(ty.yong).chinese}）"
@@ -131,7 +135,7 @@ class AdvisoryComposer(
             lines.add("本次起卦未含空间数据（纯时间卦）。")
         } else {
             lines.add(
-                "方位角：${sp.smoothedAzimuth?.let { String.format(java.util.Locale.ROOT, "%.1f", it) } ?: "无"}°（北参考：${sp.northReference}）",
+                "方位角：${sp.smoothedAzimuth?.let { String.format(java.util.Locale.ROOT, "%.1f", it) } ?: "无"}°（以${northReferenceLabel(sp.northReference)}为北）",
             )
             lines.add(
                 SpatialResponseInterpreter.interpret(
@@ -142,7 +146,10 @@ class AdvisoryComposer(
                     tiElement = r.tiYong?.let { TrigramElements.of(it.ti) } ?: com.shinefs.core.yijing.model.Element.EARTH,
                 ),
             )
-            lines.add("传感器：稳定=${if (sp.stable) "是" else "否"}，磁扰=${if (sp.magneticInterference) "有" else "无"}")
+            lines.add(
+                "测量状态：${if (sp.stable) "方位稳定" else "方位未稳"}，" +
+                    if (sp.magneticInterference) "磁场存在干扰" else "磁场正常",
+            )
         }
         return InterpretationSection("七、方位与方应", lines)
     }
@@ -172,23 +179,61 @@ class AdvisoryComposer(
                     ),
                 )
             }
-            lines.add("（以上为本地规则引擎依既定模板生成，非 AI 生成，不含随机成分。）")
+            lines.add("（以上内容依传统规则固定生成，不使用智能生成或随机内容。）")
         }
         return InterpretationSection("八、本地白话释义", lines)
     }
 
-    /** 九、规则来源与版本 */
+    /** 九、起卦依据与说明 */
     private fun sectionNine(r: DivinationResult) = InterpretationSection(
-        "九、规则来源与版本",
+        "九、起卦依据与说明",
         listOf(
-            "起卦体系：${r.rule.ruleId} v${r.rule.version}（${r.rule.system}）",
-            "规则来源：" + r.rule.sourceRefs.joinToString("；") { "${it.sourceId} ${it.title}" },
-            "显式假设：" + r.rule.assumptions.joinToString("；"),
-            "规则状态：${r.rule.status}",
-            "经典体系：${corpus.version}；历法：${r.timeContext.calendarVersion}；北参考：${r.spaceContext?.northReference ?: "未用"}",
-            "解释器：$interpreterVersion（0 AI / 0 随机 / 0 网络）",
+            "起卦方法：${ruleDisplayName(r.rule.ruleId)}",
+            "依据出处：" + r.rule.sourceRefs.joinToString("；") { it.title },
+            "说明：${ruleAssumptions(r.rule.ruleId)}",
+            "核对状态：${ruleStatusLabel(r.rule.status)}",
+            "典籍：周易通行本电子底本；历法：传统农历历表；方位基准：${r.spaceContext?.let { northReferenceLabel(it.northReference) } ?: "未使用"}",
+            "解读方式：本地固定规则，不使用智能生成、不含随机内容、无需联网",
         ),
     )
+
+    private fun ruleDisplayName(ruleId: String): String = when (ruleId) {
+        "meihua-time-v1" -> "梅花易数 · 年月日时起卦"
+        "time-cast-with-spatial-response-v1" -> "时空合参 · 时间卦与罗盘方应"
+        "meihua-postheaven-v1" -> "梅花易数 · 后天端法（物象方位）"
+        else -> "传统起卦方法"
+    }
+
+    private fun ruleAssumptions(ruleId: String): String = when (ruleId) {
+        "meihua-time-v1" -> "年支以农历正月初一为界；闰月沿用本月序号；换日时刻按当前设置。"
+        "time-cast-with-spatial-response-v1" -> "时间决定卦象，罗盘只补充方位信息，不改变时间起卦结果。"
+        "meihua-postheaven-v1" -> "物象取卦只采用《说卦》明文；方位取后天八卦。"
+        else -> "按当前页面所选方法与时间、方位取数。"
+    }
+
+    private fun ruleStatusLabel(status: RuleStatus): String = when (status) {
+        RuleStatus.VERIFIED -> "已核定"
+        RuleStatus.VERIFIED_WITH_EXPLICIT_ASSUMPTIONS -> "已核定，约定清楚"
+        RuleStatus.ENGINEERING_POLICY -> "按既定约定执行"
+        RuleStatus.PENDING -> "待核对"
+    }
+
+    private fun dayBoundaryLabel(policy: DayBoundaryPolicy): String = when (policy) {
+        DayBoundaryPolicy.CIVIL_MIDNIGHT -> "民用午夜（00:00）"
+        DayBoundaryPolicy.ZI_HOUR_START_23 -> "晚子时（23:00）"
+    }
+
+    private fun leapMonthLabel(policy: LeapMonthPolicy): String = when (policy) {
+        LeapMonthPolicy.SAME_MONTH_NUMBER -> "闰月沿用本月序号"
+    }
+
+    private fun northReferenceLabel(reference: NorthReference): String = when (reference) {
+        NorthReference.MAGNETIC -> "磁北"
+        NorthReference.TRUE -> "真北"
+    }
+
+    private fun timeZoneLabel(zoneId: String): String =
+        if (zoneId == "Asia/Shanghai") "中国标准时间" else "当地时间"
 
     private fun lineName(line: Int): String = when (line) {
         1 -> "初爻"

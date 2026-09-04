@@ -14,8 +14,11 @@ captures/
 .kotlin/
 
 # Secrets / keystores（V1 发版前如引入签名密钥，禁止入库）
+keystore.properties
 *.jks
 *.keystore
+*.p12
+*.pem
 
 # OS
 Thumbs.db
@@ -24,4 +27,10 @@ Thumbs.db
 # Logs
 *.log
 test-logs/
+
+# Release output / local script cache
+release/
+__pycache__/
+*.pyc
+
 core/classics/edition/build/

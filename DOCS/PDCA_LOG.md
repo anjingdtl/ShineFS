@@ -744,3 +744,33 @@
 4. 原典锚点抽查约 30%（结构校验 100%），S-AE1（ctext）待凭证后再复核。
 
 **验收判定：Cycle 10J 达标（全门禁通过：0 AI/0 网络/0 Fixture/0 随机，148 JVM + 3 device 测试、飞行模式全流程、V1→V2 迁移、Debug/Release/Lint；罗盘真机项 CONDITIONAL PASS），V2.0 建设收口。**
+
+---
+
+## Cycle 10J-R — 中文界面与签名 Release 收尾（2026-09-04）
+
+### Plan
+
+- **Goal**：完成 V2.0 发布前最后一轮用户体验收口：所有展示页面使用自然中文，移除直接暴露给用户的英文、内部编号、版本串、校验串和工程字段；同时完成开屏、图标、签名包和发布证据归档。
+- **Scope**：开屏与图标黑白太极统一；首页、罗盘、时间起卦、场景选择、卦象、解读、宅居测局、卦例记录、规则与典籍及典籍详情逐页巡检；Release 签名、安装、飞行模式复验、截图和文档收口。
+
+### Do
+
+- 开屏使用玄黑金铜罗盘与黑白太极主图；adaptive、圆形、单色主题和五档密度图标同步黑白太极。
+- 用户可见文本统一为中文；历史旧卦例增加兼容转换，内部规则标识继续留在存储与程序层，不进入展示层。
+- 新增 `DOCS/RELEASE_V2.0.md`，归档最终 APK、签名证书指纹、截图证据和真机遗留项。
+
+### Check
+
+- `clean test lint assembleDebug`：通过；JVM 148/148；`connectedDebugAndroidTest` 3/3；Release 构建通过。
+- Release 包元数据：`com.shinefs.app`、`versionCode 2`、`versionName 2.0`；APK v2 签名验证通过。
+- 证书 SHA-256：`017b3fbed4001083f2f70a0c51e8e463322df66b095e1c3a476fdd0d86dc2a0a`；与 TAVO-MINI 官方发布证书一致。
+- Release APK SHA-256：`b0bc4739556f07d72a78c70ef836690b0357dbfcacb9cfa453f6e7f8728c2ef9`。
+- Release 在 `emulator-5554` / `Medium_Phone` API 37、飞行模式下启动并完成首页、宅居测局、罗盘、场景选择、传统时间起卦、卦象、九段解读、收藏和删除；应用进程日志无 FATAL/ANR/常见崩溃异常。
+- 页面可见文本扫描：中文、数字、卦符和必要传统符号通过；10 张截图已归档至 `DOCS/assets/release_v2/`。
+
+### Act
+
+- **发布判定**：条件通过，可发布。周易演算、离线能力、中文展示、构建和签名门禁均通过。
+- **保留边界**：真实磁场准确度、磁扰阈值、画 8 字校正和无磁力计有限模式必须在真实 Android 设备补测；模拟器截图 `release_v20_10_sensor_limited.png` 虽按固定文件名留存，但本次实际状态为完整虚拟传感器，不作有限模式证据。
+- **下一步**：真实设备补测完成后回填 `DOCS/REAL_DEVICE_TEST.md`；其余 V2.0 发布材料已收口。

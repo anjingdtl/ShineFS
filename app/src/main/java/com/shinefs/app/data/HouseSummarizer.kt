@@ -62,6 +62,6 @@ object HouseSummarizer {
         if (summary.elementCounts.isNotEmpty()) {
             append("向方五行分布：" + summary.elementCounts.entries.joinToString("、") { "${it.key}×${it.value}" } + "。")
         }
-        append("V1.0 摘要仅汇总各处测量与卦象，不做飞星等综合断语。")
+        append("本摘要仅汇总各处测量与卦象，不做飞星等综合断语。")
     }
 }

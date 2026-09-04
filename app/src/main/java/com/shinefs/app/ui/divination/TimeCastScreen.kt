@@ -101,7 +101,7 @@ fun TimeCastScreen(
                 .semantics { contentDescription = "shinefs_time_panel" },
         ) {
             Text(
-                "时间盘（${c?.calendarVersion ?: "…"}）",
+                "时间盘（传统农历历表）",
                 color = ShineColors.GoldPrimary,
                 fontSize = 13.sp,
                 fontFamily = FontFamily.Serif,
@@ -114,7 +114,7 @@ fun TimeCastScreen(
             StatusRow("时辰", c?.shichen?.display ?: "…")
             StatusRow("节气", c?.solarTerm?.term?.chinese ?: "…")
             StatusRow("月建", c?.monthBranch?.chinese?.plus("月") ?: "…")
-            StatusRow("日界", c?.dayBoundaryPolicy?.name ?: "…")
+            StatusRow("换日", c?.dayBoundaryPolicy?.let(::dayBoundaryLabel) ?: "…")
         }
 
         Spacer(Modifier.height(16.dp))
@@ -134,10 +134,14 @@ fun TimeCastScreen(
         Spacer(Modifier.height(10.dp))
         HintCard(
             "规则说明",
-            "梅花易数年月日时起例：上卦 =（年支数＋农历月＋农历日）÷8 取余；" +
-                "下卦与动爻在此基础上加时辰数，分别 ÷8 与 ÷6 取余。余 0 作 8（坤）/作 6（上爻）。" +
-                "规则版本 meihua-time-v1（见 DOCS/YIJING_RULES.md），完全离线确定性演算。",
+            "梅花易数年月日时起例：年支、农历月、农历日与时辰分别取数，依传统方法推得上下卦和动爻；" +
+                "余数归零时按传统取卦。全程离线，每次同样输入都会得到相同结果。",
         )
         Spacer(Modifier.height(8.dp))
     }
+}
+
+private fun dayBoundaryLabel(policy: com.shinefs.core.calendar.model.DayBoundaryPolicy): String = when (policy) {
+    com.shinefs.core.calendar.model.DayBoundaryPolicy.CIVIL_MIDNIGHT -> "民用午夜（00:00）"
+    com.shinefs.core.calendar.model.DayBoundaryPolicy.ZI_HOUR_START_23 -> "晚子时（23:00）"
 }

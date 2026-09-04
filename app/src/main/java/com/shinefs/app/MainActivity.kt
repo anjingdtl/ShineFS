@@ -5,7 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.shinefs.app.data.Scenes
 import com.shinefs.app.ui.compass.CompassScreen
 import com.shinefs.app.ui.divination.HexagramRevealScreen
@@ -18,6 +21,7 @@ import com.shinefs.app.ui.nav.Router
 import com.shinefs.app.ui.rules.CorpusDetailScreen
 import com.shinefs.app.ui.rules.CorpusListScreen
 import com.shinefs.app.ui.rules.RulesScreen
+import com.shinefs.app.ui.splash.LaunchSplash
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,7 +39,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ShineApp() {
     val router = remember { Router() }
+    var splashVisible by remember { mutableStateOf(true) }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
+    if (splashVisible) {
+        LaunchSplash { splashVisible = false }
+        return
+    }
     router.HandleBack()
     when (val dest = router.currentAsState()) {
         Dest.Home -> HomeScreen(

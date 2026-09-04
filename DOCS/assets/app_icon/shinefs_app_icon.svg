@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="432" height="432">
+  <title>周易风水罗盘应用图标</title>
+  <desc>玄黑圆形罗盘底盘，古铜金八卦环，中央黑白太极天池。</desc>
+  <rect width="108" height="108" fill="#0C0C0F"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="54" cy="54" r="35" stroke="#B8955A" stroke-width="2.2"/>
+    <circle cx="54" cy="54" r="31.5" stroke="#B8955A" stroke-width="2.2"/>
+    <circle cx="54" cy="54" r="30" stroke="#6E5A39" stroke-width="0.9"/>
+    <g id="trigram" stroke="#D0AA68" stroke-width="2.1">
+      <path d="M48 25.5h12M48 29.5h12M48 33.5h12"/>
+      <path d="M48 29.5h5M55 29.5h5" stroke="#0C0C0F" stroke-width="2.8"/>
+    </g>
+    <use href="#trigram" transform="rotate(45 54 54)"/>
+    <use href="#trigram" transform="rotate(90 54 54)"/>
+    <use href="#trigram" transform="rotate(135 54 54)"/>
+    <use href="#trigram" transform="rotate(180 54 54)"/>
+    <use href="#trigram" transform="rotate(225 54 54)"/>
+    <use href="#trigram" transform="rotate(270 54 54)"/>
+    <use href="#trigram" transform="rotate(315 54 54)"/>
+  </g>
+  <circle cx="54" cy="54" r="16" fill="#0C0C0F" stroke="#B8955A" stroke-width="1.5"/>
+  <path d="M54 39a15 15 0 0 0 0 30 7.5 7.5 0 0 0 0-15 7.5 7.5 0 0 1 0-15Z" fill="#F2EDE3"/>
+  <path d="M54 39a15 15 0 0 1 0 30 7.5 7.5 0 0 1 0-15 7.5 7.5 0 0 0 0-15Z" fill="#15161A"/>
+  <circle cx="54" cy="44.5" r="2.2" fill="#15161A"/>
+  <circle cx="54" cy="63.5" r="2.2" fill="#F2EDE3"/>
+</svg>

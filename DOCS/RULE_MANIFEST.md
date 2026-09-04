@@ -38,7 +38,7 @@
 
 | ruleId | version | 来源 | 关键假设 | status |
 |---|---|---|---|---|
-| `calendar-table-v1` | 1 | S-E01 | 内置 1900–2100 历表；锚点+ICU 抽样交叉核验；版本化+checksum | ENGINEERING_POLICY |
+| `calendar-table-v1` | 1 | S-E01 | 内置 1900–2100 历表；锚点+第三方独立交叉验证源 `lunar_python` 构建期采样核验；当前项目既有 ICU 对照实现曾出现异常，暂不作为正式 Oracle；版本化+checksum | ENGINEERING_POLICY |
 | `ganzhi-day-v1` | 1 | S-E02 | JDN 取模 60，双锚点互验（1900-01-01 甲戌、1949-10-01 甲子） | ENGINEERING_POLICY |
 | `ganzhi-year-v1` | 1 | S-E05 | 年干支随农历年（正月初一）轮转 | ENGINEERING_POLICY |
 | `shichen-v1` | 1 | S-E04 | 12 时辰整点左闭右开；23:00 属次日子时 | ENGINEERING_POLICY |
@@ -66,7 +66,7 @@
 | D-06（产品名） | 维持 ShineFS |
 | D-07（兼向/分金） | 维持不做：TD-V2-06 |
 | D-08（横竖屏） | 维持竖屏 |
-| D-09（原典底本） | 已定：S-A01 通行本系统 + S-AE1/S-AE2 双电子源交叉核验（Cycle 10E） |
+| D-09（原典底本） | 已定：S-A01 通行本系统 + S-AE2 电子底本 + S-AE3 代码锚点抽查；独立第二文献源待后续治理 |
 | D-10（AI 解读） | 已定：AI 全链路移除（V2.0 方案 §1.2） |
 
 ## 5. 变更记录

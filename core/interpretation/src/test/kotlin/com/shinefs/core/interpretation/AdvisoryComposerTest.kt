@@ -47,7 +47,7 @@ class AdvisoryComposerTest {
         assertEquals(
             listOf(
                 "一、时空数据", "二、起卦过程", "三、卦象结果", "四、周易原典",
-                "五、互卦与体用", "六、五行与时令", "七、方位与方应", "八、本地白话释义", "九、规则来源与版本",
+                "五、互卦与体用", "六、五行与时令", "七、方位与方应", "八、本地白话释义", "九、起卦依据与说明",
             ),
             report.sections.map { it.title },
         )
@@ -79,10 +79,11 @@ class AdvisoryComposerTest {
         // 方应
         assertTrue(text.contains("午"))
         assertTrue(text.contains("坐子"))
-        // 版本
-        assertTrue(text.contains("meihua-time-v1"))
-        assertTrue(text.contains("zhouyi-corpus-v1"))
-        assertTrue(text.contains("0 AI"))
+        // 展示文字不暴露内部编号或工程术语
+        assertTrue(text.contains("起卦方法：梅花易数 · 年月日时起卦"))
+        assertTrue(text.contains("周易通行本电子底本"))
+        assertTrue(text.contains("不使用智能生成"))
+        assertTrue(!Regex("[A-Za-z]{2,}").containsMatchIn(text))
     }
 
     @Test

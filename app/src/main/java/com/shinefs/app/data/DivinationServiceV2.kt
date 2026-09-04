@@ -147,10 +147,10 @@ class DivinationServiceV2(
         val line = ((base + h - 1) % 6) + 1
         val original = com.shinefs.core.yijing.rules.HexagramOps.fromTrigrams(lower, upper)
         val changed = com.shinefs.core.yijing.rules.HexagramOps.withChangingLine(original, line)
-        val expect = "复算：${original.chineseName}之${changed.chineseName}（第${line}爻动）"
+        val expect = "核对结果：${original.chineseName}之${changed.chineseName}（第${line}爻动）"
         val match = original.chineseName == case.originalHexagramName &&
             changed.chineseName == case.changedHexagramName && line == case.changingLine
-        return expect + if (match) " ✓ 与原记录一致" else " ✗ 与原记录不一致（规则版本迁移？）"
+        return expect + if (match) " ✓ 与原记录一致" else " ✗ 与原记录不一致（请重新核对起卦依据）"
     }
 
     companion object {
@@ -158,7 +158,7 @@ class DivinationServiceV2(
             "meihua-time-v1" -> "梅花易数 · 年月日时起卦"
             "time-cast-with-spatial-response-v1" -> "时空合参 · 时间卦＋罗盘方应"
             "meihua-postheaven-v1" -> "梅花易数 · 后天端法（物象方位）"
-            else -> ruleId
+            else -> "传统起卦方法"
         }
     }
 }

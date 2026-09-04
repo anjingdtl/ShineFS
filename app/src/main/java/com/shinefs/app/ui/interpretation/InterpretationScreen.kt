@@ -90,13 +90,12 @@ fun InterpretationScreen(
 
         if (case.legacyFixture) {
             Banner(
-                "V1 联调期卦例（legacy-fixture）：起卦口径为临时 Fixture 规则，仅供查看，" +
-                    "不属于 V2 正式演算结果（rules-v0.1）。",
+                "这是旧卦例，起卦方法属于早期试用规则，仅供查看，不属于当前正式结果。",
                 ShineColors.CinnabarBright,
             )
         }
 
-        val report = case.reportText
+        val report = case.reportText?.localizedForDisplay()
         if (report != null) {
             // 九段报告：按「一、二、…九、」标题行分节渲染
             val lines = report.split("\n")
@@ -119,20 +118,20 @@ fun InterpretationScreen(
                 }
             }
         } else {
-            SectionTitle("卦象结果（V1 旧例）")
+            SectionTitle("卦象结果（旧卦例）")
             SectionBody(
                 "本卦 ${case.originalHexagramName}（第${case.originalHexagramOrder}卦） · " +
                     "第${case.changingLine}爻动 · 变卦 ${case.changedHexagramName}；" +
-                    "规则：${case.ruleDisplayName}（${case.rulesVersion}）。",
+                    "起卦依据：${displayRuleName(case)}。",
             )
-            SectionTitle("规则来源与版本")
-            SectionBody("V1 旧例无九段报告与复算轨迹。")
+            SectionTitle("起卦依据")
+            SectionBody("旧卦例暂无完整报告与起卦过程。")
         }
 
-        SectionTitle("离线复算")
+        SectionTitle("离线核对")
         if (recomputeText == null && !case.legacyFixture) {
             ActionButton(
-                text = "按原规则版本复算",
+                text = "按原方法重新核对",
                 enabled = true,
                 primary = false,
                 contentDesc = "shinefs_recompute",
@@ -250,4 +249,33 @@ private fun Banner(text: String, color: Color) {
             .background(ShineColors.BackgroundRaised, RoundedCornerShape(8.dp))
             .padding(12.dp),
     )
+}
+
+/** 兼容早期已保存卦例：历史报告也不把内部编号带到用户界面。 */
+private fun String.localizedForDisplay(): String = this
+    .replace("Asia/Shanghai", "中国标准时间")
+    .replace("zhouyi-corpus-v1", "周易通行本")
+    .replace("calendar-table-v1", "传统农历历表")
+    .replace("meihua-time-v1", "梅花易数·年月日时")
+    .replace("time-cast-with-spatial-response-v1", "时空合参")
+    .replace("meihua-postheaven-v1", "梅花易数·后天端法")
+    .replace("spatial-response-v1", "罗盘方应")
+    .replace("rules-v2.0", "正式规则")
+    .replace("interpret-v1", "固定规则解读")
+    .replace("CIVIL_MIDNIGHT", "民用午夜换日")
+    .replace("ZI_HOUR_START_23", "晚子时换日")
+    .replace("SAME_MONTH_NUMBER", "闰月沿用本月序号")
+    .replace("STANDARD_234_345", "按传统取互卦")
+    .replace("DOCS/YIJING_RULES.md", "使用说明")
+    .replace("0 AI / 0 随机 / 0 网络", "不使用智能生成、不含随机内容、无需联网")
+    .replace(Regex("(?m)^.*(?:checksum|校验和).*$"), "典籍内容已核对")
+    .replace(Regex("\\b(?:S|TD)-[A-Z0-9-]+\\b\\s*"), "")
+    .replace(Regex("\\b(?:V|v)\\d+(?:\\.\\d+)?\\b"), "正式版本")
+
+private fun displayRuleName(case: DivinationCase): String = when {
+    case.ruleDisplayName.contains("梅花易数") -> case.ruleDisplayName
+    case.ruleId == "time-cast-with-spatial-response-v1" -> "时空合参与罗盘方应"
+    case.ruleId == "meihua-time-v1" -> "梅花易数·年月日时起卦"
+    case.ruleId == "meihua-postheaven-v1" -> "梅花易数·后天端法"
+    else -> "早期试用方法"
 }

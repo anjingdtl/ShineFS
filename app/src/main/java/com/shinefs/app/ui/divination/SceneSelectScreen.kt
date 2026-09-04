@@ -76,7 +76,7 @@ fun SceneSelectScreen(
             SceneRow(scene.name, scene.guidance) { onSelect(scene.id) }
         }
         Spacer(Modifier.height(8.dp))
-        HintCard("定盘说明", "起卦使用定盘时刻的锁定读数与时间；同一锁定输入重复起卦结果不变（确定性规则）。")
+        HintCard("定盘说明", "起卦使用定盘时刻的方位与时间；相同的定盘结果会得到相同卦象。")
     }
 }
 

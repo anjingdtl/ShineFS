@@ -54,7 +54,7 @@ object ResultAssembler {
             listOf(
                 CalculationTraceEntry("本卦", "上${upper.chineseName} 下${lower.chineseName} → ${original.chineseName}（第${original.kingWenOrder}卦）"),
                 CalculationTraceEntry("变卦", "第${changingLine}爻动 → ${changed.chineseName}（第${changed.kingWenOrder}卦）"),
-                CalculationTraceEntry("互卦", nuclear?.let { "下互${it.lower.chineseName} 上互${it.upper.chineseName} → ${it.hexagram.chineseName}" } ?: "无（${nuclearPolicy}）"),
+                CalculationTraceEntry("互卦", nuclear?.let { "下互${it.lower.chineseName} 上互${it.upper.chineseName} → ${it.hexagram.chineseName}" } ?: "无（按当前取法）"),
                 CalculationTraceEntry("体用", "体${tiYong.ti.chineseName}${TrigramElements.of(tiYong.ti).chinese} 用${tiYong.yong.chineseName}${TrigramElements.of(tiYong.yong).chinese}（动爻在${if (tiYong.movingPart == com.shinefs.core.yijing.tiyong.MovingPart.LOWER) "下" else "上"}卦）"),
                 CalculationTraceEntry("五行", "${TrigramElements.of(tiYong.ti).chinese}与${TrigramElements.of(tiYong.yong).chinese} → ${elementRelation.display}"),
                 CalculationTraceEntry("时令", seasonalQi?.let { "${it.season.chinese}（当令${it.dominantElement.chinese}${if (it.earthMonth) "，土旺月" else ""}）" } ?: "无节气数据"),

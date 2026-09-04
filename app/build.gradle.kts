@@ -5,6 +5,37 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+fun signingEnv(primary: String, legacy: String): String? =
+    System.getenv(primary)?.takeIf { it.isNotBlank() }
+        ?: System.getenv(legacy)?.takeIf { it.isNotBlank() }
+
+val releaseBuildRequested = gradle.startParameter.taskNames.any {
+    it.contains("release", ignoreCase = true)
+}
+val releaseStoreFileValue = signingEnv("SHINEFS_RELEASE_STORE_FILE", "SHINE_WRITER_RELEASE_STORE_FILE")
+val releaseStorePasswordValue = signingEnv("SHINEFS_RELEASE_STORE_PASSWORD", "SHINE_WRITER_RELEASE_STORE_PASSWORD")
+val releaseKeyAliasValue = signingEnv("SHINEFS_RELEASE_KEY_ALIAS", "SHINE_WRITER_RELEASE_KEY_ALIAS")
+val releaseKeyPasswordValue = signingEnv("SHINEFS_RELEASE_KEY_PASSWORD", "SHINE_WRITER_RELEASE_KEY_PASSWORD")
+
+if (releaseBuildRequested) {
+    val missing = buildList {
+        if (releaseStoreFileValue == null) add("SHINEFS_RELEASE_STORE_FILE/SHINE_WRITER_RELEASE_STORE_FILE")
+        if (releaseStorePasswordValue == null) add("SHINEFS_RELEASE_STORE_PASSWORD/SHINE_WRITER_RELEASE_STORE_PASSWORD")
+        if (releaseKeyAliasValue == null) add("SHINEFS_RELEASE_KEY_ALIAS/SHINE_WRITER_RELEASE_KEY_ALIAS")
+        if (releaseKeyPasswordValue == null) add("SHINEFS_RELEASE_KEY_PASSWORD/SHINE_WRITER_RELEASE_KEY_PASSWORD")
+    }
+    if (missing.isNotEmpty()) {
+        throw GradleException(
+            "Release signing requires environment variable(s): ${missing.joinToString(", ")}. " +
+                "Debug builds do not require release signing secrets.",
+        )
+    }
+    val releaseStoreFile = file(releaseStoreFileValue!!)
+    if (!releaseStoreFile.exists()) {
+        throw GradleException("Release signing keystore not found: ${releaseStoreFile.absolutePath}")
+    }
+}
+
 android {
     namespace = "com.shinefs.app"
     compileSdk = 36
@@ -16,6 +47,29 @@ android {
         versionCode = 2
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // Release signing is environment-only. The existing TAVO-MINI variables
+    // are accepted for key reuse; ShineFS-specific names take precedence.
+    // There is deliberately no debug-keystore fallback for Release.
+    signingConfigs {
+        create("release") {
+            if (releaseBuildRequested) {
+                storeFile = file(releaseStoreFileValue!!)
+                storePassword = releaseStorePasswordValue!!
+                keyAlias = releaseKeyAliasValue!!
+                keyPassword = releaseKeyPasswordValue!!
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        release {
+            signingConfig = signingConfigs.getByName("release")
+        }
     }
 
     compileOptions {

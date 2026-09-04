@@ -8,7 +8,7 @@ import org.junit.Test
 
 /**
  * 原典库核验（V2.0 方案 §18/§26）：
- * 结构完整性（64/384/2）+ 与卦表交叉 + checksum 复算 + 双源锚点抽查（源B：结构化录入核对）。
+ * 结构完整性（64/384/2）+ 与卦表交叉 + checksum 复算 + 电子底本核对 + 代码锚点抽查。
  */
 class CanonicalCorpusTest {
 
@@ -71,7 +71,7 @@ class CanonicalCorpusTest {
         assertEquals("未济", CanonicalCorpus.byKingWenOrder(64)!!.name)
     }
 
-    // ---------- 双源锚点抽查（源B：独立于维基文库的结构化核对） ----------
+    // ---------- 代码锚点抽查（不是独立古籍第二文本源） ----------
 
     @Test
     fun `乾卦锚点`() {

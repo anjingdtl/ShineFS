@@ -2,6 +2,12 @@
 
 ### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
 
+#### 收尾优化与发布验收
+- 开屏改为玄黑金铜罗盘配黑白太极，图标同步黑白太极与 adaptive/圆形/单色主题资源。
+- 完成全页面用户可见文案巡检：英文、规则编号、版本串、校验串和工程字段不再直接展示，历史旧记录采用中文兼容显示。
+- `clean test lint assembleDebug`、148 个 JVM 测试、3 个设备端测试、Release 构建和模拟器飞行模式闭环全部通过。
+- 复用 TAVO-MINI 官方发布证书，产出 `release/ShineFS-v2.0-release.apk`；真实磁场与有限传感器模式仍按真机清单待补测。
+
 #### 新增（按 Cycle）
 - **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
 - **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。

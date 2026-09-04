@@ -54,7 +54,7 @@ class YijingTimeResolverTest {
         assertEquals("辰", ctx.yearBranch.chinese)
         assertEquals("申", ctx.hourBranch.chinese)
         val rendered = ctx.trace.render()
-        assertTrue(rendered.contains("时辰数=9"))
+        assertTrue(rendered.contains("时辰序号=9"))
         assertTrue(rendered.contains("农历"))
     }
 

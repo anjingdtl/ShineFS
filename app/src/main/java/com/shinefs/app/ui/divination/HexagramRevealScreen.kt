@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shinefs.app.data.DivinationServiceV2
 import com.shinefs.app.ui.compass.ActionButton
 import com.shinefs.app.ui.compass.HintCard
 import com.shinefs.app.ui.compass.ScreenHeader
@@ -171,7 +172,7 @@ fun HexagramRevealScreen(
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
         Text(
-            "规则：${case.ruleDisplayName}（${case.rulesVersion}）",
+            "起卦依据：${DivinationServiceV2.displayRuleName(case.ruleId)}",
             color = if (case.legacyFixture) ShineColors.CinnabarBright else ShineColors.TextSecondary,
             fontSize = 12.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 2.dp),
@@ -186,17 +187,17 @@ fun HexagramRevealScreen(
         ) { onOpenInterpretation(case.id) }
         Spacer(Modifier.height(10.dp))
         ActionButton(
-            text = if (showRule) "收起算法依据" else "查看算法依据",
+            text = if (showRule) "收起推演依据" else "查看推演依据",
             enabled = true,
             primary = false,
             contentDesc = "shinefs_show_rule",
         ) { showRule = !showRule }
         if (showRule) {
             Spacer(Modifier.height(8.dp))
-            HintCard("演算轨迹", case.calculationTrace ?: "（V1 旧例无轨迹）")
+            HintCard("起卦过程", case.calculationTrace ?: "（旧卦例暂无过程记录）")
         }
         Spacer(Modifier.height(8.dp))
-        HintCard("卦例留存", "本卦例已存入记录（规则版本 ${case.rulesVersion} / 解释版本 ${case.interpretationVersion}），可在卦例记录中查看。")
+        HintCard("卦例留存", "本卦例已存入记录，可在“卦例记录”中查看。")
         Spacer(Modifier.height(10.dp))
         ActionButton(text = "返回首页", enabled = true, primary = false) { onBackToHome() }
     }
