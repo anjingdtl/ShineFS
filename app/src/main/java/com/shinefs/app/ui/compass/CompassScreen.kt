@@ -1,6 +1,11 @@
 package com.shinefs.app.ui.compass
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -18,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -30,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -48,6 +55,7 @@ import com.shinefs.app.sensor.CompassCapabilityLevel
 import com.shinefs.app.sensor.CompassController
 import com.shinefs.app.ui.theme.ShineColors
 import com.shinefs.core.compass.CompassState
+import com.shinefs.core.compass.PreCastGuidanceResolver
 import com.shinefs.core.compass.PreCastReadiness
 import com.shinefs.core.compass.StabilityLevel
 import com.shinefs.core.compass.pose.HoldPose
@@ -93,6 +101,12 @@ fun CompassScreen(
 
     var locked by remember { mutableStateOf<LockedReading?>(null) }
     var sealVisible by remember { mutableStateOf(false) }
+    var guideExpanded by remember(context) {
+        mutableStateOf(
+            !context.getSharedPreferences(HOLD_GUIDE_PREFS, android.content.Context.MODE_PRIVATE)
+                .getBoolean(HOLD_GUIDE_COMPLETED, false),
+        )
+    }
     val haptics = LocalHapticFeedback.current
 
     // 时间盘（V2.0 方案 §30）：农历/年支/时辰/节气，每 2 秒刷新
@@ -111,6 +125,16 @@ fun CompassScreen(
     val readiness = uiState.readiness
     val canLock = uiState.capability.level == CompassCapabilityLevel.FULL &&
         liveAzimuth != null && locked == null && readiness.ready
+
+    LaunchedEffect(readiness.ready) {
+        if (readiness.ready && guideExpanded) {
+            context.getSharedPreferences(HOLD_GUIDE_PREFS, android.content.Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(HOLD_GUIDE_COMPLETED, true)
+                .apply()
+            guideExpanded = false
+        }
+    }
 
     fun doLock() {
         val az = liveAzimuth ?: return
@@ -217,6 +241,17 @@ fun CompassScreen(
         }
         Spacer(Modifier.height(12.dp))
 
+        if (lk == null && uiState.capability.level == CompassCapabilityLevel.FULL) {
+            HoldPoseGuideCard(
+                compass = compass,
+                pose = uiState.holdPose.pose,
+                readiness = readiness,
+                expanded = guideExpanded,
+                reducedMotion = reducedMotion,
+            )
+            Spacer(Modifier.height(12.dp))
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -304,6 +339,103 @@ fun CompassScreen(
         }
         Spacer(Modifier.height(10.dp))
         HintCard("使用提示", "若指针漂移或读数不稳，请远离金属桌面、音箱、磁吸手机壳与汽车，并持机画 8 字让读数稳定后再定盘。")
+    }
+}
+
+@Composable
+private fun HoldPoseGuideCard(
+    compass: CompassState,
+    pose: HoldPose,
+    readiness: PreCastReadiness,
+    expanded: Boolean,
+    reducedMotion: Boolean,
+) {
+    val guidance = PreCastGuidanceResolver.resolve(
+        compass = compass,
+        pose = com.shinefs.core.compass.pose.HoldPoseState(pose = pose),
+        readiness = readiness,
+    )
+    val transition = if (reducedMotion) {
+        null
+    } else {
+        rememberInfiniteTransition(label = "holdPoseGuide")
+    }
+    val sway = transition?.animateFloat(
+        initialValue = -2.5f,
+        targetValue = 2.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(850, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "holdPoseGuideSway",
+    )?.value ?: 0f
+    val phoneRotation = when (pose) {
+        HoldPose.FLAT -> 0f
+        HoldPose.UPRIGHT -> 0f
+        HoldPose.TRANSITION -> 28f
+        HoldPose.INVALID -> 16f
+    } + sway
+    val phoneWidth = if (pose == HoldPose.UPRIGHT) 32.dp else 54.dp
+    val phoneHeight = if (pose == HoldPose.UPRIGHT) 54.dp else 32.dp
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ShineColors.BackgroundRaised, RoundedCornerShape(8.dp))
+            .padding(12.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = "shinefs_hold_pose_guide"
+            },
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .width(phoneWidth)
+                    .height(phoneHeight)
+                    .rotate(phoneRotation)
+                    .border(BorderStroke(1.5.dp, if (guidance.ready) ShineColors.GoldPrimary else ShineColors.GoldMuted), RoundedCornerShape(7.dp))
+                    .background(ShineColors.BackgroundDeep, RoundedCornerShape(7.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = if (guidance.ready) "✓" else "·",
+                    color = if (guidance.ready) ShineColors.GoldBright else ShineColors.CinnabarBright,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = if (expanded) "起卦前持握引导" else "起卦前状态",
+                    color = ShineColors.GoldPrimary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+                Spacer(Modifier.height(3.dp))
+                Text(
+                    text = guidance.headline,
+                    color = if (guidance.ready) ShineColors.GoldBright else ShineColors.TextPrimary,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+                Text(
+                    text = guidance.detail,
+                    color = ShineColors.TextSecondary,
+                    fontSize = 12.sp,
+                    lineHeight = 18.sp,
+                )
+            }
+        }
+        if (expanded && !guidance.ready) {
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = "姿态、稳定度、磁场和传感器精度满足后，定盘按钮会自动通过。",
+                color = ShineColors.TextSecondary,
+                fontSize = 11.sp,
+                lineHeight = 16.sp,
+            )
+        }
     }
 }
 
@@ -493,3 +625,6 @@ private fun offsetLabel(minutes: Int): String {
     val absolute = kotlin.math.abs(minutes)
     return "$sign${absolute / 60}:${(absolute % 60).toString().padStart(2, '0')}"
 }
+
+private const val HOLD_GUIDE_PREFS = "shinefs_compass_guide"
+private const val HOLD_GUIDE_COMPLETED = "hold_pose_guide_completed"

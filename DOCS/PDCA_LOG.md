@@ -862,3 +862,31 @@
 - 初次补充属性测试时发现测试矩阵把自然轴与显示轴混用，导致竖持在 ROTATION_90 下无法构造有效姿态；改为先构造显示 right/top 的物理向量，再按 `DisplayRotationMapping` 逆填自然轴，复检通过。
 - 快速姿态变化用例的首版时间间隔不足以进入算法的剧烈变化窗口，调整为明确的 100ms 跳变后复检通过。
 - 11C 达标，进入 11D：起卦前动态持握引导、自动通过与用户可理解的 readiness 文案。
+
+---
+
+## Cycle 11D — 起卦前动态持握引导与自动通过（2026-09-04）
+
+### Plan
+
+- 把 `PreCastReadiness` 的阻断事实转换成用户能立即执行的轻量提示：平放/竖持、保持稳定、远离磁场干扰、等待读数或校正精度。
+- 不改变定盘门禁和空间算法；引导只反映实时状态，姿态/传感器满足条件后自动通过并启用既有定盘按钮。
+- 兼顾首次使用与重复测量：首次展示完整说明，完成一次后保留紧凑动态状态卡；系统减少动画时不影响功能。
+
+### Do
+
+- 新增纯 Kotlin `PreCastGuidanceResolver`，集中定义磁扰、姿态、稳定、磁场读数、精度和 ready 的优先级及文案。
+- 罗盘页增加 `HoldPoseGuideCard`：根据实时 HoldPose 改变手机示意图与提示，展示自动通过状态，并以 SharedPreferences 记忆首次引导完成事实。
+- 为引导容器和定盘链增加 `shinefs_hold_pose_guide` / `shinefs_precast_readiness` 语义描述，便于设备端 E2E 检查；减少动画设置下示意图静止。
+- 新增 guidance 状态测试，覆盖磁扰、过渡姿态、不稳定和 ready 自动通过分支。
+
+### Check
+
+- `:core:compass:test`：通过（含 guidance 状态分支）。
+- `:app:testDebugUnitTest`：通过；`:app:lintDebug`：通过（0 error）。
+- readiness 仍由姿态、稳定、磁场和传感器精度四项事实计算，UI 没有放宽定盘门禁或用提示覆盖坐标结果。
+
+### Act / Re-Check
+
+- 引导优先级调整为磁场干扰优先，避免姿态同时异常时把用户引向错误的校正动作；调整后测试与 lint 复检通过。
+- 11D 达标，进入 11E：原典 verification status 与用户可见措辞收口。
