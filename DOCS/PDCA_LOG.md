@@ -693,3 +693,54 @@
 - **Next**: Cycle 10J — V2 正式验收。
 
 **验收判定：Cycle 10I 达标（legacy 标记 ✓ 保留查看 ✓ 不伪装 ✓），Cycle 10I 关闭。**
+
+
+---
+
+## Cycle 10J — V2 正式验收（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §33-10J：0 AI / 0 网络请求 / 0 生产 Fixture / 0 随机演算，64卦/384爻/384变卦/64互卦/384体用/古例/历法边界/24山边界/多圈罗盘/CalculationTrace/RuleManifest/原典版本/飞行模式 E2E/Room 历史/Debug/Release/Lint 全部通过。
+- **Scope**: 飞行模式完整 E2E（清数据首启→历法→罗盘→定盘→起卦→九段→保存→杀进程→重启→读历史）；V1→V2 覆盖安装迁移；设备端核验；文档收口；总报告。
+
+### Do
+
+- **飞行模式 E2E（模拟器 airplane-mode on + pm clear + 首启）全部通过**：
+  首页六入口 ✓ → 传统时间起卦页（时间盘：丙午年七月廿三·辛巳日·巳时·处暑·申月建，与方案 §30 示例吻合）✓ → 起卦（年7+月7+日23=37 除8=巽上 44 除8=震下 44除6=2爻，益之六二动变中孚——逐项手算复算一致）✓ → 六爻揭示页（动爻朱砂高亮）✓ → 九段解卦报告（时空/轨迹/卦象/原典（益卦辞+彖+大象+六二爻辞+小象）/互卦剥/体用比和/时令秋金/方位无数据/白话释义/规则来源）✓ → 按原规则版本复算「益之中孚（第2爻动）✓ 与原记录一致」✓ → 收藏 ✓ → 杀进程重启 → 历史列表仍在（★收藏+《益》2爻动→《中孚》）✓ → 打开旧例解读页 ✓；全程 **0 FATAL / 0 ANR**。
+- **V1→V2 覆盖安装迁移（10J-b）**：V1（bf006b1 worktree 构建）清数据安装→罗盘定盘（向子坐午）→大门场景起卦（节之临）→覆盖安装 V2：**migration 1→2 无 crash**；历史列表显示旧例「旧例·非正式」标签；打开显示 legacy-fixture 横幅「V1 联调期卦例…仅供查看，不属于 V2 正式演算结果」✓（保留查看、不伪装）。
+- **设备端核验（10J-c）**：androidTest CalendarDeviceSmokeTest 3/3 PASS（现代+历史锚点+往返抽样）。
+
+### Check（终门禁）
+
+| 项 | 结果 |
+|---|---|
+| JVM 单测 | **148/148**（yijing 55 / calendar 30 / compass 23 / divination 15 / classics 9 / interpretation 4 / app 12） |
+| androidTest | 3/3 PASS（历表设备端冒烟） |
+| 64卦/384爻/用九用六 | ✅ 结构测试 + 双源锚点（乾坤全爻+散卦20+） |
+| 384变卦/64互卦/384体用 | ✅ 全覆盖测试（10C） |
+| 金标准古例 | ✅ 观梅占/牡丹占/老人/少年/牛哀鸣（10D） |
+| 历法边界 | ✅ 春节2000-2029逐年/2033闰冬月/7.3万日往返/闰月/晚子时换日/DST（10B） |
+| 24山/多圈罗盘 | ✅ 边界+坐向+五圈顺逆/交替/快速旋转/精度分离（01/02/10G） |
+| 0 AI | ✅ 生产链 0 AI 引用，九段报告全部本地模板（10F/10H） |
+| 0 网络 | ✅ Manifest 无 INTERNET/ACCESS_NETWORK_STATE；飞行模式全流程通过 |
+| 0 生产 Fixture | ✅ FixtureDirectionRule/FixtureClassicTexts 移至 test 源集；主源集 0 引用 |
+| 0 随机演算 | ✅ 演算核心无 Random/毫秒取模；同输入同输出测试固化 |
+| Debug/Release/Lint | ✅ assembleDebug + assembleRelease（7.6MB unsigned）成功；lintDebug 0 error |
+| Room 历史 | ✅ v2 schema 迁移 + 收藏/复算/持久化全链路 |
+| 真机磁场项 | ⬜ 未验证（清单化：REAL_DEVICE_TEST §1-10，罗盘 CONDITIONAL PASS） |
+
+### Act（重要发现与裁定）
+
+- **ICU 历法核验裁决（文献/工具实质冲突，记录不阻塞）**：android.icu.util.ChineseCalendar 在本机模拟器（API 37.1）对农历字段输出系统性问题——1900/1913/2000 多日期出现「农历十一月三十一日」等非法农历日（权威库 lunar_python 与内置历表一致给出腊月初六等值）；6/15 类日期与权威恒差 1–4 天。**裁定：ICU 不作为本项目农历核验源**；交叉核验改以 **lunar_python（构建期）1900–2100 采样 603/603 全量一致** + 30 年春节锚点 + 48 闰月年清单，并通过「2026-09-04 双独立历书来源」（压缩历表源 + lunar_python 历算）。S-E01 注记 + REAL_DEVICE_TEST §10 同步。androidTest 改为历表设备端锚点冒烟。
+- **D8 dex 限制发现**：androidTest 方法名不得含空格/中文（方法名须 ASCII），与 JVM 单测反引号中文名策略不同——已入档避免重犯。
+- **其他修复**：testInstrumentationRunner 缺失导致 androidTest 空跑（补 AndroidJUnitRunner）；androidTest JUnit 依赖缺失（补 androidTestImplementation junit + androidx.test:runner 1.6.2 离线可用）。
+
+### 遗留（不阻塞验收）
+
+1. **真机磁场 18+ 项未验证**（REAL_DEVICE_TEST §1-10）：罗盘模块最终验收 = **CONDITIONAL PASS**（周易演算核心独立 PASS）。
+2. 后天端法正式 UI 入口（类象表就绪，下版本接）。
+3. 大衍筮法/数字起卦/立春年界/真太阳时/旺衰细目/昼夜真北等为 TD-V2-01~08 冻结项。
+4. 原典锚点抽查约 30%（结构校验 100%），S-AE1（ctext）待凭证后再复核。
+
+**验收判定：Cycle 10J 达标（全门禁通过：0 AI/0 网络/0 Fixture/0 随机，148 JVM + 3 device 测试、飞行模式全流程、V1→V2 迁移、Debug/Release/Lint；罗盘真机项 CONDITIONAL PASS），V2.0 建设收口。**

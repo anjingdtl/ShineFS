@@ -13,8 +13,9 @@ android {
         applicationId = "com.shinefs.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -59,6 +60,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     testImplementation(libs.junit)
+    // androidTest 用独立 JUnit（不吃 app 主依赖的 test scope；库来自同一版本目录，离线可用）
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.runner)
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

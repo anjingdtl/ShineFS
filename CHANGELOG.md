@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
+
 ### Cycle 09 — 质量门禁与 V1.0 总验收（2026-09-04）
 
 #### 验收结论
@@ -10,6 +29,25 @@
 - **V1.0 判定：可安装体验（模拟器验收全绿，真机罗盘验收待执行）**
 ## [Unreleased]
 
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
+
 ### Cycle 08 — 视觉统一与动效打磨（2026-09-03）
 
 #### 新增
@@ -18,6 +56,25 @@
 #### 验证
 - 大字体 1.3× 无截断；系统"减少动画"下正常；Lint 警告 27→16（图标类清零）
 ## [Unreleased]
+
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
 
 ### Cycle 07 — 卦例与本地数据（2026-09-03）
 
@@ -33,6 +90,25 @@
 - 持久化 E2E：保存→强杀→重启→历史在；收藏跨重启持久；删除后空态正确；logcat 0 crash
 ## [Unreleased]
 
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
+
 ### Cycle 06 — 宅居测局（2026-09-03）
 
 #### 新增
@@ -41,6 +117,25 @@
 - Router.replace 语义（修复返回键重复起卦缺陷）；测局会话跨导航保持
 - 4 个新单测（累计 76 全绿）
 ## [Unreleased]
+
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
 
 ### Cycle 05 — 解卦与原典（2026-09-03）
 
@@ -51,6 +146,25 @@
 - 确定性解读引擎（象义=结构事实/空间=五行特质+场景建议/宜忌通则；不做生克吉凶推断，列待决策 D-10）
 - 11 个新单测（累计 72 全绿）
 ## [Unreleased]
+
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
 
 ### Cycle 04 — 定盘与起卦（2026-09-03）
 
@@ -64,6 +178,25 @@
 - 模拟器 E2E：定盘→场景→起卦→井卦三爻动变坎（结构验算正确）；logcat 0 crash
 ## [Unreleased]
 
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
+
 ### Cycle 03 — 动态罗盘 UI（2026-09-03）
 
 #### 新增
@@ -76,6 +209,25 @@
 - 正常竖持误报告倾斜（姿态基准）、指针压字、卦符过小
 ## [Unreleased]
 
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
+
 ### Cycle 02 — 电子罗盘引擎（2026-09-03）
 
 #### 新增
@@ -87,6 +239,25 @@
 本文件记录每个 PDCA Cycle 的对外可见变化。格式参考 Keep a Changelog，版本号随发版周期演进。
 
 ## [Unreleased]
+
+### V2.0（Cycle 10A–10J，2026-09-04）— 完全离线确定性演算核心
+
+#### 新增（按 Cycle）
+- **10A 文献与规则冻结**：SOURCE_CATALOG（A/B/C/E 四级来源）/ RULE_MANIFEST（16 术数规则+7 历法工程规则+5 金标准古例）/ YIJING_RULES rules-v2.0 / PRODUCT_V2；V1 D-01~D-10 收口。
+- **10B CalendarCore**（:core:calendar）：1900–2100 版本化农历历表（SHA-256 checksum）、十二时辰、干支（双锚）、Meeus 节气算法、日界双策略、YijingTimeResolver + CalendarTrace；30 测试（7.3 万日往返、30 年春节锚点、2033 闰冬月、DST）。
+- **10C YijingCore 2.0**：互卦（234/345 + 乾坤无互策略登记）、体用、五行生克、时令（节气月令+辰戌丑未土旺）；64互卦/384体用/25对五行全测试。
+- **10D DivinationCore**（:core:divination）：MeihuaTimeDivinationRuleV1（模式A）/ PostHeaven（模式B）/ TimeCastWithSpatialResponse（模式C，空间不改卦）、RuleManifest、CalculationTrace、ClassImageTable（18条说卦明文类象）；观梅占/牡丹占/老人/少年/牛哀鸣五古例金标准全通过。
+- **10E ClassicCorpus**（:core:classics）：64卦辞+384爻辞+64彖+64大象+386小象+用九用六；维基文库底本存档（64 文件入库）+ OpenCC t2s；逐卦+全库 SHA-256；异文（一作太和）透明保留；双源锚点核验。
+- **10F InterpretationCore**（:core:interpretation）：九段固定报告（interpret-v1）、五行关系五模板、系辞爻位引文、时令/方应事实层——0 AI。
+- **10G 罗盘修复**：shortestDiff 任意量级负余数修复（五圈顺/逆时针等 +12 测试）、朝向/磁力计精度分离、YijingSpaceContextFactory；REAL_DEVICE_TEST V2 增补。
+- **10H App V2 接入**：首页六入口、时间起卦页（时间盘）、九段解卦页（legacy 横幅+离线复算）、规则与典籍页（含日界设置）+ 64 卦原典浏览、Room schema v2（方案 §28 全字段+MIGRATION_1_2）、移除生产 Fixture/AI。
+- **10I 数据迁移**：V1 旧例幂等标记 legacy-fixture（保留查看、不伪装）。
+
+#### 验证
+- **148/148 JVM 测试 + 3/3 设备端 androidTest**；Lint 0 error；Debug/Release（7.6MB）构建通过。
+- **飞行模式完整 E2E**（清数据首启→时间盘→起卦→九段→复算→收藏→杀进程→历史）0 FATAL/0 ANR。
+- **V1→V2 覆盖安装迁移**：migration 1→2 无 crash，旧例「旧例·非正式」标记 + legacy 横幅。
+- 真机磁场项:CONDITIONAL PASS（清单 REAL_DEVICE_TEST §1-10）。
 
 ### Cycle 01 — 术数数据与演算核心（2026-09-03）
 
