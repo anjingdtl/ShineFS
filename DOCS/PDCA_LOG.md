@@ -667,3 +667,29 @@
 - **Next**: Cycle 10I — 数据迁移。
 
 **验收判定：Cycle 10H 达标（0 生产 Fixture ✓ 0 AI ✓ 正式核心全接入 ✓ 九段报告 ✓ 148 测试 ✓），Cycle 10H 关闭。**
+
+
+---
+
+## Cycle 10I — 数据迁移（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §33-10I：V1 Fixture 卦例统一标记 legacy-fixture，保留查看但不伪装为 V2 正式结果。
+- **Scope**: AppGraph.init 启动时幂等标记（后台线程）；历史列表"旧例·非正式"标签；解读页 legacy 横幅（10H 已含）；时间卦列表文案。
+- **Out of scope**: V1→V2 数据转写（口径不同不转写，只标记——符合方案"不伪装"原则）。
+
+### Do
+
+- markLegacyFixtures：`UPDATE ... SET legacyFixture=1 WHERE legacyFixture=0 AND rulesVersion != 'rules-v2.0'`（幂等，新装无感）。
+
+### Check
+
+- 全仓 test + assembleDebug 全绿；历史/解读页 legacy 显示逻辑就位。
+
+### Act
+
+- **遗留**: 覆盖安装（V1→V2 升级路径）E2E 于 10J 模拟器验证。
+- **Next**: Cycle 10J — V2 正式验收。
+
+**验收判定：Cycle 10I 达标（legacy 标记 ✓ 保留查看 ✓ 不伪装 ✓），Cycle 10I 关闭。**

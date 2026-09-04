@@ -93,5 +93,10 @@ object AppGraph {
             .addMigrations(ShineDatabase.MIGRATION_1_2)
             .build()
         caseRepository = RoomCaseRepository(database.divinationCaseDao())
+        // Cycle 10I：V1 Fixture 卦例统一标记 legacy-fixture（幂等；后台线程避免主线程 DB）。
+        // 旧例保留可查看（解读页显示 legacy 横幅），不伪装为 V2 正式结果。
+        Thread {
+            runCatching { database.divinationCaseDao().markLegacyFixtures() }
+        }.start()
     }
 }

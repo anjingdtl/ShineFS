@@ -150,6 +150,13 @@ private fun CaseRow(c: DivinationCase, onClick: () -> Unit) {
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
             )
+            if (c.legacyFixture) {
+                Text(
+                    "　旧例·非正式",
+                    color = ShineColors.CinnabarBright,
+                    fontSize = 11.sp,
+                )
+            }
             Spacer(Modifier.weight(1f))
             Text(
                 SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(c.timestamp)),
@@ -158,8 +165,15 @@ private fun CaseRow(c: DivinationCase, onClick: () -> Unit) {
             )
         }
         Text(
-            "《${c.originalHexagramName}》${c.changingLine}爻动 → 《${c.changedHexagramName}》　向${c.facingMountain}坐${c.sittingMountain}" +
-                if (c.note != null) "　📝" else "",
+            buildString {
+                append("《${c.originalHexagramName}》${c.changingLine}爻动 → 《${c.changedHexagramName}》")
+                if (c.facingMountain != null) {
+                    append("　向${c.facingMountain}坐${c.sittingMountain}")
+                } else {
+                    append("　时间卦")
+                }
+                if (c.note != null) append("　📝")
+            },
             color = ShineColors.TextSecondary,
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 2.dp),
