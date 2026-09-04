@@ -529,3 +529,29 @@
 - **遗留**: 无。**Next**: Cycle 10D — DivinationCore。
 
 **验收判定：Cycle 10C 达标（64 互卦 ✓ 384 体用 ✓ 五行生克 ✓ 时令 ✓），Cycle 10C 关闭。**
+
+---
+
+## Cycle 10D — DivinationCore 起卦核心（2026-09-04）
+
+### Plan
+
+- **Goal**: V2.0 方案 §33-10D：MeihuaTimeDivinationRuleV1 / MeihuaPostHeavenObjectDirectionRuleV1 / TimeCastWithSpatialResponse / RuleManifest / CalculationTrace / DivinationResult；古例全通过。
+- **Scope**: 新建 `:core:divination`（依赖 yijing+calendar+compass）；类象表 meihua-classimage-v1（仅说卦明文+梅花古例 18 条）；空间方应事实层（不改卦）；compass 补 NorthReference/SensorAccuracyState 类型（10G 完成接线）。
+- **Out of scope**: 大衍筮法/数字起卦（TD-V2-01/02 冻结）；解释文案（10F）。
+
+### Do
+
+- **Added**: manifest（RuleManifest/SourceRef/RuleSystem/RuleStatus）、trace、context（YijingMomentContext/YijingSpaceContext/DivinationEvent）、classimage（ClassImageTable）、rule（MeihuaMath 余数归一 + A/B/C 三模式 + ResultAssembler 装配）。
+- **Key invariant**: 上/下卦+动爻一经确定，本卦/变卦/互卦/体用/五行/时令全部确定性推出；空间仅进 spatialResponse 事实层。
+
+### Check
+
+- `:core:divination:test`：**12/12 PASS**；全仓 `test` 全绿（calendar 30 + yijing 55 + divination 12 + compass/app 既有）。
+- **Problems found**: 牛哀鸣变卦我测试预期误写为坤（师六三为阴爻，变后地风升）——运行结果与逐爻手算确认实现正确，修正测试。ClassImage/Element 属性名笔误 2 处编译期拦截。
+
+### Act
+
+- **遗留**: 无。**Next**: Cycle 10E — ClassicCorpus 原典库。
+
+**验收判定：Cycle 10D 达标（A/B/C 三模式 ✓ 五古例金标准 ✓ RuleManifest ✓ CalculationTrace ✓ 空间不改卦 ✓），Cycle 10D 关闭。**

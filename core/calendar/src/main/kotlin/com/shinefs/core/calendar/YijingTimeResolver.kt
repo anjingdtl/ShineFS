@@ -48,7 +48,7 @@ class YijingTimeResolver(
 
         val trace = CalendarTrace(
             listOf(
-                CalendarTraceEntry("公历时刻", "${civil.year}-${civil.month}-${civil.day} ${civil.hour}:${"%02d".format(civil.minute)}", zoneId),
+                CalendarTraceEntry("公历时刻", "${civil.year}-${civil.month}-${civil.day} ${civil.hour}:" + String.format(java.util.Locale.ROOT, "%02d", civil.minute), zoneId),
                 CalendarTraceEntry(
                     "有效日期",
                     "${effectiveCivil.year}-${effectiveCivil.month}-${effectiveCivil.day}",

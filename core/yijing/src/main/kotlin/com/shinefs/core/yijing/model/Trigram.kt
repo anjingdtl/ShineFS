@@ -39,5 +39,11 @@ enum class Trigram(
             }
             return entries.first { it.lines == lines }
         }
+
+        /** 依先天卦数（`XIANTIAN_NUMBER`，乾1…坤8）反查卦。 */
+        fun fromXiantianNumber(number: Int): Trigram {
+            require(number in 1..8) { "xiantian number must be in 1..8, got $number" }
+            return entries[number - 1]
+        }
     }
 }
