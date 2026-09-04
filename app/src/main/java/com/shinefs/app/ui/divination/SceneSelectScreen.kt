@@ -24,8 +24,6 @@ import com.shinefs.app.data.Scenes
 import com.shinefs.app.ui.compass.HintCard
 import com.shinefs.app.ui.compass.ScreenHeader
 import com.shinefs.app.ui.theme.ShineColors
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 /** 场景选择（产品方案 §9.5）：定盘后选择测局场景，随即按确定性规则起卦。 */
@@ -56,7 +54,7 @@ fun SceneSelectScreen(
                 fontSize = 15.sp,
             )
             Text(
-                "${reading.facingTrigram}卦 · ${reading.facingElement} · ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(reading.timestamp))}",
+                "${reading.facingTrigram}卦 · ${reading.facingElement} · ${reading.localDateTime?.replace('T', ' ') ?: reading.timestamp}",
                 color = ShineColors.TextSecondary,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 2.dp),

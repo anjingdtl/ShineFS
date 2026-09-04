@@ -9,6 +9,8 @@ package com.shinefs.core.calendar.model
 data class YijingTimeContext(
     val epochMillis: Long,
     val zoneId: String,
+    /** 该 instant 在 [zoneId] 下的 UTC offset，单位为分钟，含夏令时。 */
+    val utcOffsetMinutes: Int,
     val civil: CivilDateTime,
     /** 日界策略生效后的"有效民用日期"（ZI_HOUR_START_23 时 23:00–23:59 归次日）。 */
     val effectiveCivil: CivilDateTime,
@@ -37,6 +39,12 @@ data class YijingTimeContext(
     val leapMonthPolicy: LeapMonthPolicy,
     val trace: CalendarTrace,
 ) {
+    /** 历史留痕使用的本地日期时间；[epochMillis] 是同一瞬间的 UTC epoch。 */
+    val localDateTime: String get() = civil.isoLocal
+
+    /** 明确的 instant 别名，避免把本地时间误当成时间输入。 */
+    val instant: Long get() = epochMillis
+
     val lunarDisplay: String
         get() = ChineseDate(lunarYear, lunarMonth, lunarDay, leapMonth).display
 

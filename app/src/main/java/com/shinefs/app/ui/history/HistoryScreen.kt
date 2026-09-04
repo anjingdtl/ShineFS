@@ -159,7 +159,7 @@ private fun CaseRow(c: DivinationCase, onClick: () -> Unit) {
             }
             Spacer(Modifier.weight(1f))
             Text(
-                SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(c.timestamp)),
+                formatCaseTime(c),
                 color = ShineColors.TextSecondary,
                 fontSize = 12.sp,
             )
@@ -179,4 +179,11 @@ private fun CaseRow(c: DivinationCase, onClick: () -> Unit) {
             modifier = Modifier.padding(top = 2.dp),
         )
     }
+}
+
+private fun formatCaseTime(case: DivinationCase): String {
+    case.localDateTime?.takeIf { it.isNotBlank() }?.let { return it.replace('T', ' ').take(16) }
+    val format = SimpleDateFormat("MM-dd HH:mm", Locale.ROOT)
+    format.timeZone = java.util.TimeZone.getTimeZone(case.zoneId ?: java.util.TimeZone.getDefault().id)
+    return format.format(Date(case.timestamp))
 }

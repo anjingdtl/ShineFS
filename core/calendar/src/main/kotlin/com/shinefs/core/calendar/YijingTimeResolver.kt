@@ -29,6 +29,7 @@ class YijingTimeResolver(
     ): YijingTimeContext {
         val zoneId = timeZone.id
         val civil = CivilTime.toCivilDateTime(epochMillis, timeZone)
+        val utcOffsetMinutes = timeZone.getOffset(epochMillis) / (60 * 1000)
 
         // 日界策略：晚子时 23:00 起即算次日（DOCS/YIJING_RULES.md §9.4）
         val effectiveCivil = if (dayBoundaryPolicy == DayBoundaryPolicy.ZI_HOUR_START_23 && civil.hour == 23) {
@@ -50,9 +51,10 @@ class YijingTimeResolver(
             listOf(
                 CalendarTraceEntry(
                     "公历时刻",
-                    "${civil.year}-${civil.month}-${civil.day} ${civil.hour}:" + String.format(java.util.Locale.ROOT, "%02d", civil.minute),
-                    if (zoneId == "Asia/Shanghai") "中国标准时间" else "当地时间",
+                    civil.isoLocal,
+                    "设备时区=$zoneId，UTC${formatOffset(utcOffsetMinutes)}",
                 ),
+                CalendarTraceEntry("时间瞬间", epochMillis.toString(), "UTC epoch 毫秒"),
                 CalendarTraceEntry(
                     "有效日期",
                     "${effectiveCivil.year}-${effectiveCivil.month}-${effectiveCivil.day}",
@@ -70,6 +72,7 @@ class YijingTimeResolver(
         return YijingTimeContext(
             epochMillis = epochMillis,
             zoneId = zoneId,
+            utcOffsetMinutes = utcOffsetMinutes,
             civil = civil,
             effectiveCivil = effectiveCivil,
             lunarYear = chinese.lunarYear,
@@ -92,5 +95,11 @@ class YijingTimeResolver(
             leapMonthPolicy = com.shinefs.core.calendar.model.LeapMonthPolicy.SAME_MONTH_NUMBER,
             trace = trace,
         )
+    }
+
+    private fun formatOffset(minutes: Int): String {
+        val sign = if (minutes >= 0) "+" else "-"
+        val absolute = kotlin.math.abs(minutes)
+        return "$sign${absolute / 60}:${(absolute % 60).toString().padStart(2, '0')}"
     }
 }

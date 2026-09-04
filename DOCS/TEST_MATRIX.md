@@ -3,6 +3,16 @@
 > 初稿（Cycle 00）。随每个 Cycle 更新：新增用例标记所属周期与状态。
 > 状态图例：✅ 通过｜🚧 已有用例/待跑｜⬜ 计划（标注目标 Cycle）｜❌ 失败（必须挂 PDCA Act）
 
+## 0. V2.1 增量门禁
+
+| 用例组 | 覆盖内容 | 状态 | 目标 Cycle |
+|---|---|---|---|
+| 设备时区一致性 | Asia/Shanghai、America/Los_Angeles、UTC、Asia/Tokyo；offset、本地日期时间、instant、跨日 | ✅(11A) | 11A |
+| 点击瞬间一致性 | 时间起卦 UI 与核心使用同一点击毫秒 | ✅(11A) | 11A |
+| Room 时间元数据 | schema v3、MIGRATION_2_3、zone/offset/localDateTime 留痕 | ✅(11A) | 11A |
+| 真实罗盘快照 | 禁止重建 CompassState；raw/smoothed/姿态/精度/磁场全字段 | ⬜ | 11B |
+| HoldPose 与双姿态 | 平放/竖持/过渡/无效、迟滞、Display Rotation、双姿态误差 | ⬜ | 11C |
+
 ## 1. 算法测试（JVM 单元测试，`core/yijing`）
 
 | 用例组 | 覆盖内容 | 状态 | 目标 Cycle |

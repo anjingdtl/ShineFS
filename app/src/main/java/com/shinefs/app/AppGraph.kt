@@ -29,7 +29,8 @@ object AppGraph {
     lateinit var caseRepository: CaseRepository
         private set
 
-    val timeZone: TimeZone = TimeZone.getTimeZone("Asia/Shanghai")
+    /** 设备当前时区；不缓存，保证用户切换系统时区后下一次解析立即一致。 */
+    val timeZone: TimeZone get() = TimeZone.getDefault()
 
     val timeResolver: YijingTimeResolver by lazy {
         YijingTimeResolver(TableChineseCalendarProvider())
@@ -39,7 +40,7 @@ object AppGraph {
 
     val divinationService: DivinationServiceV2
         get() = serviceV2 ?: DivinationServiceV2(
-            caseRepository, composer = composer, timeZone = timeZone,
+            caseRepository, composer = composer, timeZoneProvider = { TimeZone.getDefault() },
             dayBoundaryPolicy = dayBoundaryPolicy(),
         ).also { serviceV2 = it }
 
@@ -90,7 +91,7 @@ object AppGraph {
             ShineDatabase::class.java,
             "shinefs.db",
         )
-            .addMigrations(ShineDatabase.MIGRATION_1_2)
+            .addMigrations(ShineDatabase.MIGRATION_1_2, ShineDatabase.MIGRATION_2_3)
             .build()
         caseRepository = RoomCaseRepository(database.divinationCaseDao())
         // Cycle 10I：V1 Fixture 卦例统一标记 legacy-fixture（幂等；后台线程避免主线程 DB）。

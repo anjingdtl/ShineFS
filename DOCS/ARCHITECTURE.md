@@ -1,7 +1,7 @@
 # ShineFS 架构说明（ARCHITECTURE）
 
 > 维护规则：每个 PDCA Cycle 结束时同步更新本文件。
-> 当前状态：**V2.0 Release 收尾**（2026-09-04；正式核心、离线链路与模拟器验收按 `DOCS/RELEASE_V2.0.md` 记录；真机罗盘验收清单见 `DOCS/REAL_DEVICE_TEST.md`，罗盘模块保持 CONDITIONAL PASS）
+> 当前状态：**V2.1 Cycle 11A 完成**（2026-09-04；设备时区、UI 时间、核心时间与历史留痕已统一；真机姿态与空间快照继续在 11B–11G 收口）
 > V2.0 方案：`DOCS/ShineFS_V2.0_完全离线周易时空演算_完整建设方案.md`（分层：事实层→演算层→规则关系层→解释层）
 
 ## 1. 项目定位
@@ -78,7 +78,7 @@ core/calendar/src/main/kotlin/com/shinefs/core/calendar/
 ```
 
 **API 24 兼容决策**：不启用 core library desugaring（保持零新依赖离线构建），
-公开 API 用 `epochMillis + java.util.TimeZone`（替代方案建议稿中的 java.time 类型）；
+公开 API 用 `epochMillis + java.util.TimeZone`（替代方案建议稿中的 java.time 类型）；生产默认由 `TimeZone.getDefault()` 提供设备时区，时间上下文同时保存 `zoneId`、UTC offset、本地日期时间与 instant；
 deviation 已登记于 YIJING_RULES §9 与 SOURCE_CATALOG S-E01。
 
 ### 关键解耦约束（Cycle 01 起生效）

@@ -35,6 +35,10 @@ data class DivinationCase(
     /** 起卦模式：TIME（纯时间）/ TIME_SPACE（时空合参）。 */
     val castMode: String? = null,
     val zoneId: String? = null,
+    /** 该例时间 instant 在 zoneId 下的 UTC offset（分钟）。 */
+    val utcOffsetMinutes: Int? = null,
+    /** 该例时间 instant 在 zoneId 下的本地日期时间。 */
+    val localDateTime: String? = null,
     val calendarVersion: String? = null,
     val ruleVersion: String? = null,
     val classicCorpusVersion: String? = null,

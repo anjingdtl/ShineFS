@@ -8,7 +8,18 @@ data class CivilDateTime(
     val hour: Int,
     val minute: Int,
     val second: Int = 0,
-)
+) {
+    /** API 24 安全的本地日期时间表示，作为历史留痕字段而不是演算输入。 */
+    val isoLocal: String
+        get() = buildString {
+            append(year.toString().padStart(4, '0')).append('-')
+            append(month.toString().padStart(2, '0')).append('-')
+            append(day.toString().padStart(2, '0')).append('T')
+            append(hour.toString().padStart(2, '0')).append(':')
+            append(minute.toString().padStart(2, '0')).append(':')
+            append(second.toString().padStart(2, '0'))
+        }
+}
 
 /** 农历日期（`calendar-table-v1`，E 级）。 */
 data class ChineseDate(

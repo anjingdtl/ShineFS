@@ -32,8 +32,6 @@ import com.shinefs.app.ui.compass.ScreenHeader
 import com.shinefs.app.ui.compass.StatusRow
 import com.shinefs.app.ui.theme.ShineColors
 import com.shinefs.core.calendar.model.YijingTimeContext
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,6 +62,8 @@ fun TimeCastScreen(
         }
     }
 
+    val c = ctx
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -74,7 +74,8 @@ fun TimeCastScreen(
         ScreenHeader(title = "传统时间起卦", onBack = onBack)
 
         Text(
-            SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss", Locale.getDefault()).format(Date(clock)),
+            c?.let { "${it.localDateTime.replace('T', ' ')}（${it.zoneId} UTC${offsetLabel(it.utcOffsetMinutes)}）" }
+                ?: "读取设备时间…",
             color = ShineColors.GoldBright,
             fontSize = 22.sp,
             fontWeight = FontWeight.Medium,
@@ -92,7 +93,6 @@ fun TimeCastScreen(
         )
 
         Spacer(Modifier.height(14.dp))
-        val c = ctx
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -115,6 +115,7 @@ fun TimeCastScreen(
             StatusRow("节气", c?.solarTerm?.term?.chinese ?: "…")
             StatusRow("月建", c?.monthBranch?.chinese?.plus("月") ?: "…")
             StatusRow("换日", c?.dayBoundaryPolicy?.let(::dayBoundaryLabel) ?: "…")
+            StatusRow("时区", c?.let { "${it.zoneId} · UTC${offsetLabel(it.utcOffsetMinutes)}" } ?: "…")
         }
 
         Spacer(Modifier.height(16.dp))
@@ -126,7 +127,16 @@ fun TimeCastScreen(
             contentDesc = "shinefs_time_cast_button",
         ) {
             scope.launch(Dispatchers.IO) {
-                val case = AppGraph.divinationService.castTime(scene = Scenes.generic)
+                val castAt = System.currentTimeMillis()
+                val castContext = withContext(Dispatchers.Default) {
+                    AppGraph.timeResolver.resolve(castAt, AppGraph.timeZone, AppGraph.dayBoundaryPolicy())
+                }
+                clock = castAt
+                ctx = castContext
+                val case = AppGraph.divinationService.castTime(
+                    scene = Scenes.generic,
+                    atMillis = castAt,
+                )
                 onCasted(case.id)
             }
         }
@@ -144,4 +154,10 @@ fun TimeCastScreen(
 private fun dayBoundaryLabel(policy: com.shinefs.core.calendar.model.DayBoundaryPolicy): String = when (policy) {
     com.shinefs.core.calendar.model.DayBoundaryPolicy.CIVIL_MIDNIGHT -> "民用午夜（00:00）"
     com.shinefs.core.calendar.model.DayBoundaryPolicy.ZI_HOUR_START_23 -> "晚子时（23:00）"
+}
+
+private fun offsetLabel(minutes: Int): String {
+    val sign = if (minutes >= 0) "+" else "-"
+    val absolute = kotlin.math.abs(minutes)
+    return "$sign${absolute / 60}:${(absolute % 60).toString().padStart(2, '0')}"
 }

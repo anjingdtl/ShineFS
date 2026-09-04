@@ -2,6 +2,8 @@ package com.shinefs.core.divination.context
 
 import com.shinefs.core.compass.CompassState
 import com.shinefs.core.compass.NorthReference
+import com.shinefs.core.compass.SensorAccuracy
+import com.shinefs.core.compass.SensorAccuracyState
 import com.shinefs.core.compass.StabilityLevel
 import com.shinefs.core.yijing.model.Trigram
 import com.shinefs.core.yijing.rules.LaterHeavenBagua
@@ -14,6 +16,38 @@ import com.shinefs.core.yijing.rules.Mountains24
  * 北参考默认磁北（TD-V2-08）。
  */
 object YijingSpaceContextFactory {
+
+    /**
+     * V2 旧导航对象适配器：只把已有读数映射为空间事实，不创建 CompassEngine、
+     * 不重复喂入角度，也不声称这些字段是新的真实快照。V2.1 UI 将只传入快照。
+     */
+    fun fromLegacyReading(
+        rawAzimuth: Float?,
+        smoothedAzimuth: Float?,
+        facingMountain: String?,
+        sittingMountain: String?,
+        facingTrigram: String?,
+        stable: Boolean,
+        orientationAccuracy: String?,
+        magneticAccuracy: String?,
+        northReference: NorthReference = NorthReference.MAGNETIC,
+    ): YijingSpaceContext? {
+        val azimuth = smoothedAzimuth ?: return null
+        return YijingSpaceContext(
+            rawAzimuth = rawAzimuth,
+            smoothedAzimuth = azimuth,
+            northReference = northReference,
+            facingMountain = facingMountain,
+            sittingMountain = sittingMountain,
+            directionTrigram = LaterHeavenBagua.trigramAt(azimuth),
+            sensorAccuracy = SensorAccuracyState(
+                orientationAccuracy = accuracyOf(orientationAccuracy),
+                magneticAccuracy = accuracyOf(magneticAccuracy),
+            ),
+            stable = stable,
+            magneticInterference = false,
+        )
+    }
 
     fun fromCompassState(
         state: CompassState,
@@ -36,4 +70,7 @@ object YijingSpaceContextFactory {
 
     /** 便捷重载：直接取 Trigram（供展示层）。 */
     fun trigramAt(azimuth: Float): Trigram = LaterHeavenBagua.trigramAt(azimuth)
+
+    private fun accuracyOf(label: String?): SensorAccuracy =
+        SensorAccuracy.entries.firstOrNull { it.label == label } ?: SensorAccuracy.NO_CONTACT
 }

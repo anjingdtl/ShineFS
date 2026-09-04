@@ -39,6 +39,8 @@ data class DivinationCaseEntity(
     // ---- V2 新增（带默认值以支持 v1→v2 迁移）----
     @ColumnInfo(defaultValue = "TIME") val castMode: String,
     @ColumnInfo(defaultValue = "Asia/Shanghai") val zoneId: String,
+    @ColumnInfo(defaultValue = "0") val utcOffsetMinutes: Int,
+    @ColumnInfo(defaultValue = "") val localDateTime: String,
     @ColumnInfo(defaultValue = "") val calendarVersion: String,
     @ColumnInfo(defaultValue = "") val ruleVersion: String,
     @ColumnInfo(defaultValue = "") val classicCorpusVersion: String,
@@ -93,7 +95,7 @@ interface DivinationCaseDao {
     fun markLegacyFixtures()
 }
 
-@Database(entities = [DivinationCaseEntity::class], version = 2, exportSchema = true)
+@Database(entities = [DivinationCaseEntity::class], version = 3, exportSchema = true)
 abstract class ShineDatabase : RoomDatabase() {
     abstract fun divinationCaseDao(): DivinationCaseDao
 
@@ -131,6 +133,14 @@ abstract class ShineDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE divination_cases ADD COLUMN calculationTrace TEXT")
                 db.execSQL("ALTER TABLE divination_cases ADD COLUMN reportText TEXT")
                 db.execSQL("ALTER TABLE divination_cases ADD COLUMN legacyFixture INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        /** v2 → v3：保存设备时区下的 offset 与本地日期时间，便于历史复算核对。 */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN utcOffsetMinutes INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE divination_cases ADD COLUMN localDateTime TEXT NOT NULL DEFAULT ''")
             }
         }
     }

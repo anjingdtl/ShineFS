@@ -774,3 +774,32 @@
 - **发布判定**：条件通过，可发布。周易演算、离线能力、中文展示、构建和签名门禁均通过。
 - **保留边界**：真实磁场准确度、磁扰阈值、画 8 字校正和无磁力计有限模式必须在真实 Android 设备补测；模拟器截图 `release_v20_10_sensor_limited.png` 虽按固定文件名留存，但本次实际状态为完整虚拟传感器，不作有限模式证据。
 - **下一步**：真实设备补测完成后回填 `DOCS/REAL_DEVICE_TEST.md`；其余 V2.0 发布材料已收口。
+
+---
+
+## Cycle 11A — 设备时区与时间一致性（2026-09-04）
+
+### Plan
+
+- 将设备当前时区作为生产默认输入，统一 UI、CalendarCore、DivinationCore 与历史留痕。
+- 每条时间卦记录 `zoneId`、UTC offset、本地日期时间与 instant；覆盖上海、洛杉矶、UTC、东京以及跨日边界。
+- 不改变既有术数公式与离线架构；旧 Room 数据仅保留迁移兼容默认值。
+
+### Do
+
+- `AppGraph.timeZone` 改为每次读取 `TimeZone.getDefault()`；`DivinationServiceV2` 增加可注入时区与生产时区 provider。
+- `YijingTimeContext` 增加 `utcOffsetMinutes`、`localDateTime`、`instant`，`CalendarTrace` 写入设备时区、offset 与 UTC epoch。
+- 时间起卦页以同一点击毫秒解析并提交；罗盘定盘/场景选择/历史显示使用记录时区的本地时间。
+- `DivinationCase`/Room schema 升至 v3，新增 `utcOffsetMinutes` 与 `localDateTime`，加入 `MIGRATION_2_3`。
+- 移除时空起卦中的虚假 `CompassEngine` 重建，暂以显式 legacy reading 适配器承接旧测试入口，真实快照在 11B 接入。
+
+### Check
+
+- `:core:calendar:test`：32/32 PASS（含 4 时区、offset、本地日期时间、跨本地日边界）。
+- `:app:testDebugUnitTest`：PASS；`:app:lintDebug`：PASS（0 error）；`assembleDebug`：PASS。
+- Room schema `app/schemas/.../3.json` 已由 KSP 生成并核对；生产源码不再以东八区固定时区解析新起卦。
+
+### Act / Re-Check
+
+- 首版跨日断言误把 UTC 与洛杉矶日期直接作对象相等，修正为各自明确的本地日期时间后复检通过。
+- 11A 验收达标，进入 11B：真实 `LockedCompassSnapshot` 与 Room 空间快照字段。

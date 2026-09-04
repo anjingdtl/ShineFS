@@ -24,6 +24,10 @@ data class LockedReading(
     val stability: String,
     val accuracy: String,
     val magneticAccuracy: String = "",
+    /** 定盘时设备时区；空间快照与时间演算共用该 zone。 */
+    val zoneId: String? = null,
+    val localDateTime: String? = null,
+    val utcOffsetMinutes: Int? = null,
 )
 
 /**
@@ -34,8 +38,10 @@ data class LockedReading(
 class DivinationServiceV2(
     private val repository: CaseRepository,
     private val composer: AdvisoryComposer = AdvisoryComposer(),
-    private val timeZone: TimeZone = TimeZone.getTimeZone("Asia/Shanghai"),
+    /** 测试或历史复算可注入固定时区；生产默认每次读取设备当前时区。 */
+    private val timeZone: TimeZone? = null,
     private val dayBoundaryPolicy: DayBoundaryPolicy = DayBoundaryPolicy.CIVIL_MIDNIGHT,
+    private val timeZoneProvider: () -> TimeZone = { TimeZone.getDefault() },
 ) {
     private val timeResolver = YijingTimeResolver(TableChineseCalendarProvider())
     private val spaceRule = TimeCastWithSpatialResponse()
@@ -47,7 +53,7 @@ class DivinationServiceV2(
         houseAuditId: String? = null,
         atMillis: Long = System.currentTimeMillis(),
     ): DivinationCase {
-        val time = timeResolver.resolve(atMillis, timeZone, dayBoundaryPolicy)
+        val time = timeResolver.resolve(atMillis, currentTimeZone(), dayBoundaryPolicy)
         val result = timeRule.cast(time)
         return save(result, scene, houseAuditId, DivinationCase.CAST_MODE_TIME, null)
     }
@@ -58,11 +64,21 @@ class DivinationServiceV2(
         scene: SceneType,
         houseAuditId: String? = null,
     ): DivinationCase {
-        val time = timeResolver.resolve(reading.timestamp, timeZone, dayBoundaryPolicy)
-        val compassState = com.shinefs.core.compass.CompassEngine().apply {
-            repeat(40) { onAzimuth(reading.azimuth, 0f, 0f) }
-        }.state
-        val space = YijingSpaceContextFactory.fromCompassState(compassState)!!
+        val time = timeResolver.resolve(
+            reading.timestamp,
+            reading.zoneId?.let(TimeZone::getTimeZone) ?: currentTimeZone(),
+            dayBoundaryPolicy,
+        )
+        val space = YijingSpaceContextFactory.fromLegacyReading(
+            rawAzimuth = reading.azimuth,
+            smoothedAzimuth = reading.azimuth,
+            facingMountain = reading.facingMountain,
+            sittingMountain = reading.sittingMountain,
+            facingTrigram = reading.facingTrigram,
+            stable = reading.stability == "良好",
+            orientationAccuracy = reading.accuracy,
+            magneticAccuracy = reading.magneticAccuracy,
+        ) ?: error("时空起卦缺少有效的定盘读数")
         val result = spaceRule.cast(YijingMomentContext(time, space, null, reading.timestamp))
         return save(result, scene, houseAuditId, DivinationCase.CAST_MODE_TIME_SPACE, reading)
     }
@@ -101,6 +117,8 @@ class DivinationServiceV2(
             changedHexagramName = result.changed.chineseName,
             castMode = castMode,
             zoneId = t.zoneId,
+            utcOffsetMinutes = t.utcOffsetMinutes,
+            localDateTime = t.localDateTime,
             calendarVersion = t.calendarVersion,
             ruleVersion = result.rule.version,
             classicCorpusVersion = CanonicalCorpus.version,
@@ -134,6 +152,8 @@ class DivinationServiceV2(
         repository.save(case)
         return case
     }
+
+    private fun currentTimeZone(): TimeZone = timeZone ?: timeZoneProvider()
 
     /** 按原起卦四数离线复算（方案 §28：旧卦可按原规则版本复算）。 */
     fun recomputeTrace(case: DivinationCase): String? {

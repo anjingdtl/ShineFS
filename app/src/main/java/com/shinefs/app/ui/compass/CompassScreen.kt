@@ -114,6 +114,12 @@ fun CompassScreen(
     fun doLock() {
         val az = liveAzimuth ?: return
         val o = runCatching { Orientation.fromAzimuth(az) }.getOrNull() ?: return
+        val timestamp = System.currentTimeMillis()
+        val lockedTime = AppGraph.timeResolver.resolve(
+            timestamp,
+            AppGraph.timeZone,
+            AppGraph.dayBoundaryPolicy(),
+        )
         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         locked = LockedReading(
             azimuth = az,
@@ -121,10 +127,13 @@ fun CompassScreen(
             sittingMountain = o.sittingMountain,
             facingTrigram = o.facingTrigram.chineseName,
             facingElement = o.facingElement,
-            timestamp = System.currentTimeMillis(),
+            timestamp = timestamp,
             stability = compass.stability.label,
             accuracy = compass.orientationAccuracy.label,
             magneticAccuracy = compass.magneticAccuracy.label,
+            zoneId = lockedTime.zoneId,
+            localDateTime = lockedTime.localDateTime,
+            utcOffsetMinutes = lockedTime.utcOffsetMinutes,
         )
         sealVisible = true
     }
@@ -188,7 +197,7 @@ fun CompassScreen(
         val lk = locked
         if (lk != null) {
             Text(
-                text = "已定盘 · ${SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(lk.timestamp))}",
+                text = "已定盘 · ${lk.localDateTime?.replace('T', ' ') ?: formatLocalTime(lk.timestamp, lk.zoneId)}",
                 color = ShineColors.CinnabarBright,
                 fontSize = 12.sp,
                 modifier = Modifier
@@ -218,6 +227,7 @@ fun CompassScreen(
             StatusRow("日干支", timeCtx?.dayGanzhi?.name ?: "…")
             StatusRow("时辰", timeCtx?.shichen?.display ?: "…")
             StatusRow("节气", timeCtx?.solarTerm?.term?.chinese ?: "…")
+            StatusRow("时区", timeCtx?.let { "${it.zoneId} · UTC${offsetLabel(it.utcOffsetMinutes)}" } ?: "…")
         }
         Spacer(Modifier.height(12.dp))
 
@@ -439,4 +449,16 @@ fun stabilityLabel(s: StabilityLevel): String = when (s) {
     StabilityLevel.UNSTABLE -> "不稳定（请持稳手机）"
     StabilityLevel.FAIR -> "一般"
     StabilityLevel.GOOD -> "良好 · 可定盘"
+}
+
+private fun formatLocalTime(timestamp: Long, zoneId: String?): String {
+    val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT)
+    format.timeZone = java.util.TimeZone.getTimeZone(zoneId ?: AppGraph.timeZone.id)
+    return format.format(Date(timestamp))
+}
+
+private fun offsetLabel(minutes: Int): String {
+    val sign = if (minutes >= 0) "+" else "-"
+    val absolute = kotlin.math.abs(minutes)
+    return "$sign${absolute / 60}:${(absolute % 60).toString().padStart(2, '0')}"
 }
